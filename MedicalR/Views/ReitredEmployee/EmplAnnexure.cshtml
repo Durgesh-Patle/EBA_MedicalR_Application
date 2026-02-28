@@ -1,0 +1,92 @@
+﻿@model MedicalR.Models.RetiredEmployee.RetiredempTransModel
+@{
+    ViewBag.Title = "EmplAnnexure";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Annexure </strong></a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            @*<li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/Trans_RetiredEmp">Statistics</a> </li>*@
+            <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong> Annexure </strong></a> </li>
+
+        </ul>
+        <hr class="m-0">
+    </div>
+    <br>
+    <br />
+    <div class="row">
+        <div class="form-group col-md-6"></div>
+        <div class="form-group col-md-4"></div>
+        <button type="button" class="btn btn-primary" id="exportSubmit">ExportToExcel</button>
+    </div>
+    <br />
+    <form>
+        <div class="col-md-12">
+
+        </div>
+        <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th class="th-sm">Empl Code</th>
+                    <th class="th-sm">Name</th>
+                    <th class="th-sm">From Year</th>
+                    <th class="th-sm">To Year</th>
+                    <th class="th-sm">Bank Name</th>
+                    <th class="th-sm">Account.No</th>
+                    <th class="th-sm">IfSC Code</th>
+                    @*<th class="th-sm">Option</th>*@
+                    <th class="th-sm">Amount</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.EmplSanc_list)
+                {
+                    <tr>
+
+                        <td>@item.Empcd</td>
+                        <td>@item.Name</td>
+                        <td>@item.yearfrom</td>
+                        <td>@item.yearto</td>
+                        <td>@item.bankname</td>
+                        <td>@item.accno</td>
+                        <td>@item.ifsccode</td>
+                        @*<td>@item.option</td>*@
+                        <td>@item.sanc_amt</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="row">
+            <input type="hidden" id="lotno" value="@Model.lot_no" />
+        </div>
+    </form>
+    <form id="exportData" action="/ReitredEmployee/AnnexExportToExcel" style="display:none">
+        <input type="text" value="" name="lotno" />
+
+    </form>
+</article>
+<script>
+    $(document).ready(function () {
+        $("#exportSubmit").click(function () {
+
+            
+            var lotno = $("#lotno").val();
+
+            $("#exportData input[name=lotno]").val(lotno);
+
+            $("#exportData").submit();
+        })
+    });
+</script>
+

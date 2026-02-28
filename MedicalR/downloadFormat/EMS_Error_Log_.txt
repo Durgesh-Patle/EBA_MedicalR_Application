@@ -1,0 +1,168 @@
+29-Jul-21 15:46:20	email body :<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <span style="font-family:Arial;font-size:10pt">
+        Dear Sir/Madam,<br /><br />
+        Your VHS reimbursement claim is processed for the year #{yearfrom}-#{yearto}.<br/>
+        the amount will be credited to your bank account with 2 working days.<br/><br/>
+For any further query please write to following email id sarang
+      <br/>koshe@uti.co.in
+     <br/>kiran.hemrajani@uti.co.in
+        <br /><br />
+        Thanks<br />
+        UTIAMC LTD.
+        <br />
+        <i>This is a system generated mail.</i>
+
+</body>
+</html>
+29-Jul-21 15:51:23	email body :<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <span style="font-family:Arial;font-size:10pt">
+        Dear Sir/Madam,<br /><br />
+        Your VHS reimbursement claim is processed for the year #{yearfrom}-#{yearto}.<br/>
+        the amount will be credited to your bank account with 2 working days.<br/><br/>
+For any further query please write to following email id sarang
+      <br/>koshe@uti.co.in
+     <br/>kiran.hemrajani@uti.co.in
+        <br /><br />
+        Thanks<br />
+        UTIAMC LTD.
+        <br />
+        <i>This is a system generated mail.</i>
+
+</body>
+</html>
+31-Jul-21 11:39:49	email body :<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <span style="font-family:Arial;font-size:10pt">
+        Dear Sir/Madam,<br /><br />
+        Your VHS reimbursement claim is processed for the year #{yearfrom}-#{yearto}.<br/>
+        the amount will be credited to your bank account with 2 working days.<br/><br/>
+For any further query please write to following email id sarang
+      <br/>koshe@uti.co.in
+     <br/>kiran.hemrajani@uti.co.in
+        <br /><br />
+        Thanks<br />
+        UTIAMC LTD.
+        <br />
+        <i>This is a system generated mail.</i>
+
+</body>
+</html>
+31-Jul-21 11:44:39	email body :<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <span style="font-family:Arial;font-size:10pt">
+        Dear Sir/Madam,<br /><br />
+        Your VHS reimbursement claim is processed for the year #{yearfrom}-#{yearto}.<br/>
+        the amount will be credited to your bank account with 2 working days.<br/><br/>
+For any further query please write to following email id sarang
+      <br/>koshe@uti.co.in
+     <br/>kiran.hemrajani@uti.co.in
+        <br /><br />
+        Thanks<br />
+        UTIAMC LTD.
+        <br />
+        <i>This is a system generated mail.</i>
+
+</body>
+</html>
+31-Jul-21 11:45:27	email body :<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <span style="font-family:Arial;font-size:10pt">
+        Dear Sir/Madam,<br /><br />
+        Your VHS reimbursement claim is processed for the year #{yearfrom}-#{yearto}.<br/>
+        the amount will be credited to your bank account with 2 working days.<br/><br/>
+For any further query please write to following email id sarang
+      <br/>koshe@uti.co.in
+     <br/>kiran.hemrajani@uti.co.in
+        <br /><br />
+        Thanks<br />
+        UTIAMC LTD.
+        <br />
+        <i>This is a system generated mail.</i>
+
+</body>
+</html>
+31-Jul-21 11:47:30	email body :<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <span style="font-family:Arial;font-size:10pt">
+        Dear Sir/Madam,<br /><br />
+        Your VHS reimbursement claim is processed for the year #{yearfrom}-#{yearto}.<br/>
+        the amount will be credited to your bank account with 2 working days.<br/><br/>
+For any further query please write to following email id sarang
+      <br/>koshe@uti.co.in
+     <br/>kiran.hemrajani@uti.co.in
+        <br /><br />
+        Thanks<br />
+        UTIAMC LTD.
+        <br />
+        <i>This is a system generated mail.</i>
+
+</body>
+</html>
+31-Jul-21 11:53:21	email body :<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <span style="font-family:Arial;font-size:10pt">
+        Dear Sir/Madam,<br /><br />
+        Your VHS reimbursement claim is processed for the year #{yearfrom}-#{yearto}.<br/>
+        the amount will be credited to your bank account with 2 working days.<br/><br/>
+For any further query please write to following email id sarang
+      <br/>koshe@uti.co.in
+     <br/>kiran.hemrajani@uti.co.in
+        <br /><br />
+        Thanks<br />
+        UTIAMC LTD.
+        <br />
+        <i>This is a system generated mail.</i>
+
+</body>
+</html>
+31-Jul-21 11:56:35	email body :<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    <span style="font-family:Arial;font-size:10pt">
+        Dear Sir/Madam,<br /><br />
+        Your VHS reimbursement claim is processed for the year #{yearfrom}-#{yearto}.<br/>
+        the amount will be credited to your bank account with 2 working days.<br/><br/>
+For any further query please write to following email id sarang
+      <br/>koshe@uti.co.in
+     <br/>kiran.hemrajani@uti.co.in
+        <br /><br />
+        Thanks<br />
+        UTIAMC LTD.
+        <br />
+        <i>This is a system generated mail.</i>
+
+</body>
+</html>

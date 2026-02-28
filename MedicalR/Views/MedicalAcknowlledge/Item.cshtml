@@ -1,0 +1,72 @@
+﻿
+@{
+    ViewBag.Title = "Item";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .headerstatics {
+        margin-top: 45px;
+    }
+</style>
+<!--Header end-->
+<div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 headerstatics">
+                <ul class="nav">
+                    <li class="nav-item"> <a class="nav-link" href="Request Form.html">Statistics</a> </li>
+                    <li class="nav-item"> <a class="nav-link text-dark" href="Application Form.html"><strong>Acknowledge Form</strong></a> </li>
+                </ul>
+                <hr class="m-0">
+            </div>
+            <article class="col-md-12">
+                <div class="row pt-2 bg-light"> </div>
+                <div class="row">
+                    <div class="col-md-3 shadow p-0">
+                        <hr class="mb-0 mt-0 border-top-0">
+                        @{
+                            Html.RenderPartial("_EmployeeSideBar");
+                        }
+
+                    </div>
+                    <div class="col-md-9 mt-3">
+                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+
+                            <li class="nav-item" role="presentation"> <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#one" role="tab" aria-controls="two" aria-selected="true">New Request</a> </li>
+                            <li class="nav-item" role="presentation"> <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#two" role="tab" aria-controls="six" aria-selected="false">Attachments</a> </li>
+                        </ul>
+                        <div class="tab-content" id="pills-tabContent">
+                            <hr>
+                            <!--<div class="tab-pane fade show active" id="one" role="tabpanel" aria-labelledby="pills-home-tab">New Request</div>-->
+                            @*-------------------New Request tab started--------------------*@
+
+                            <div class="tab-pane fade show active" id="one" role="tabpanel" aria-labelledby="one">
+                                @{
+                                    Html.RenderPartial("_AckNewRequest");
+                                }
+
+                            </div>
+                            @*---------------------New Request tab end here-------------------*@
+                            <div class="tab-pane fade show" id="two" role="tabpanel" aria-labelledby="two">
+                                @{
+                                    Html.RenderPartial("_Attachment");
+                                }
+
+                            </div>
+                            @*-------------------------Notes tab start here-----------------------*@
+                            @*-------------------------Notes tab end here--------------------------*@
+                            @*-------------------------Attachment tab start here---------------------*@
+                            @*-------------------------attachment tab end here----------------------*@
+                        </div>
+                    </div>
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</div>
+

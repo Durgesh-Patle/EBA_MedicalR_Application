@@ -1,0 +1,224 @@
+﻿@model MedicalR.Models.MedicalBillsException.HospitilizationCr
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label for="">Appln.No</label>
+        <input type="text" class="form-control" id="appln_no" value="@Model.appln_no">
+    </div>
+    <div class="form-group col-md-6">
+        <label for="">Date of Request</label>
+        @*<input type="text" class="form-control" id="date_of_request" value="@Model.date_of_request">*@
+        @Html.TextBoxFor(m => @Model.date_of_request, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label for="">Band Group</label>
+        <input type="text" class="form-control" id="band_group" value="@Model.band_group">
+    </div>
+    <div class="form-group col-md-6">
+        <label for="">Relationship</label>
+        <input type="text" class="form-control" id="relationship" value="@Model.relationship">
+    </div>
+
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label for="">Nature of Illness:</label>
+        <input type="text" class="form-control" id="nature_of_illness" value="@Model.nature_of_illness">
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-2">
+        <label for="">Treatment Type:</label>
+
+    </div>
+    <div class="form-group col-md-2">
+
+        <input type="text" class="form-control" id="treatment_type" value="@Model.treatment_type">
+    </div>
+    <div class="form-group col-md-2">
+        <label for="">From Date:</label>
+
+    </div>
+    <div class="form-group col-md-2">
+
+        <input type="text" class="form-control" id="from_date" value="@Model.from_date">
+    </div>
+    <div class="form-group col-md-2">
+        <label for="">To Date:</label>
+
+    </div>
+    <div class="form-group col-md-2">
+
+        <input type="text" class="form-control" id="to_date" value="@Model.to_date">
+    </div>
+
+
+</div>
+
+<div class="form-row">
+    <div class="form-group col-md-2">
+        <label for="">Name of Hospital:</label>
+
+    </div>
+    <div class="form-group col-md-2">
+
+        <input type="text" class="form-control" id="name_of_hospital" value="@Model.name_of_hospital">
+    </div>
+    <div class="form-group col-md-2">
+        <label for="">Bill No:</label>
+
+    </div>
+    <div class="form-group col-md-2">
+
+        <input type="text" class="form-control" id="bill_no" value="@Model.bill_no">
+    </div>
+    <div class="form-group col-md-2">
+        <label for="">Bill Date:</label>
+
+    </div>
+    <div class="form-group col-md-2">
+
+        <input type="text" class="form-control" id="bill_date" value="@Model.bill_date">
+    </div>
+
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-2"></div>
+    <div class="form-group col-md-5">
+        <label for="">Whether Hospital Awarded I.T.Rebate Certificate:</label>
+
+    </div>
+    <div class="form-group col-md-2">
+
+        <select class="form-control" id="wheather_hospital_awarded_i_t_rebate">
+            <option>@Model.wheather_hospital_awarded_i_t_rebate</option>
+           
+        </select>
+    </div>
+
+</div>
+<hr />
+
+
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="">Gross Bill Amount in Rs.:</label>
+
+    </div>
+    <div class="form-group col-md-4">
+
+        <input type="text" class="form-control" id="gross_bill_amount_in_rs" placeholder="Enter Amount" value="@Model.gross_bill_amount_in_rs">
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="">Amount Paid to Hospital in Rs.:</label>
+
+    </div>
+    <div class="form-group col-md-4">
+
+        <input type="text" class="form-control" id="amount_paid_to_hospital_in_rs" placeholder="Enter Amount" value="@Model.amount_paid_to_hospital_in_rs">
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="">Amount Approved / Sanctioned TMS Rs.:</label>
+
+    </div>
+    <div class="form-group col-md-4">
+
+        <input type="text" class="form-control" id="amount_approved_sanction_tms_rs" placeholder="Enter Amount" value="@Model.amount_approved_sanction_tms_rs">
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="">Amount Approved / Sanctioned MAF Rs.:</label>
+
+    </div>
+    <div class="form-group col-md-4">
+
+        <input type="text" class="form-control" id="amount_approved_sanction_maf_rs" placeholder="Enter Amount" value="@Model.amount_approved_sanction_maf_rs">
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="">Additional Sanction in Rs.:</label>
+
+    </div>
+    <div class="form-group col-md-4">
+
+        <input type="text" class="form-control" id="addl_sanction_in_rs" placeholder="Enter Amount">
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="">Amount to be Recover from Empl. in Rs.:</label>
+
+    </div>
+    <div class="form-group col-md-4">
+
+        <input type="text" class="form-control" id="amount_to_recover_from_empl" placeholder="">
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="">Recovery installment/Period:</label>
+
+    </div>
+    <div class="form-group col-md-4">
+
+        <input type="text" class="form-control" id="recovery_installment_period" onchange="check()"  placeholder="">
+    </div>
+
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="">EMI:</label>
+
+    </div>
+    <div class="form-group col-md-4">
+
+        <input type="text" class="form-control" id="emi" placeholder="" readonly>
+    </div>
+
+</div>
+<h6 class="pt-3"><strong>Application Status - Information</strong></h6>
+
+<div class="form-row">
+
+    <div class="form-group col-md-3">
+        <label for="">Send Date To TMO:</label>
+
+    </div>
+    <div class="form-group col-md-3">
+
+        <input type="text" class="form-control" id="send_date_to_tmo" value="@Model.send_date_to_tmo">
+    </div>
+    <div class="form-group col-md-3">
+        <label for="">Received Date from TMO:</label>
+
+    </div>
+    <div class="form-group col-md-3">
+
+        <input type="text" class="form-control" id="received_date_from_tmo" value="@Model.received_date_from_tmo">
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="form-group col-md-2"></div>
+    <div class="form-group col-md-4"> <a href="" class="btn btn-primary">Save for Later</a>  </div>
+    <div class="form-group col-md-4"> <a href="javascript:void(0)" class="btn btn-primary" id="Approved" data-val="1">Submit & Approved <span class="spinner"></span></a>  </div>
+   
+</div>

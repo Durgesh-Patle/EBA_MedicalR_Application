@@ -1,0 +1,95 @@
+﻿@model IEnumerable<MedicalR.Models.RetiredEmployee.RetiredempTransModel>
+
+@{
+    ViewBag.Title = "Trans_RetiredEmp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link text-dark" href="#"><strong>Statistics</strong></a> </li>
+        <li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/Trans_RetiredEmp/0/add">Transaction For Retired Employees</a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item"> <a class="nav-link text-dark" href="#"><strong>Statistics</strong></a> </li>
+            <li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/Trans_RetiredEmp/0/add">Transaction For Retired Employees</a> </li>
+        </ul>
+        <hr class="m-0">
+        <a href="/ReitredEmployee/Trans_RetiredEmp/0/add" class="btn btn-secondary plusbut float-right ml-1">+</a>
+    </div>
+    <div class="pt-3">
+        @* <div id="sidemain" class="float-left pl-1"> <span class="btn btn-primary" style="cursor:pointer" onclick="openNav()"><i class="fa fa-search text-light mr-3"></i> FILTER BY</span> </div>*@
+        <div class="">
+
+        </div>
+    </div>
+    <br />
+    <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th class="th-sm">EmpID</th>
+                <th class="th-sm">Name</th>
+                <th class="th-sm">Request Date</th>
+                <th class="th-sm">Sanc.Amt</th>
+                <th class="th-sm">From Year</th>
+                <th class="th-sm">To Year</th>
+
+                @*<th class="th-sm text-right">Action</th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Empcd</td>
+                    <td><span style="cursor:pointer" onclick="openBar()"></span> <a href="/ReitredEmployee/Trans_RetiredEmp/@item.Id/@item.Empcd/edit">@item.Name</a></td>
+                    <td>@Html.Label(item.req_date.ToString())</td>
+                    <td>@item.sanc_amt</td>
+                    <td>@item.yearfrom</td>
+                    <td>@item.yearto</td>
+                    @*<td>
+                            <select class="custom-select dropright sel" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                                <option selected>Select </option>
+                                <option value="/ReitredEmployee/Trans_RetiredEmp/@item.Id/edit">Edit</option>
+                                <option value="/ReitredEmployee/Trans_RetiredEmp/@item.Id/edit">Delete</option>
+
+                            </select>
+                        </td>*@
+                </tr>
+            }
+        </tbody>
+    </table>
+</article>
+
+@*<script>
+        $(document).ready(function () {
+            $('#dtBasicExample').DataTable();
+            $('.dataTables_length').addClass('bs-select');
+        });
+    </script>*@
+
+
+@section Scripts {
+    <script>
+        $(function () {
+
+            if ($.fn.DataTable.isDataTable('#dtBasicExample')) {
+                $('#dtBasicExample').DataTable().destroy();
+            }
+
+            $('#dtBasicExample').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                lengthChange: true
+            });
+
+        });
+    </script>
+}
+

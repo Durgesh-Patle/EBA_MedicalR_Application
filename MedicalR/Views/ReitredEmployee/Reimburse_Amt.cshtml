@@ -1,0 +1,92 @@
+﻿@model IEnumerable<MedicalR.Models.RetiredEmployee.ReimburseAmtModel>
+
+@{
+    ViewBag.Title = "Reimburse_Amt";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<article class="col-md-12">
+    <br />
+    <br />
+
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item"> <a class="nav-link text-dark" href="#"><strong>Statistics</strong></a> </li>
+            <li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/Reimburse_Amt/0/add">Reimbursement Amount Master</a> </li>
+        </ul>
+        <hr class="m-0">
+    </div>
+    <div class="pt-3">
+        <div class="">
+            <select class="custom-select col-sm-2" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                <option selected>Action</option>
+                <option value="">Print</option>
+                <option value="">Export To Excel</option>
+                <option value="">Export To Pdf</option>
+            </select>
+            <a href="/ReitredEmployee/Reimburse_Amt/0/add" class="btn btn-secondary plusbut float-right ml-1">+</a>
+        </div>
+    </div>
+    <br />
+    <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th class="th-sm">Sr.No</th>
+                <th class="th-sm">Financial Year</th>
+                <th class="th-sm">Amount</th>
+                <th class="th-sm text-right">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Finyear</td>
+                    <td>@item.Amount</td>
+                    <td>
+                        <select class="custom-select dropright sel" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                            <option selected>Select </option>
+                            <option value="/ReitredEmployee/Reimburse_Amt/@item.Id/edit">Edit</option>
+                            <option value="/ReitredEmployee/Reimburse_Amt/@item.Id/edit">Delete</option>
+
+                        </select>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.Count() == 0)
+    {
+        <div class="no-data-found">No Data Found</div>
+    }
+</article>
+
+@*<script>
+        $(document).ready(function () {
+            $('#dtBasicExample').DataTable();
+            $('.dataTables_length').addClass('bs-select');
+        });
+    </script>*@
+
+@section Scripts {
+    <script>
+        $(function () {
+
+            if ($.fn.DataTable.isDataTable('#dtBasicExample')) {
+                $('#dtBasicExample').DataTable().destroy();
+            }
+
+            $('#dtBasicExample').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                lengthChange: true
+            });
+
+        });
+    </script>
+}
+

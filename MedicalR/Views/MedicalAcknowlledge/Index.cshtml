@@ -1,0 +1,212 @@
+﻿@{
+    ViewBag.Title = "Acknowledge Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Acknowledge Form</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+
+            <div class="pt-3">
+                <select id="actionDropdown" class="custom-select col-sm-2">
+                    <option value="0">Select</option>
+                    <option value="1">Acknowledge</option>
+                </select>
+            </div>
+
+            <table id="table_id" class="table table-hover table-bordered" width="100%">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll">
+                        </th>
+                        <th>Appln.No</th>
+                        <th>Employee Code</th>
+                        <th>Name of Employee</th>
+                        <th>Name Of Patient</th>
+                        <th>Relationship</th>
+                        <th>Total Claimed Rs.</th>
+                        <th>Enclosure</th>
+                        <th>Form</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </article>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    var ackGridDetails = [];
+
+    $(document).ready(function () {
+
+        loadAcknowledgeGrid();
+
+        // Select All Checkbox
+        $('#selectAll').on('click', function () {
+            var isChecked = $(this).is(':checked');
+
+            $('#table_id tbody input[type="checkbox"]').prop('checked', isChecked);
+
+            ackGridDetails.forEach(function (item) {
+                item.is_acknowledged = isChecked;
+            });
+        });
+
+        // Row Checkbox Change
+        $('#table_id tbody').on('change', '.rowCheckbox', function () {
+
+            var id = parseInt($(this).val());
+            var isChecked = $(this).is(':checked');
+
+            var record = ackGridDetails.find(x => x.id === id);
+            if (record) {
+                record.is_acknowledged = isChecked;
+            }
+
+            // Update Select All checkbox state
+            var total = $('.rowCheckbox').length;
+            var checked = $('.rowCheckbox:checked').length;
+
+            $('#selectAll').prop('checked', total === checked);
+        });
+
+        // Dropdown Action
+        $('#actionDropdown').on('change', function () {
+
+            var actionId = parseInt($(this).val());
+
+            if (actionId === 1) {
+                startAcknowledge();
+            }
+        });
+
+    });
+
+    // Load Grid
+    function loadAcknowledgeGrid() {
+
+        $.ajax({
+            url: '/MedicalAcknowlledge/GetAcknowledgeGridData/',
+            type: 'POST',
+            dataType: 'json',
+            success: function (response) {
+
+                if (!response || response.length === 0) {
+                    //alert("No data found.");
+                    return;
+                }
+
+                ackGridDetails = response;
+
+                initializeDataTable(response);
+            },
+            error: function () {
+                alert("Error loading data.");
+            }
+        });
+    }
+
+    // Initialize DataTable
+    function initializeDataTable(data) {
+
+        if ($.fn.DataTable.isDataTable('#table_id')) {
+            $('#table_id').DataTable().clear().destroy();
+        }
+
+        $('#table_id').DataTable({
+            lengthChange: true,
+            lengthMenu: [[10, 15, 20, -1], [10, 15, 20, "All"]],
+            searching: true,
+            ordering: true,
+            paging: true,
+            data: data,
+            columns: [
+                {
+                    data: 'id',
+                    render: function (data) {
+                        return '<input type="checkbox" class="rowCheckbox" value="' + data + '">';
+                    },
+                    orderable: false
+                },
+                { data: 'appln_no' },
+                { data: 'employeecode' },
+                { data: 'employeename' },
+                { data: 'patient_name' },
+                { data: 'family_relation_code' },
+                {
+                    data: 'total_claimed_rs',
+                    render: function (data) {
+                        return data ? parseFloat(data).toFixed(2) : '0.00';
+                    }
+                },
+                { data: 'enclosure' },
+                {
+                    data: 'id',
+                    render: function (data, type, row) {
+                        if (row.is_saveforletter) {
+                            return "";
+                        } else {
+                            return '<a href="/MedicalRequest/download/' + data + '">Download</a>';
+                        }
+                    }
+                }
+            ]
+        });
+    }
+
+    // Start Acknowledge Process
+    function startAcknowledge() {
+
+        var selectedRecords = ackGridDetails.filter(x => x.is_acknowledged);
+
+        if (selectedRecords.length === 0) {
+            alert("Please select at least 1 record!");
+            $('#actionDropdown').val("0");
+            return;
+        }
+
+        var confirmMsg = "You have selected " + selectedRecords.length +
+            " record(s) to acknowledge. Do you want to continue?";
+
+        if (!confirm(confirmMsg)) {
+            $('#actionDropdown').val("0");
+            return;
+        }
+
+        $.ajax({
+            url: '/MedicalAcknowlledge/AcknowledgeStart/',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ model: selectedRecords }),
+            success: function (response) {
+
+                alert(response);
+
+                window.location.href = '/MedicalAcknowlledge';
+            },
+            error: function () {
+                alert("Error while acknowledging records.");
+            }
+        });
+    }
+
+</script>

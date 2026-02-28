@@ -1,0 +1,142 @@
+﻿@model MedicalR.Models.CHC.CHCBillProcess
+<form>
+    @if (Model.relationship == "Self and Spouse")
+    {
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Employee ID: </label>
+                <input type="text" hidden class="form-control" readonly id="emplid" value="@Model.emplid">
+                <input type="text" class="form-control" readonly id="employeecode" value="@Model.employeecode">
+            </div>
+
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Employee Name: </label>
+                <input type="text" class="form-control" readonly id="employee_name" value="@Model.employee_name">
+            </div>
+            <div class="form-group col-md-4">
+
+                <label for="">Name of CHC Center:</label>
+                <select class="form-control" id="chc_centerid" disabled>
+                    <option value="@Model.chc_centerid">@Model.hosname</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Bill No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="bill_no">
+
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Amount: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="amount">
+
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Name of Spouse: </label>
+                <input type="text" class="form-control" readonly id="name_of_spouse" value="@Model.name_of_spouse">
+            </div>
+            <div class="form-group col-md-4">
+
+                <label for="">Name of CHC Center:</label>
+                <select class="form-control" id="spouse_chc_centerid" disabled>
+                    <option value="@Model.spouse_chc_centerid">@Model.phosname</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for=""> Spouse Bill No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="spouse_bill_no">
+
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Spouse Amount: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="spouse_amount">
+            </div>
+        </div>
+
+    }
+    @if (Model.relationship == "self")
+    {
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Employee ID: </label>
+                <input type="text" hidden class="form-control" readonly id="emplid" value="@Model.emplid">
+                <input type="text" class="form-control" readonly id="employeecode" value="@Model.employeecode">
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Employee Name: </label>
+                <input type="text" class="form-control" readonly id="employee_name" value="@Model.employee_name">
+            </div>
+            <div class="form-group col-md-4">
+
+                <label for="">Name of CHC Center:</label>
+                <select class="form-control" id="chc_centerid" disabled>
+                    <option value="@Model.chc_centerid">@Model.hosname</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Bill No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="bill_no">
+
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Amount: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="amount">
+
+            </div>
+        </div>
+    }
+
+    @if (Model.relationship == "spouse")
+    {
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Employee ID: </label>
+                <input type="text" hidden class="form-control" readonly id="emplid" value="@Model.emplid">
+                <input type="text" class="form-control" readonly id="employeecode" value="@Model.employeecode">
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Name of Spouse: </label>
+                <input type="text" class="form-control" id="name_of_spouse" readonly value="@Model.name_of_spouse">
+            </div>
+            <div class="form-group col-md-4">
+
+                <label for="">Name of CHC Center:</label>
+                <select class="form-control" id="spouse_chc_centerid" disabled>
+                    <option value="@Model.spouse_chc_centerid">@Model.phosname</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for=""> Spouse Bill No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="spouse_bill_no">
+
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Spouse Amount: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="spouse_amount">
+
+            </div>
+
+        </div>
+    }
+
+    <div class="row">
+        <input type="text" hidden class="form-control" id="relationship" value="@Model.relationship">
+        <div class="form-group col-md-4"></div>
+        <div class="form-group col-md-4">
+            @*<button type="button" class="btn btn-primary" id="Approve" data-val="1">Process for Payment<span class="spinner"></span></button>*@
+             <a href="javascript:void(0)" class="btn btn-primary" id="Approve" data-val="1">Process for Payment<span class="spinner"></span></a>
+        </div>
+        <div class="form-group col-md-4"> <a href="javascript:void(0)" class="btn btn-primary" id="Hold" data-val="1">On Hold<span class="spinner"></span></a> </div>
+
+    </div>
+
+</form>

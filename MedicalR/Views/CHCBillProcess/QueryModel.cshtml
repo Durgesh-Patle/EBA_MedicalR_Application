@@ -1,0 +1,227 @@
+﻿@model IEnumerable<MedicalR.Models.CHC.CHCBillProcess>
+@{
+    ViewBag.Title = "Query Module";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Query Model </strong></a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item"> <a class="nav-link" href="#">Statistics ></a> </li>
+            <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Query Module </strong></a> </li>
+
+        </ul>
+        <hr class="m-0">
+    </div>
+    <br>
+    <br />
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+
+                <div class="form-group col-md-1">
+                    <label for="">Lot No:</label>
+                </div>
+                <div class="form-group col-md-2">
+                    <select class="form-control select2" id="lot_no">
+                        <option value="">Select Lot No</option>
+                        @foreach (var item in Model)
+                        {
+
+                            <option value="@item.lot_no">@item.lot_no</option>
+                        }
+                    </select>
+
+                </div>
+                &nbsp;&nbsp;
+                <div class="form-group col-md-1">
+                    <label for="">Empl Code:</label>
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="text" class="form-control" id="Empcode">
+                </div>
+
+                &nbsp;&nbsp;
+
+                @*<div class="form-group col-md-1"></div>*@
+                <div class="form-group col-md-1">
+                    <button type="button" class="btn btn-primary" onclick="ViewAnnexure()">Search</button>
+                </div>
+
+                @*<div class="form-group col-md-2">
+                        <button type="button" class="btn btn-info" onclick="Viewpending()">View Pending List</button>
+                    </div>*@
+                @*<div class="form-group col-md-1"></div>*@
+
+
+            </div>
+
+        </div>
+        <div class="col-md-12">
+            <div class="form-row">
+
+                <div class="form-group col-md-2">
+                    <button type="button" class="btn btn-primary" id="exportSubmit" onclick="ViewofficeNote()">Download Office Note</button>
+                    @*<span style="cursor:pointer" onclick="openBar()"></span> <a href="/ReitredEmployee/OfficeNote/">View Office Note</a>*@
+
+                </div>
+                <div class="form-group col-md-2">
+                    <button type="button" class="btn btn-primary" id="bankadvise" onclick="BankAdvise()">Download Bank Advise</button>
+                    @*<span style="cursor:pointer" onclick="openBar()"></span> <a href="/ReitredEmployee/OfficeNote/">View Office Note</a>*@
+
+                </div>
+
+                @*<div class="form-group col-md-1">
+                        <button type="button" class="btn btn-primary" onclick="getPDF()">Print</button>
+                    </div>*@
+            </div>
+        </div>
+        <div class="PDF">
+
+            <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th class="th-sm">Empl Code</th>
+                        <th class="th-sm">Name</th>
+                        <th class="th-sm">CHC Centres</th>
+                        <th class="th-sm">Date Of Checkup</th>
+                        <th class="th-sm">Lot No</th>
+                        <th class="th-sm">Lot Date</th>
+                        <th class="th-sm">Bill No</th>
+                        <th class="th-sm">Amount</th>
+                        <th class="th-sm">Status</th>
+
+
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </form>
+
+    <form id="exportData" action="/CHCBillProcess/Officenotepdf" style="display:none">
+        <input type="text" value="lot" name="lot" />
+        <input type="text" value="lot_no" name="lotno" />
+        @*<input type="text" value="" name="ToDate" />*@
+    </form>
+    <form id="exportData1" action="/CHCBillProcess/Bankadvicepdf" style="display:none">
+        <input type="text" value="lot" name="lot" />
+        <input type="text" value="lot_no" name="lotno" />
+        @*<input type="text" value="" name="ToDate" />*@
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" />
+
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+        integrity="sha512-BNa5lJX9X8x9m5u5hM90+hCbGyF/F7fs/3Gzdh0dX8GZFODdgNpTiFqouBZhOiCkCmZJLdnOjFkMrDXe4EAl4g=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        integrity="sha512-Aq6G2OZp+X5dE3sGmIYJ9r8tLZRxurx8WcN6iYG3wxY5E9O+V1YxDCEV4VpWwfvX2VNMeruEx+kt1Pyf4jl7JQ=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>*@
+
+
+<script src="~/Includes/js/jspdf.min.js"></script>
+
+    <script src="~/Includes/js/html2canvas.js"></script>
+<script>
+
+    function BankAdvise() {
+        var lotno = $("#lot_no").val().trim();
+        if (lotno == '') {
+            alert("Please select Lot No");
+        }
+        else {
+
+            var lots = $("#lot").val();
+            //var ToDate = $("#TO_DATE").val();
+            var lotno = $("#lot_no").val();
+            $("#exportData1 input[name=lot]").val("test");
+            $("#exportData1 input[name=lotno]").val(lotno);
+            //$("#exportData input[name=ToDate]").val(ToDate);
+            $("#exportData1").submit();
+
+            //  window.location.href = "/CHCBillProcess/BankAdvise/" + lotno;
+
+        }
+
+    }
+    function ViewofficeNote() {
+        var lotno = $("#lot_no").val().trim();
+        if (lotno == '') {
+            alert("Please select Lot No");
+        }
+        else {
+
+            var lots = $("#lot").val();
+            //var ToDate = $("#TO_DATE").val();
+            var lotno = $("#lot_no").val();
+            $("#exportData input[name=lot]").val("test");
+            $("#exportData input[name=lotno]").val(lotno);
+            //$("#exportData input[name=ToDate]").val(ToDate);
+            $("#exportData").submit();
+
+        }
+
+
+
+    }
+    function ViewAnnexure() {
+
+        var lot_no = $("#lot_no").val().trim();
+        var employee_code = $("#Empcode").val().trim();
+        //if (lot_no == '') {
+        //    alert("Please select Lot No");
+        //}
+
+        //else {
+        // var lot_no = $("#lot_no option:selected").Text().trim();
+        // if (lot_no == 0) {
+        var data = {
+
+            "lot_no": lot_no,
+            "employee_code": employee_code,
+        };
+        $.ajax({
+            url: "/CHCBillProcess/GetdatabyLotNo",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: function (result) {
+                $("#dtBasicExample tbody").empty();
+                // $("#yearto").empty();
+                if (result.length > 0) {
+                    for (var i = 0; i < result.length > 0; i++) {
+                        var row = '<tr><td> ' + result[i].employeecode + ' </td> <td> ' + result[i].employee_name + ' </td> <td> ' + result[i].hosname + ' </td><td> ' + result[i].date_of_checkup + ' </td> <td>' + result[i].lot_no + '</td> <td>' + result[i].lotdate + '</td> <td>' + result[i].bill_no + '</td> <td>' + result[i].amount + '</td><td>' + result[i].status + '</td> </tr>'
+                        $("#dtBasicExample tbody").append(row);
+                    }
+
+                }
+                else {
+                    //var row = '<tr><td> ' + "No Records found" + ' </td></tr>'
+                    ////var row = '<tr>' + "No Records found" + '</tr>'
+                    //$("#dtBasicExample tbody").append(row);
+                    alert("No Records Found ");
+                }
+
+
+            },
+
+        });
+
+
+
+        //}
+    }
+</script>

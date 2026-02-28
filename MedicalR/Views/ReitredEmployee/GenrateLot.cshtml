@@ -1,0 +1,116 @@
+﻿@model IEnumerable<MedicalR.Models.RetiredEmployee.RetiredempTransModel>
+
+@{
+    ViewBag.Title = "GenrateLot";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="javascript:void(0);">
+                        <strong>Statistics ></strong>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Lot Generation</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <div class="pt-3">
+                <select id="action_id" class="custom-select col-sm-2">
+                    <option value="0">Select</option>
+                    <option value="1">Generate Lot</option>
+                </select>
+            </div>
+
+            <table id="lotTable" class="table table-hover table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="chkAll">
+                        </th>
+                        <th>Emp Code</th>
+                        <th>Name</th>
+                        <th>Sanc. Amt</th>
+                        <th>Request Date</th>
+                        <th>Bank Name</th>
+                        <th>Account No</th>
+                        <th>IFSC Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="rowChk"
+                                       data-id="@item.Id" />
+                            </td>
+                            <td>@item.Empcd</td>
+                            <td>@item.Name</td>
+                            <td>@item.sanc_amt</td>
+                            @*<td>@item.req_date.ToString("dd-MMM-yyyy")</td>*@
+                            <td>@item.req_date</td>
+                            <td>@item.bankname</td>
+                            <td>@item.accno</td>
+                            <td>@item.ifsccode</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </article>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        // Select All Checkbox
+        $("#chkAll").on("change", function () {
+            $(".rowChk").prop("checked", $(this).is(":checked"));
+        });
+
+        // Dropdown Change
+        $("#action_id").on("change", function () {
+
+            var actionId = $(this).val();
+
+            if (actionId == "1") {
+
+                var selectedRows = [];
+
+                $(".rowChk:checked").each(function () {
+                    selectedRows.push({
+                        Id: $(this).data("id")
+                    });
+                });
+
+                if (selectedRows.length === 0) {
+                    toastr.error("Please select at least 1 record!");
+                    $("#action_id").val("0");
+                    return;
+                }
+
+                $.ajax({
+                    url: "/ReitredEmployee/LotGenerationStart",
+                    type: "POST",
+                    data: JSON.stringify({ model: selectedRows }),
+                    contentType: "application/json",
+                    success: function (response) {
+                        toastr.success(response);
+                        location.reload();
+                    },
+                    error: function () {
+                        toastr.error("Something went wrong!");
+                    }
+                });
+            }
+        });
+    });
+</script>

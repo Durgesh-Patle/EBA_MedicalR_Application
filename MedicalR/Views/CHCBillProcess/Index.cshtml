@@ -1,0 +1,135 @@
+﻿@model IEnumerable<MedicalR.Models.CHC.CHCBillProcess>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+                <li class="nav-item"> <a class="nav-link" href="#">Bill Process</a> </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <div class="pt-3">
+                <div class="col-md-12 p-0">
+                    <ul class="nav">
+                        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+                        <li class="nav-item"> <a class="nav-link" href="#">Bill Process</a> </li>
+                    </ul>
+                    @*<hr class="m-0">*@
+                </div>
+                @*<div class="">
+                        <select class="custom-select col-sm-2" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                            <option selected>Action</option>
+                            <option value="">Export To Excel</option>
+                            <option value="">Export To Pdf</option>
+                            <option value="/CHCBillProcess/OfficeNote">View Office Note</option>
+                            <option value="/CHCBillProcess/BankAdvise">Letter for Fund Transfer</option>
+                        </select>
+
+                    </div>*@
+            </div>
+
+            <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th class="th-sm">EmplID</th>
+                        <th class="th-sm">Name of Employee</th>
+                        <th class="th-sm">Name of CHC Center</th>
+                        <th class="th-sm">Req Date</th>
+                        <th class="th-sm">Relationship</th>
+
+                        @*<th class="th-sm text-right">Action</th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.employeecode</td>
+                            <td><span style="cursor:pointer" onclick="openBar()"></span> <a href="/CHCBillProcess/Detail/@item.id">@item.employee_name</a></td>
+                            @if (item.relationship == "spouse")
+                            {
+                                <td>@item.phosname</td>
+                                @*<td hidden id="spouse_chc_centerid">@item.spouse_chc_centerid</td>*@
+                            }
+                            else
+                            {
+                                <td>@item.hosname</td>
+                                @*<td hidden id="chc_centerid">@item.chc_centerid</td>*@
+                            }
+                            @if (item.relationship == "spouse")
+                            {
+                                <td>@item.spouse_dt_of_checkup</td>
+                            }
+                            else
+                            {
+                                <td>@item.date_of_checkup</td>
+                            }
+
+                            <td>@item.relationship</td>
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+        </article>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+@*@section Scripts {
+        <script>
+            $(function () {
+
+                if ($.fn.DataTable.isDataTable('#dtBasicExample')) {
+                    $('#dtBasicExample').DataTable().destroy();
+                }
+
+                $('#dtBasicExample').DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    lengthChange: true
+                });
+            });
+        </script>
+    }*@
+
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('#dtBasicExample').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $(".select2").select2();
+
+        var table = $('#dtUserList').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+        $('#tableSearch').on('keyup', function () {
+            table.search(this.value).draw();
+        })
+    });
+</script>
+

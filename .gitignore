@@ -1,0 +1,72 @@
+############################
+# Build Results
+############################
+bin/
+obj/
+Debug/
+Release/
+
+############################
+# Visual Studio Files
+############################
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+############################
+# NuGet Packages
+############################
+packages/
+*.nupkg
+*.snupkg
+
+############################
+# ASP.NET Scaffolding
+############################
+ScaffoldingReadMe.txt
+
+############################
+# IIS Express
+############################
+/.vs/
+/iisexpress/
+*.pfx
+
+############################
+# Logs
+############################
+*.log
+
+############################
+# OS Generated Files
+############################
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+############################
+# Rider / Resharper
+############################
+_ReSharper*/
+*.DotSettings.user
+
+############################
+# Node (if any frontend used)
+############################
+node_modules/
+dist/
+build/
+
+############################
+# Environment Files
+############################
+.env
+.env.local
+
+############################
+# Temporary Files
+############################
+*.tmp
+*.temp

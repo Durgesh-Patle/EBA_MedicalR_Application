@@ -1,0 +1,1012 @@
+﻿
+<style>
+    body {
+        background: #f8f9fa;
+    }
+
+    .border {
+        border: 1px solid #dee2e6 !important;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        z-index: 9999;
+    }
+</style>
+
+<div class="container mt-4">
+    <form id="NewRequestForm">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label>Name of Patient</label>
+                <select id="patient_id" name="patient_id" class="form-control">
+                    <option value="0">-- Select Patient --</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Treatment Type:</label>
+                <select id="treatment_type_id" name="treatment_type_id" class="form-control">
+                    <option value="0">-- Select Treatment Type --</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Nature of Illness: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="nature_of_illness" name="nature_of_illness" placeholder="Nature of Illness">
+            </div>
+        </div>
+
+        <h6 class="pt-3"><strong>Details of Claim (For the Treatment Taken)</strong></h6>
+
+        <div id="expense_type_container"></div>
+
+        <div class="row mt-2">
+            <div class="form-group col-md-2"></div>
+            <div class="form-group col-md-3">
+                <label>Grant Total Claimed Rs.:</label>
+            </div>
+            <div class="form-group col-md-4">
+                <input type="text" class="form-control" id="total_claimed_rs" readonly>
+            </div>
+            <div class="form-group col-md-3">
+                <button type="button" class="form-control btn-primary" id="btnAddExpenseType">+ Expense Type</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label>Enclosure:</label>
+                <input type="text" class="form-control" id="enclosure" name="enclosure" placeholder="Enclosure">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-4"></div>
+            <div class="form-group col-md-2">
+                <button type="button" class="btn btn-primary" id="btnSaveForLater">Save For Later</button>
+            </div>
+            <div class="form-group col-md-1">
+                <button type="button" class="btn btn-primary" id="btnSubmit">Submit</button>
+            </div>
+            <div class="form-group col-md-1" id="btnDeleteWrapper" style="display:none;">
+                <button type="button" class="btn btn-danger" id="btnDelete">Delete</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="loader"><div class="spinner-border text-primary"></div></div>
+
+<script>
+$(function () {
+
+    // ===================== STATE =====================
+    var model = {
+        id: 0,
+        patient_id: 0,
+        treatment_type_id: 0,
+        nature_of_illness: '',
+        enclosure: '',
+        total_claimed_rs: 0.0,
+        is_delete_appln: false,
+        is_saveforletter: false,
+        is_objection: false,
+        expense_type_detalis: []
+    };
+
+    var GetPatients = [];
+    var treatment_types = [];
+    var treament_types2 = [];
+    var expense_types = [];
+    var head_of_expenses = {}; // index -> array
+
+    // UI state arrays (indexed by expense block index)
+    var ishidefrmtodates = {};
+    var ishideOnlydates = {};
+    var isHideHeadofExpenses = {};
+    var ishidedays = {};
+    var is_qty = {};
+    var is_qty_disable = {};
+    var is_head_of_expenses = {};
+    var exp_sub_total = {};
+
+    var isPastDate = false;
+    var is_teeth_qty_over = false;
+    var is_btn_dis = false;
+    var submit_btn_name = "Submit";
+    var treatment_type_code = null; // filtered obj
+
+    // ===================== INIT =====================
+    initPage();
+
+    
+    function initPage() {
+        var id = 0;
+        var urls = window.location.href.split('?')[0].split('/');
+        var match = urls[urls.length - 1].match(/\d+/g);
+        if (match) id = parseInt(match[0]);
+
+        $.when(
+            getItem(id),
+            getPatients(),
+            getTreatmentTypes()
+        ).done(function (itemRes, patientsRes, treatmentRes) {
+            model = itemRes[0];
+            if (!model) {
+                model = { id: 0, patient_id: 0, treatment_type_id: 0, nature_of_illness: '', enclosure: '', total_claimed_rs: 0.0, is_delete_appln: false, is_saveforletter: false, is_objection: false, expense_type_detalis: [] };
+            }
+            GetPatients = patientsRes[0];
+            treatment_types = treatmentRes[0];
+
+            populatePatients();
+            populateTreatmentTypes(treatment_types);
+
+            if (model.id > 0) {
+                if (model.is_objection) {
+                    submit_btn_name = "Resubmit";
+                    $('#btnSubmit').text(submit_btn_name);
+                }
+                $('#patient_id').val(model.patient_id).trigger('change', true);
+                $('#treatment_type_id').val(model.treatment_type_id);
+                $('#nature_of_illness').val(model.nature_of_illness);
+                $('#enclosure').val(model.enclosure);
+                $('#total_claimed_rs').val(model.total_claimed_rs);
+                $('#btnDeleteWrapper').show();
+
+                loadExpenseTypesForEdit(model.treatment_type_id, function () {
+                    renderAllExpenseBlocks();
+                });
+            } else {
+                // Show modal for new request
+                if (typeof $('#myModal').modal === 'function') {
+                    $('#myModal').modal('show');
+                }
+                addNewExpenseType();
+            }
+        });
+    }
+
+    // ===================== API CALLS =====================
+    function getItem(id) {
+        return $.ajax({ url: '/MedicalRequest/GetItem', type: 'POST', data: { id: id }, dataType: 'json' });
+    }
+    function getPatients() {
+        return $.ajax({ url: '/Common/GetPatients/', type: 'GET', dataType: 'json' });
+    }
+    function getTreatmentTypes() {
+        return $.ajax({ url: '/Common/GetTreatmentTypes/', type: 'GET', dataType: 'json' });
+    }
+    function getExpenseTypes(treatment_type_id) {
+        return $.ajax({ url: '/Common/GetExpemseTypes/', type: 'POST', data: { treatment_type_id: treatment_type_id }, dataType: 'json' });
+    }
+    function getHeadOfExpenses(expense_type_id) {
+        return $.ajax({ url: '/Common/GetHeadOfExpenses/', type: 'POST', data: { expense_type_id: expense_type_id }, dataType: 'json' });
+    }
+    function saveRequest(modelData) {
+        return $.ajax({ url: '/MedicalRequest/Save', type: 'POST', data: { model: modelData }, dataType: 'json' });
+    }
+
+    // ===================== POPULATE DROPDOWNS =====================
+    function populatePatients() {
+        var sel = $('#patient_id');
+        sel.empty().append('<option value="0">-- Select Patient --</option>');
+        $.each(GetPatients, function (i, p) {
+            sel.append('<option value="' + p.id + '">' + p.name + '</option>');
+        });
+        if (model.patient_id) sel.val(model.patient_id);
+    }
+
+    function populateTreatmentTypes(types) {
+        var sel = $('#treatment_type_id');
+        sel.empty().append('<option value="0">-- Select Treatment Type --</option>');
+        $.each(types, function (i, t) {
+            sel.append('<option value="' + t.id + '">' + t.name + '</option>');
+        });
+        if (model.treatment_type_id) sel.val(model.treatment_type_id);
+    }
+
+    // ===================== PATIENT CHANGE =====================
+    $('#patient_id').on('change', function (e, isInit) {
+        var newVal = parseInt($(this).val()) || 0;
+        if (!newVal) return;
+
+        if (model.id === 0) {
+            model.treatment_type_id = 0;
+        }
+
+        model.patient_id = newVal;
+
+        var is_spouse_selected = GetPatients.filter(function (el) { return el.id == newVal; });
+        if (!is_spouse_selected.length) return;
+
+        var pat = is_spouse_selected[0];
+
+        if (((pat.code === 'Spouse') && (pat.gender === 'Male')) || ((pat.code === 'Self') && (pat.gender === 'Female'))) {
+            treament_types2 = treatment_types;
+        } else {
+            treament_types2 = treatment_types.filter(function (el) { return el.code !== '#MATERNITY#'; });
+        }
+
+        populateTreatmentTypes(treament_types2);
+        if (!isInit) $('#treatment_type_id').val(0);
+    });
+
+    // ===================== TREATMENT TYPE CHANGE =====================
+    $('#treatment_type_id').on('change', function () {
+        var newVal = parseInt($(this).val()) || 0;
+        if (!newVal) return;
+        model.treatment_type_id = newVal;
+
+        treatment_type_code = treatment_types.filter(function (el) { return el.id == newVal; });
+
+        // Show/hide hospitalization section in all expense blocks
+        updateHospitalizationSections();
+
+        var patient_id = parseInt($('#patient_id').val()) || 0;
+        var selected_patient_details = GetPatients.filter(function (el) { return el.id == patient_id; });
+
+        getExpenseTypes(newVal).done(function (data) {
+            if (selected_patient_details.length && treatment_type_code.length &&
+                ((selected_patient_details[0].code === 'Mother') || (selected_patient_details[0].code === 'Father')) &&
+                treatment_type_code[0].code === '#DOMCIL#') {
+                expense_types = $.grep(data, function (e) { return e.code != '#HEARAID#'; });
+            } else {
+                expense_types = data;
+            }
+            // Repopulate expense type dropdowns in all blocks
+            $('#expense_type_container .expense-type-select').each(function () {
+                var curVal = $(this).val();
+                populateExpenseTypeDropdown($(this));
+                $(this).val(curVal);
+            });
+        });
+    });
+
+    function updateHospitalizationSections() {
+        var showHosp = treatment_type_code && treatment_type_code.length &&
+            (treatment_type_code[0].code === '#HOSPIL#' || treatment_type_code[0].code === '#MATERNITY#');
+        $('.hosp-section').toggle(!!showHosp);
+    }
+
+    // ===================== EXPENSE TYPE BLOCKS =====================
+    function getExpenseBlockIndex($block) {
+        return parseInt($block.data('index'));
+    }
+
+    function addNewExpenseType(prefillData) {
+        var idx = $('#expense_type_container .expense-block').length;
+        var expDetail = prefillData || {
+            expense_type_id: 0,
+            from_date: '',
+            to_date: '',
+            hospital_id: 0,
+            hospital_name: '',
+            isHospitalAwardedCertificate: false,
+            request_claim_expense_items: [newExpenseItemObj()]
+        };
+
+        if (!expDetail.request_claim_expense_items || !expDetail.request_claim_expense_items.length) {
+            expDetail.request_claim_expense_items = [newExpenseItemObj()];
+        }
+
+        // Default show/hide states
+        ishidefrmtodates[idx] = true;
+        ishideOnlydates[idx] = true;
+        isHideHeadofExpenses[idx] = true;
+        ishidedays[idx] = true;
+        is_qty[idx] = false;
+        is_head_of_expenses[idx] = false;
+        exp_sub_total[idx] = 0.0;
+
+        var block = buildExpenseBlock(idx, expDetail);
+        $('#expense_type_container').append(block);
+        updateExpenseBlockVisibility(idx);
+
+        if (prefillData && prefillData.expense_type_id) {
+            showhidefields(prefillData.expense_type_id, idx, function () {
+                loadHeadOfExpensesForBlock(prefillData.expense_type_id, idx, function () {
+                    renderItemRows(idx, prefillData.request_claim_expense_items);
+                });
+            });
+        } else {
+            renderItemRows(idx, expDetail.request_claim_expense_items);
+        }
+    }
+
+    function newExpenseItemObj() {
+        return { expense_type_id: 0, head_of_expense_id: 0, no_of_teeth: '', bill_no: '', amt_claimed_rs: '', remark: '', only_date: '', from_date: '', to_date: '', days: '' };
+    }
+
+    function buildExpenseBlock(idx, expDetail) {
+        var fromDate = expDetail.from_date ? formatDateForInput(expDetail.from_date) : '';
+        var toDate = expDetail.to_date ? formatDateForInput(expDetail.to_date) : '';
+
+        var html = '<div class="expense-block row ng-scope border m-0 mt-2 mb-2" data-index="' + idx + '">'
+            + '<div class="col-md-12 p-2">'
+            + '<div class="form-row">'
+            + '<div class="form-group col-md-11">'
+            + '<label><strong>Expense Type:</strong></label>'
+            + '<select class="form-control col-md-6 expense-type-select" data-block-index="' + idx + '"></select>'
+            + '</div>'
+            + '<div class="form-group col-md-1 text-right float-lg-right">'
+            + '<a href="#" class="btn btn-danger rounded-circle btn-delete-expense" data-block-index="' + idx + '">X</a>'
+            + '</div>'
+            + '</div>'
+            // Hospitalization section
+            + '<div class="hosp-section" style="display:none;">'
+            + '<div class="form-row">'
+            + '<div class="form-group col-md-3"><label>From Date: <span class="text-danger">*</span></label>'
+            + '<input type="date" class="form-control hosp-from-date" value="' + fromDate + '"></div>'
+            + '<div class="form-group col-md-3"><label>To Date: <span class="text-danger">*</span></label>'
+            + '<input type="date" class="form-control hosp-to-date" value="' + toDate + '"></div>'
+            + '<div class="form-group col-md-3"><label>Name of Hospital: <span class="text-danger">*</span></label>'
+            + '<input type="text" class="form-control hosp-name" value="' + (expDetail.hospital_name || '') + '"></div>'
+            + '<div class="form-group col-md-3"><label>Hospital Awarded I.T R Cert.?: <span class="text-danger">*</span></label>'
+            + '<select class="form-control hosp-awarded"><option value="Yes">Yes</option><option value="No">No</option></select>'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            // Items table
+            + '<div class="row pl-3 pr-3">'
+            + '<table class="table table-hover table-bordered border w-100" data-block-index="' + idx + '">'
+            + '<thead><tr>'
+            + '<th class="th-sm col-only-date">Date</th>'
+            + '<th class="th-sm">Bill.No</th>'
+            + '<th class="th-sm col-from-date">from date</th>'
+            + '<th class="th-sm col-to-date">To Date</th>'
+            + '<th class="th-sm col-days">Days</th>'
+            + '<th class="th-sm col-head-expense">Heads of Expense</th>'
+            + '<th class="th-sm col-qty">Qty</th>'
+            + '<th class="th-sm">Amt. Claimed Rs (<span class="exp-subtotal">0</span>)</th>'
+            + '<th class="th-sm">Remarks</th>'
+            + '<th class="th-sm"></th>'
+            + '<th class="th-sm"></th>'
+            + '</tr></thead>'
+            + '<tbody class="items-tbody"></tbody>'
+            + '</table>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
+        var $block = $(html);
+
+        populateExpenseTypeDropdown($block.find('.expense-type-select'));
+        if (expDetail.expense_type_id) {
+            $block.find('.expense-type-select').val(expDetail.expense_type_id);
+        }
+
+        return $block;
+    }
+
+    function populateExpenseTypeDropdown($sel) {
+        $sel.empty().append('<option value="0">-- Select --</option>');
+        $.each(expense_types, function (i, et) {
+            $sel.append('<option value="' + et.id + '">' + et.name + '</option>');
+        });
+    }
+
+    // ===================== RENDER ITEM ROWS =====================
+    function renderItemRows(blockIdx, items) {
+        var $tbody = $('#expense_type_container .expense-block[data-index="' + blockIdx + '"] .items-tbody');
+        $tbody.empty();
+        $.each(items, function (i, item) {
+            appendItemRow(blockIdx, i, item);
+        });
+        updateTableColumnVisibility(blockIdx);
+    }
+
+    function appendItemRow(blockIdx, itemIdx, item) {
+        var $tbody = $('#expense_type_container .expense-block[data-index="' + blockIdx + '"] .items-tbody');
+        var only_date = item.only_date ? formatDateForInput(item.only_date) : '';
+        var from_date = item.from_date ? formatDateForInput(item.from_date) : '';
+        var to_date = item.to_date ? formatDateForInput(item.to_date) : '';
+
+        var row = '<tr data-item-index="' + itemIdx + '">'
+            + '<td class="col-only-date"><input type="date" class="form-control only-date-input" value="' + only_date + '"></td>'
+            + '<td><input type="text" class="form-control bill-no-input" placeholder="" value="' + (item.bill_no || '') + '"></td>'
+            + '<td class="col-from-date"><input type="date" class="form-control from-date-input" value="' + from_date + '"></td>'
+            + '<td class="col-to-date"><input type="date" class="form-control to-date-input" value="' + to_date + '"></td>'
+            + '<td class="col-days days-display">' + (item.days || '') + '</td>'
+            + '<td class="col-head-expense"><select class="form-control head-expense-select"></select></td>'
+            + '<td class="col-qty"><input type="text" class="form-control teeth-qty-input" placeholder="" value="' + (item.no_of_teeth || '') + '"></td>'
+            + '<td><input type="text" class="form-control amt-claimed-input" placeholder="" value="' + (item.amt_claimed_rs || '') + '"></td>'
+            + '<td><input type="text" class="form-control remark-input" placeholder="" value="' + (item.remark || '') + '"></td>'
+            + '<td><button type="button" class="form-control btn-add-item">+</button></td>'
+            + '<td><button type="button" class="form-control btn-delete-item">-</button></td>'
+            + '</tr>';
+
+        var $row = $(row);
+        $tbody.append($row);
+
+        // Populate head of expense dropdown
+        if (head_of_expenses[blockIdx] && head_of_expenses[blockIdx].length) {
+            populateHeadOfExpenseDropdown($row.find('.head-expense-select'), blockIdx);
+            if (item.head_of_expense_id) {
+                $row.find('.head-expense-select').val(item.head_of_expense_id);
+                validateHeadOfExpenses(item.head_of_expense_id, blockIdx, itemIdx);
+            }
+        }
+
+        updateTableColumnVisibility(blockIdx);
+    }
+
+    function populateHeadOfExpenseDropdown($sel, blockIdx) {
+        $sel.empty().append('<option value="0">-- Select --</option>');
+        if (head_of_expenses[blockIdx]) {
+            $.each(head_of_expenses[blockIdx], function (i, h) {
+                $sel.append('<option value="' + h.id + '">' + h.name + '</option>');
+            });
+        }
+    }
+
+    // ===================== SHOW/HIDE FIELDS =====================
+    function showhidefields(expense_type_id, idx, callback) {
+        var code = getExpenseTypeCode(expense_type_id);
+
+        if (code === '#PHYC#' || code === '#HAT#') {
+            ishidefrmtodates[idx] = false;
+        } else {
+            ishidefrmtodates[idx] = true;
+        }
+
+        if (code === '#HAT#') {
+            ishidedays[idx] = false;
+        } else {
+            ishidedays[idx] = true;
+        }
+
+        if (code !== '#PHYC#') {
+            ishideOnlydates[idx] = false;
+        } else {
+            ishideOnlydates[idx] = true;
+        }
+
+        if (code === '#CFDT#' || code === '#MRE#' || code === '#HECHRG#') {
+            isHideHeadofExpenses[idx] = false;
+        } else {
+            isHideHeadofExpenses[idx] = true;
+        }
+
+        updateTableColumnVisibility(idx);
+        if (typeof callback === 'function') callback();
+    }
+
+    function getExpenseTypeCode(expense_type_id) {
+        var found = $.grep(expense_types, function (e) { return e.id == expense_type_id; });
+        return found.length ? found[0].code : '';
+    }
+
+    function updateTableColumnVisibility(idx) {
+        var $block = $('#expense_type_container .expense-block[data-index="' + idx + '"]');
+
+        // only_date column
+        if (ishideOnlydates[idx]) {
+            $block.find('.col-only-date').hide();
+        } else {
+            $block.find('.col-only-date').show();
+        }
+
+        // from-date / to-date columns
+        if (ishidefrmtodates[idx]) {
+            $block.find('.col-from-date, .col-to-date').hide();
+        } else {
+            $block.find('.col-from-date, .col-to-date').show();
+        }
+
+        // days column
+        if (ishidedays[idx]) {
+            $block.find('.col-days').hide();
+        } else {
+            $block.find('.col-days').show();
+        }
+
+        // head of expense column
+        if (isHideHeadofExpenses[idx]) {
+            $block.find('.col-head-expense').hide();
+        } else {
+            $block.find('.col-head-expense').show();
+        }
+
+        // qty column
+        var showQty = is_qty[idx] || (is_head_of_expenses[idx] && !isHideHeadofExpenses[idx]);
+        if (showQty) {
+            $block.find('.col-qty').show();
+        } else {
+            $block.find('.col-qty').hide();
+        }
+    }
+
+    function updateExpenseBlockVisibility(idx) {
+        updateTableColumnVisibility(idx);
+        updateHospitalizationSections();
+    }
+
+    // ===================== HEAD OF EXPENSE VALIDATION =====================
+    function validateHeadOfExpenses(head_of_expense_id, blockIdx, itemIdx) {
+        if (!head_of_expenses[blockIdx]) return;
+
+        var found = $.grep(head_of_expenses[blockIdx], function (el) { return el.id == head_of_expense_id; });
+        if (!found.length) return;
+
+        var code = found[0].code;
+
+        if (code === '#MEDICPUR#') {
+            alert('Kindly ensure the prescription enclosed is not more than 1 year old from date of claim !');
+        }
+
+        if (code === '#CBC#' || code === '#RC#') {
+            is_head_of_expenses[blockIdx] = true;
+            is_qty[blockIdx] = true;
+            is_qty_disable[itemIdx] = true;
+        } else {
+            is_head_of_expenses[blockIdx] = false;
+            is_qty_disable[itemIdx] = false;
+        }
+
+        updateTableColumnVisibility(blockIdx);
+
+        // Clear no_of_teeth in row
+        var $row = $('#expense_type_container .expense-block[data-index="' + blockIdx + '"] .items-tbody tr[data-item-index="' + itemIdx + '"]');
+        if (!(code === '#CBC#' || code === '#RC#')) {
+            $row.find('.teeth-qty-input').val('').prop('disabled', true);
+        } else {
+            $row.find('.teeth-qty-input').prop('disabled', false);
+        }
+    }
+
+    // ===================== LOAD HEAD OF EXPENSES =====================
+    function loadHeadOfExpensesForBlock(expense_type_id, blockIdx, callback) {
+        getHeadOfExpenses(expense_type_id).done(function (data) {
+            if (!head_of_expenses) head_of_expenses = {};
+            head_of_expenses[blockIdx] = data;
+            // Repopulate head of expense dropdowns in this block
+            $('#expense_type_container .expense-block[data-index="' + blockIdx + '"] .head-expense-select').each(function () {
+                var curVal = $(this).val();
+                populateHeadOfExpenseDropdown($(this), blockIdx);
+                $(this).val(curVal);
+            });
+            if (typeof callback === 'function') callback();
+        });
+    }
+
+    // ===================== EXPENSE TYPE SELECT CHANGE =====================
+    $(document).on('change', '.expense-type-select', function () {
+        var idx = parseInt($(this).data('block-index'));
+        var expense_type_id = parseInt($(this).val()) || 0;
+        if (!expense_type_id) return;
+
+        // Set in model
+        if (model.expense_type_detalis[idx]) {
+            model.expense_type_detalis[idx].expense_type_id = expense_type_id;
+        }
+
+        // Duplicate check
+        var valueArr = [];
+        $('#expense_type_container .expense-type-select').each(function () {
+            valueArr.push(parseInt($(this).val()) || 0);
+        });
+        var isDuplicate = valueArr.some(function (item, idx) {
+            return item !== 0 && valueArr.indexOf(item) !== idx;
+        });
+        if (isDuplicate) {
+            $(this).val(0);
+            toastr['error']('Expense type can not be duplicate !');
+            return;
+        }
+
+        // Alerts
+        var code = getExpenseTypeCode(expense_type_id);
+        if (code === '#HAT#') {
+            alert('Kindly Ensure that the Treatment Period is Mentioned in the Prescription by the Doctor !');
+        }
+        if (code === '#PRC#') {
+            alert('Kindly Ensure that the Test Wise Amount is Mentioned in the Bills Provided by the Pathology Lab. !');
+        }
+        if (code === '#CFDT#') {
+            alert('Please Ensure Pre & Post Dental Treatment -> OPG/intra Oral X-Ray are Enclosed. !');
+        }
+
+        showhidefields(expense_type_id, idx);
+        loadHeadOfExpensesForBlock(expense_type_id, idx);
+    });
+
+    // ===================== DATES =====================
+    function formatDateForInput(val) {
+        if (!val) return '';
+        var d = new Date(val);
+        if (isNaN(d)) return '';
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var dd = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + dd;
+    }
+
+    function allowPastDateOnly(from_date_str, to_date_str, blockIdx, itemIdx) {
+        var curdate = new Date();
+        var bill_from_date = from_date_str ? new Date(from_date_str) : undefined;
+        var bill_to_date = to_date_str ? new Date(to_date_str) : undefined;
+
+        var expense_type_id = parseInt($('#expense_type_container .expense-block[data-index="' + blockIdx + '"] .expense-type-select').val()) || 0;
+        var code = getExpenseTypeCode(expense_type_id);
+
+        if (((bill_from_date && bill_from_date > curdate) || (bill_to_date && bill_to_date > curdate)) && code !== '#HAT#') {
+            isPastDate = true;
+            toastr['error']("Bill date can't be future date !");
+        } else {
+            isPastDate = false;
+        }
+
+        if (bill_from_date && bill_to_date) {
+            var days = calculateDays(bill_from_date, bill_to_date);
+            var $row = $('#expense_type_container .expense-block[data-index="' + blockIdx + '"] .items-tbody tr[data-item-index="' + itemIdx + '"]');
+            $row.find('.days-display').text(days);
+        }
+    }
+
+    // only_date (single date)
+    $(document).on('change', '.only-date-input', function () {
+        var $block = $(this).closest('.expense-block');
+        var blockIdx = getExpenseBlockIndex($block);
+        var itemIdx = parseInt($(this).closest('tr').data('item-index'));
+        var val = $(this).val();
+        var curdate = new Date();
+        var billDate = val ? new Date(val) : undefined;
+        var code = getExpenseTypeCode(parseInt($block.find('.expense-type-select').val()) || 0);
+        if (billDate && billDate > curdate && code !== '#HAT#') {
+            isPastDate = true;
+            toastr['error']("Bill date can't be future date !");
+        } else {
+            isPastDate = false;
+        }
+    });
+
+    $(document).on('change', '.from-date-input, .to-date-input', function () {
+        var $row = $(this).closest('tr');
+        var $block = $(this).closest('.expense-block');
+        var blockIdx = getExpenseBlockIndex($block);
+        var itemIdx = parseInt($row.data('item-index'));
+        var from_date = $row.find('.from-date-input').val();
+        var to_date = $row.find('.to-date-input').val();
+        allowPastDateOnly(from_date, to_date, blockIdx, itemIdx);
+    });
+
+    function calculateDays(d1, d2) {
+        var ms = d1.getTime() - d2.getTime();
+        var days = ms / (1000 * 3600 * 24);
+        return Math.round(Math.abs(days));
+    }
+
+    // ===================== TEETH QTY =====================
+    $(document).on('input', '.teeth-qty-input', function () {
+        var qty = parseInt($(this).val()) || 0;
+        var $block = $(this).closest('.expense-block');
+        var blockIdx = getExpenseBlockIndex($block);
+        var itemIdx = parseInt($(this).closest('tr').data('item-index'));
+        if (qty > 3) {
+            is_teeth_qty_over = true;
+            toastr['error']('Quantity of teeth can not be more than 3 in a year !');
+        } else {
+            is_teeth_qty_over = false;
+        }
+    });
+
+    // ===================== HEAD OF EXPENSE CHANGE =====================
+    $(document).on('change', '.head-expense-select', function () {
+        var $block = $(this).closest('.expense-block');
+        var blockIdx = getExpenseBlockIndex($block);
+        var itemIdx = parseInt($(this).closest('tr').data('item-index'));
+        var head_id = parseInt($(this).val()) || 0;
+        // Reset teeth qty
+        $(this).closest('tr').find('.teeth-qty-input').val('');
+        is_head_of_expenses[blockIdx] = false;
+        is_qty_disable[itemIdx] = false;
+        if (is_qty[blockIdx] === undefined) is_qty[blockIdx] = false;
+        validateHeadOfExpenses(head_id, blockIdx, itemIdx);
+    });
+
+    // ===================== AMT CHANGE =====================
+    $(document).on('input', '.amt-claimed-input', function () {
+        calculateTotAmt();
+    });
+
+    function calculateTotAmt() {
+        exp_sub_total = {};
+        var total = 0.0;
+        $('#expense_type_container .expense-block').each(function () {
+            var blockIdx = getExpenseBlockIndex($(this));
+            exp_sub_total[blockIdx] = 0.0;
+            $(this).find('.amt-claimed-input').each(function () {
+                var v = parseFloat($(this).val()) || 0;
+                total += v;
+                exp_sub_total[blockIdx] += v;
+            });
+            $(this).find('.exp-subtotal').text(exp_sub_total[blockIdx].toFixed(2));
+        });
+        model.total_claimed_rs = total;
+        $('#total_claimed_rs').val(total.toFixed(2));
+    }
+
+    // ===================== ADD ITEM ROW =====================
+    $(document).on('click', '.btn-add-item', function () {
+        if (isPastDate) {
+            toastr['error']('Please Enter Proper Bill Details !');
+            return;
+        }
+        var $block = $(this).closest('.expense-block');
+        var blockIdx = getExpenseBlockIndex($block);
+        var $tbody = $block.find('.items-tbody');
+        var newIdx = $tbody.find('tr').length;
+        appendItemRow(blockIdx, newIdx, newExpenseItemObj());
+    });
+
+    // ===================== DELETE ITEM ROW =====================
+    $(document).on('click', '.btn-delete-item', function () {
+        var $row = $(this).closest('tr');
+        $row.remove();
+        // Re-index remaining rows
+        var $block = $(this).closest('.expense-block');
+        $block.find('.items-tbody tr').each(function (i) {
+            $(this).attr('data-item-index', i);
+        });
+        calculateTotAmt();
+    });
+
+    // ===================== DELETE EXPENSE BLOCK =====================
+    $(document).on('click', '.btn-delete-expense', function (e) {
+        e.preventDefault();
+        var blockIdx = parseInt($(this).data('block-index'));
+        $(this).closest('.expense-block').remove();
+        calculateTotAmt();
+    });
+
+    // ===================== ADD EXPENSE TYPE =====================
+    $('#btnAddExpenseType').on('click', function () {
+        var newExpDetail = {
+            expense_type_id: 0,
+            from_date: '',
+            to_date: '',
+            hospital_id: 0,
+            hospital_name: '',
+            isHospitalAwardedCertificate: false,
+            request_claim_expense_items: [newExpenseItemObj()]
+        };
+        model.expense_type_detalis.push(newExpDetail);
+        addNewExpenseType();
+    });
+
+    // ===================== SAVE / SUBMIT =====================
+    $('#btnSaveForLater').on('click', function () {
+        saveForm(true, 0);
+    });
+
+    $('#btnSubmit').on('click', function () {
+        saveForm(false, 0);
+    });
+
+    $('#btnDelete').on('click', function () {
+        saveForm(true, 1);
+    });
+
+    function saveForm(is_saveforletter, check_points) {
+        if (check_points === 1) {
+            model.is_delete_appln = true;
+        }
+
+        if (isPastDate) {
+            toastr['error']("Bill date can't be future date !");
+            return;
+        }
+
+        // Collect model from DOM
+        collectModelFromDOM();
+
+        // Hospitalization 1-day check
+        if (model.treatment_type_id == 19) {
+            if (model.expense_type_detalis.length > 0) {
+                var fd = model.expense_type_detalis[0].from_date;
+                var td = model.expense_type_detalis[0].to_date;
+                if (fd && td) {
+                    var day_gap_1 = calculateDays(new Date(fd), new Date(td));
+                    if (day_gap_1 > 1) {
+                        alert('Hospitalization can not allowed more than 1 day !');
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Duplicate expense type check
+        var valueArr = model.expense_type_detalis.map(function (item) { return item.expense_type_id; });
+        var isDuplicate = valueArr.some(function (item, idx) {
+            return item !== 0 && valueArr.indexOf(item) !== idx;
+        });
+        if (isDuplicate) {
+            toastr['error']('Expense type can not be duplicate !');
+            return;
+        }
+
+        if (is_teeth_qty_over) {
+            toastr['error']('Quantity of teeth can not be more than 3 in a year!');
+            return;
+        }
+
+        // Duplicate head of expense check (first block only, like Angular)
+        if (model.expense_type_detalis.length > 0) {
+            var headexp_arr = model.expense_type_detalis[0].request_claim_expense_items.map(function (item) { return item.head_of_expense_id; });
+            var isheadexp_Duplicate = headexp_arr.some(function (item, idx) {
+                return item !== 0 && headexp_arr.indexOf(item) !== idx;
+            });
+            if (isheadexp_Duplicate) {
+                toastr['error']('Head of expense can not be duplicate !');
+                return;
+            }
+        }
+
+        // Basic required field validation
+        if (!model.patient_id || model.patient_id == 0) { toastr['error']('Please select Patient !'); return; }
+        if (!model.treatment_type_id || model.treatment_type_id == 0) { toastr['error']('Please select Treatment Type !'); return; }
+        if (!model.nature_of_illness || model.nature_of_illness.trim() === '') { toastr['error']('Please enter Nature of Illness !'); return; }
+        if (!model.enclosure || model.enclosure.trim() === '') { toastr['error']('Please enter Enclosure !'); return; }
+
+        model.is_saveforletter = is_saveforletter;
+
+        if (is_btn_dis) return;
+        is_btn_dis = true;
+        $('#btnSaveForLater, #btnSubmit, #btnDelete').prop('disabled', true);
+
+        saveRequest(model).done(function (data) {
+            if (data.Status === undefined) {
+                window.location.href = window.location.origin + '/MedicalRequest';
+                return;
+            }
+            if (data.Status) {
+                toastr['success'](data.Message);
+                window.location.href = window.location.origin + '/MedicalRequest';
+            } else {
+                toastr['error'](data.Message);
+                is_btn_dis = false;
+                $('#btnSaveForLater, #btnSubmit, #btnDelete').prop('disabled', false);
+            }
+        }).fail(function (xhr) {
+            if (xhr.status === 401) {
+                window.location.reload();
+                return;
+            }
+            is_btn_dis = false;
+            $('#btnSaveForLater, #btnSubmit, #btnDelete').prop('disabled', false);
+            toastr['error']('Something went wrong!');
+        });
+    }
+
+    // ===================== COLLECT MODEL FROM DOM =====================
+    function collectModelFromDOM() {
+        model.patient_id = parseInt($('#patient_id').val()) || 0;
+        model.treatment_type_id = parseInt($('#treatment_type_id').val()) || 0;
+        model.nature_of_illness = $('#nature_of_illness').val();
+        model.enclosure = $('#enclosure').val();
+        model.expense_type_detalis = [];
+
+        $('#expense_type_container .expense-block').each(function () {
+            var blockIdx = getExpenseBlockIndex($(this));
+            var expDetail = {
+                expense_type_id: parseInt($(this).find('.expense-type-select').val()) || 0,
+                from_date: $(this).find('.hosp-from-date').val(),
+                to_date: $(this).find('.hosp-to-date').val(),
+                hospital_name: $(this).find('.hosp-name').val(),
+                isHospitalAwardedCertificate: $(this).find('.hosp-awarded').val() === 'Yes',
+                request_claim_expense_items: []
+            };
+
+            $(this).find('.items-tbody tr').each(function () {
+                var item = {
+                    expense_type_id: expDetail.expense_type_id,
+                    head_of_expense_id: parseInt($(this).find('.head-expense-select').val()) || 0,
+                    no_of_teeth: $(this).find('.teeth-qty-input').val(),
+                    bill_no: $(this).find('.bill-no-input').val(),
+                    amt_claimed_rs: $(this).find('.amt-claimed-input').val(),
+                    remark: $(this).find('.remark-input').val(),
+                    only_date: $(this).find('.only-date-input').val(),
+                    from_date: $(this).find('.from-date-input').val(),
+                    to_date: $(this).find('.to-date-input').val(),
+                    days: $(this).find('.days-display').text()
+                };
+                expDetail.request_claim_expense_items.push(item);
+            });
+
+            model.expense_type_detalis.push(expDetail);
+        });
+
+        model.total_claimed_rs = parseFloat($('#total_claimed_rs').val()) || 0;
+    }
+
+    // ===================== EDIT MODE: RENDER ALL BLOCKS =====================
+    function loadExpenseTypesForEdit(treatment_type_id, callback) {
+        var patient_id = model.patient_id;
+        var selected_patient_details = GetPatients.filter(function (el) { return el.id == patient_id; });
+
+        treatment_type_code = treatment_types.filter(function (el) { return el.id == treatment_type_id; });
+
+        getExpenseTypes(treatment_type_id).done(function (data) {
+            if (selected_patient_details.length && treatment_type_code.length &&
+                ((selected_patient_details[0].code === 'Mother') || (selected_patient_details[0].code === 'Father')) &&
+                treatment_type_code[0].code === '#DOMCIL#') {
+                expense_types = $.grep(data, function (e) { return e.code != '#HEARAID#'; });
+            } else {
+                expense_types = data;
+            }
+            if (typeof callback === 'function') callback();
+        });
+    }
+
+    function renderAllExpenseBlocks() {
+        $('#expense_type_container').empty();
+        var expDetails = model.expense_type_detalis;
+        var total = expDetails.length;
+        var loaded = 0;
+
+        if (!total) {
+            addNewExpenseType();
+            return;
+        }
+
+        $.each(expDetails, function (k, expDetail) {
+            // Convert dates
+            if (expDetail.from_date) expDetail.from_date = formatDateForInput(expDetail.from_date);
+            if (expDetail.to_date) expDetail.to_date = formatDateForInput(expDetail.to_date);
+
+            $.each(expDetail.request_claim_expense_items, function (k2, item) {
+                if (item.from_date) item.from_date = formatDateForInput(item.from_date);
+                if (item.to_date) item.to_date = formatDateForInput(item.to_date);
+                if (item.only_date) item.only_date = formatDateForInput(item.only_date);
+            });
+
+            (function (blockIdx, expDetailCopy) {
+                // Init state
+                ishidefrmtodates[blockIdx] = true;
+                ishideOnlydates[blockIdx] = true;
+                isHideHeadofExpenses[blockIdx] = true;
+                ishidedays[blockIdx] = true;
+                is_qty[blockIdx] = false;
+                is_head_of_expenses[blockIdx] = false;
+                exp_sub_total[blockIdx] = 0.0;
+
+                var $block = buildExpenseBlock(blockIdx, expDetailCopy);
+                $('#expense_type_container').append($block);
+
+                showhidefields(expDetailCopy.expense_type_id, blockIdx);
+
+                // Load head of expenses
+                getHeadOfExpenses(expDetailCopy.expense_type_id).done(function (heData) {
+                    if (!head_of_expenses) head_of_expenses = {};
+                    head_of_expenses[blockIdx] = heData;
+
+                    renderItemRows(blockIdx, expDetailCopy.request_claim_expense_items);
+
+                    // Validate each item's head_of_expense
+                    $.each(expDetailCopy.request_claim_expense_items, function (k2, item) {
+                        if (item.head_of_expense_id) {
+                            validateHeadOfExpenses(item.head_of_expense_id, blockIdx, k2);
+                        }
+                    });
+
+                    // Calc sub total
+                    exp_sub_total[blockIdx] = 0.0;
+                    $.each(expDetailCopy.request_claim_expense_items, function (k2, item) {
+                        exp_sub_total[blockIdx] += parseFloat(item.amt_claimed_rs) || 0;
+                    });
+                    $block.find('.exp-subtotal').text(exp_sub_total[blockIdx].toFixed(2));
+
+                    loaded++;
+                    if (loaded === total) {
+                        calculateTotAmt();
+                        updateHospitalizationSections();
+                    }
+                });
+            })(k, expDetail);
+        });
+    }
+
+}); // end document.ready
+</script>

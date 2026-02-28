@@ -1,0 +1,349 @@
+﻿@model IEnumerable<MedicalR.Models.MedicalR.ProcessPaymentModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    <style>
+        /*        body {
+            font-family: Arial;
+            margin: 0;
+        }*/
+
+        ex1 {
+            border: 1px solid red;
+            padding: 35px;
+        }
+
+        .header {
+            margin: auto;
+            width: 60%;
+            border: 1px solid black;
+            padding: 20px;
+            color: black;
+            font-size: 12px;
+            border-color: black;
+        }
+
+        .contents {
+            margin: auto;
+            width: 60%;
+            padding: 5px;
+            color: black;
+            font-size: 16px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+    </style>
+}
+
+<!-- Loader Overlay -->
+<div id="loaderOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.6);z-index:9999;text-align:center;">
+    <div style="position:relative;top:50%;transform:translateY(-50%);">
+        <span class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></span>
+    </div>
+</div>
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics ></strong></a> </li>
+                <li class="nav-item"> <a class="nav-link" href="#">Payment Lot Creation</a> </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <br />
+            <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th class="th-sm"><input type="checkbox" id="checkAll"></th>
+                        <th class="th-sm">Appln.No</th>
+                        <th class="th-sm">Date of Request</th>
+                        <th class="th-sm">Empl Code</th>
+                        <th class="th-sm">Name</th>
+                        <th class="th-sm">Claimed Rs.</th>
+                        <th class="th-sm">Amount Cr. to Sal A/c.</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
+                    <!-- Rows will be rendered by jQuery -->
+                </tbody>
+            </table>
+
+            <div class="row">
+                <div class="form-group col-md-4"></div>
+                <div class="form-group col-md-4">
+                    <label><strong>Summary Amount in Rs. <span id="total_summary_amt">0</span></strong></label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-3"></div>
+                <div class="form-group col-md-3">
+                    <label>Enter Date on Which Amount Credit to Bank A/C.</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="date" class="form-control" id="date_of_payment" placeholder="dd-mm-yyyy">
+                </div>
+                <div class="form-group col-md-2">
+                    <button type="button" class="form-control btn-primary" id="btnCreateLot">Create Lot</button>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+@*<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>*@
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    var get_processpayment_details = [];
+    var is_any_selected = false;
+    var is_button_disable = false;
+
+    // Helper: Format date to dd-MMM-yyyy  (replaces Angular date filter)
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        var milliseconds = null;
+
+        // Handle ASP.NET /Date(....)/ format
+        if (typeof dateStr === 'string' && dateStr.indexOf('/Date(') === 0) {
+            milliseconds = parseInt(dateStr.replace(/\/Date\((\d+)\)\//, '$1'));
+        }
+        else {
+            milliseconds = Date.parse(dateStr);
+        }
+
+        if (!milliseconds) return '';
+
+        var d = new Date(milliseconds);
+
+        return ('0' + d.getDate()).slice(-2) + '-' +
+            months[d.getMonth()] + '-' +
+            d.getFullYear();
+    }
+
+    // Render Table Rows (replaces ng-repeat)
+    function renderTable() {
+        var tbody = $('#paymentTableBody');
+        tbody.empty();
+
+        if (!get_processpayment_details || get_processpayment_details.length === 0) {
+            tbody.append('<tr><td colspan="7" class="text-center">No records found.</td></tr>');
+            return;
+        }
+
+        $.each(get_processpayment_details, function (index, item) {
+            var checked = item.is_process ? 'checked' : '';
+            var row = '<tr data-index="' + index + '">' +
+                '<td><input type="checkbox" class="row-checkbox" data-id="' + item.claim_request_id + '" ' + checked + '></td>' +
+                '<td>' + (item.appln_no || '') + '</td>' +
+                '<td>' + formatDate(item.date_of_request) + '</td>' +
+                '<td>' + (item.employeecode || '') + '</td>' +
+                '<td>' + (item.employeename || '') + '</td>' +
+                '<td>' + (item.total_claimed_rs || 0) + '</td>' +
+                '<td>' + (item.total_sanctioned_rs || 0) + '</td>' +
+                '</tr>';
+            tbody.append(row);
+        });
+    }
+
+    // Calculate Summary Amount (replaces calculat_summary_amt)
+    function calculat_summary_amt() {
+        var selected_data = get_processpayment_details.filter(function (el) {
+            return el.is_process === true;
+        });
+        var total = selected_data.reduce(function (prev, curr) {
+            return prev + (parseFloat(curr.total_sanctioned_rs) || 0);
+        }, 0);
+        $('#total_summary_amt').text(total);
+    }
+
+    // Individual Checkbox Handler (replaces ackChecked)
+    function ackChecked(request_id, flg) {
+        for (var k = 0; k < get_processpayment_details.length; k++) {
+            if (request_id == get_processpayment_details[k].claim_request_id) {
+                if (flg) {
+                    get_processpayment_details[k].is_process = true;
+                    is_any_selected = true;
+                } else {
+                    get_processpayment_details[k].is_process = false;
+                    // Check if any other is still selected
+                    is_any_selected = get_processpayment_details.some(function (el) {
+                        return el.is_process === true;
+                    });
+                }
+            }
+        }
+        calculat_summary_amt();
+    }
+
+    // Select All Checkbox Handler (replaces allackChecked)
+    function allackChecked(ischecked) {
+        for (var k = 0; k < get_processpayment_details.length; k++) {
+            if (ischecked) {
+                get_processpayment_details[k].is_process = true;
+                is_any_selected = true;
+            } else {
+                get_processpayment_details[k].is_process = false;
+                is_any_selected = false;
+            }
+        }
+        // Update all row checkboxes visually
+        $('.row-checkbox').prop('checked', ischecked);
+        calculat_summary_amt();
+    }
+    debugger
+   function save(date_of_payment) {
+
+
+    is_button_disable = true;
+    $('#btnCreateLot').prop('disabled', true);
+
+    if (!is_any_selected) {
+        toastr["error"]("Please select at least 1 record !");
+        is_button_disable = false;
+        $('#btnCreateLot').prop('disabled', false);
+        return;
+    }
+
+    if (!date_of_payment || date_of_payment.trim() === '') {
+        toastr["error"]("Please enter amount credit date !");
+        is_button_disable = false;
+        $('#btnCreateLot').prop('disabled', false);
+        return;
+    }
+
+    var selectedRecords = get_processpayment_details.filter(x => x.is_process === true);
+
+    $('#loaderOverlay').show();
+
+    var requestData = {
+        modelPayment: selectedRecords,   // 🔥 send only selected
+        date_of_payment: date_of_payment
+    };
+
+    $.ajax({
+        url: '@Url.Action("LotDetailsSave","ProcessPayment")',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(requestData),
+
+        success: function (response) {
+            $('#loaderOverlay').hide();
+
+            if (response.Status) {
+                alert(response.Message);
+                window.location.reload();
+            } else {
+                toastr["error"](response.Message);
+                is_button_disable = false;
+                $('#btnCreateLot').prop('disabled', false);
+            }
+        },
+
+        error: function (xhr) {
+            $('#loaderOverlay').hide();
+            console.log("Error status:", xhr.status);
+            toastr["error"]("Server error occurred.");
+            is_button_disable = false;
+            $('#btnCreateLot').prop('disabled', false);
+        }
+    });
+}
+
+    // Init: Load Data (replaces PaymentProcessFactory.init)
+    function initPaymentProcess() {
+        $.ajax({
+            url: '/ProcessPayment/ProcessPayment_grid_data/',
+            type: 'POST',
+            contentType: 'application/json',
+            success: function (data) {
+                get_processpayment_details = data;
+                renderTable();
+                calculat_summary_amt();
+            },
+            error: function () {
+                toastr["error"]("Failed to load payment data.");
+            }
+        });
+    }
+
+    // DOM Ready
+    $(document).ready(function () {
+
+        initPaymentProcess();
+
+        $('#checkAll').on('change', function () {
+            var isChecked = $(this).is(':checked');
+            allackChecked(isChecked);
+        });
+
+        $('#paymentTableBody').on('change', '.row-checkbox', function () {
+            var request_id = $(this).data('id');
+            var flg = $(this).is(':checked');
+            // Update model
+            ackChecked(request_id, flg);
+            // Sync header checkbox state
+            var total = get_processpayment_details.length;
+            var checked = get_processpayment_details.filter(function (el) { return el.is_process; }).length;
+            $('#checkAll').prop('checked', total === checked);
+        });
+
+        // ── Create Lot Button Click (replaces ng-click="save(date_of_payment)")
+        $('#btnCreateLot').on('click', function () {
+            if (is_button_disable) return;
+            var date_of_payment = $('#date_of_payment').val();
+            save(date_of_payment);
+        });
+
+    });
+
+    // BankAdvise Function (unchanged logic)
+    function BankAdvise() {
+        var dt = new Date($('#date_of_payment').val().trim());
+        if (isNaN(dt)) {
+            alert("Please Enter Date");
+            window.location.reload();
+        } else {
+            window.location.href = "/ProcessPayment/BankAdvise";
+        }
+    }
+
+    // PDF Export Function (unchanged logic)
+    function getPDF() {
+        var HTML_Width = $(".PDF").width();
+        var HTML_Height = $(".PDF").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+        html2canvas($(".PDF")[0], { allowTaint: true }).then(function (canvas) {
+            canvas.getContext('2d');
+            var imgData = canvas.toDataURL("image/jpeg", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            pdf.save("HTML-Document.pdf");
+        });
+    }
+
+</script>

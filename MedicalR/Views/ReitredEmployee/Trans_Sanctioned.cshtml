@@ -1,0 +1,221 @@
+﻿@model MedicalR.Models.RetiredEmployee.RetiredempTransModel
+@{
+    ViewBag.Title = "Trans_Sanctioned";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        @*<li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/Trans_RetiredEmp">Statistics</a> </li>
+            <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Employee name</strong></a> </li>*@
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            @*<li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/Trans_RetiredEmp">Statistics</a> </li>*@
+            <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Employees Transaction Checking </strong></a> </li>
+
+        </ul>
+        <hr class="m-0">
+    </div>
+    <br>
+    <br />
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="">EmpId </label>
+                    <input type="text" class="form-control" id="Empcd" readonly value="@Model.Empcd">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Name<span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Name" readonly value="@Model.Name">
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="">Claim From Year </label>
+                    <input type="text" class="form-control" id="yearfrom" readonly value="@Model.yearfrom">
+
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Claim To Year</label>
+                    <input type="text" class="form-control" id="yearto" readonly value="@Model.yearto">
+                    @*<select class="form-control select2" id="Preyear">
+                            @foreach (var item in ViewBag.Yearlist)
+                            {
+                                <option value="@item.Name" @(Model.Preyear == item.Name ? "selected" : "")>@item.Id</option>
+                            }
+                        </select>*@
+                    @*<label class="has-error"></label>*@
+                </div>
+            </div>
+            <div class="form-row">
+
+                <div class="form-group col-md-3">
+                    <label for="">Sanc Amount <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="sanc_amt" readonly value="@Model.sanc_amt">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Bank Name</label>
+                    <input type="text" class="form-control" id="Totalclaim" readonly value="@Model.bankname">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Bank Account No <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Totalclaim" readonly value="@Model.accno">
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="row pt-2">
+            <input type="hidden" id="ID" value="@Model.Id" />
+            <div class="col-md-12 mt-5">
+                
+                    <a href="javascript:void(0)" class="btn btn-primary" id="Sanction" data-val="1">Sanction</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="javascript:void(0)" class="btn btn-danger" id="Reject" data-val="1">Reject</a>
+                </div>
+            </div>
+    </form>
+</article>
+<script>
+    $(document).ready(function () {
+
+        $("body").on("click", "#Sanction", function () {
+            $(this).css("pointer-events", "none");
+            var btn = $(this);
+            var retStatus = true;
+            $(".has-error").html("");
+            var buttonValue = $(this).data("val");
+            var ID = $("#ID").val().trim();
+
+
+            if (retStatus == true) {
+                setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+                var formData = new FormData();
+
+                formData.append("ID", ID);
+
+
+                // $(btn).attr("data-loading", "");
+
+                // var url = "/Clients/UpdateClient";
+
+
+                url = "/ReitredEmployee/AddSanction";
+
+
+                $.ajax({
+                    url: url,
+                    type: "Post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                            if (buttonValue == 1) {
+                                window.location.href = "/ReitredEmployee/Trans_Sanction_Grid";
+                            }
+                            else if (buttonValue == 2) {
+                                $("#client-tabContent input").val('');
+                                $("#client-tabContent textarea").val('');
+                                $("#client-tabContent select").val('');
+                            }
+                            else {
+                                LoadEmpsidebarViews();
+                            }
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(btn).removeAttr("data-loading");
+
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        $(btn).removeAttr("data-loading");
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+            else {
+                $(this).css("pointer-events", "unset");
+            }
+        })
+        $("body").on("click", "#Reject", function () {
+            $(this).css("pointer-events", "none");
+            var btn = $(this);
+            var retStatus = true;
+            $(".has-error").html("");
+            var buttonValue = $(this).data("val");
+            var ID = $("#ID").val().trim();
+
+
+            if (retStatus == true) {
+                setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+                var formData = new FormData();
+
+                formData.append("ID", ID);
+
+
+                // $(btn).attr("data-loading", "");
+
+                // var url = "/Clients/UpdateClient";
+
+
+                url = "/ReitredEmployee/AddSanction";
+
+
+                $.ajax({
+                    url: url,
+                    type: "Post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                            if (buttonValue == 1) {
+                                window.location.href = "/ReitredEmployee/Trans_Sanction_Grid";
+                            }
+                            else if (buttonValue == 2) {
+                                $("#client-tabContent input").val('');
+                                $("#client-tabContent textarea").val('');
+                                $("#client-tabContent select").val('');
+                            }
+                            else {
+                                LoadEmpsidebarViews();
+                            }
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(btn).removeAttr("data-loading");
+
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        $(btn).removeAttr("data-loading");
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+            else {
+                $(this).css("pointer-events", "unset");
+            }
+        })
+    });
+</script>

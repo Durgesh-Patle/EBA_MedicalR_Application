@@ -1,0 +1,88 @@
+﻿@model IEnumerable<MedicalR.Models.RoleManagement.RoleViewModel>
+@{
+    ViewBag.Title = "Roles";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+        <li class="nav-item"> <a class="nav-link" href="/settings/roles/add">Roles Privileges</a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="p-2">
+        <div class=""> <a href="/settings/roles/add" class="btn btn-secondary float-right ml-1">+</a> &nbsp;<a href="roles-privileges.html" class="btn btn-secondary float-right">Import</a> </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Action</th>
+                <th scope="col">Role Name</th>
+                <th scope="col">Role Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <th scope="row">
+                        <a href="/settings/roles/@item.RoleID/edit"><i class="fa fa-edit"></i></a>
+                        <label class="switch">
+                            <input type="checkbox" @(item.IsActive == true ? "checked" : "") class="roleStatus" data-roleID="@item.RoleID">
+                            <span class="slider round"></span>
+                        </label>
+                    </th>
+                    <td><a href="/settings/roles/@item.RoleID/edit">@item.RoleName</a></td>
+                    <td>@item.RoleDescription</td>
+
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    @if (Model.Count() == 0)
+    {
+        <div class="no-data-found">No Data Found</div>
+    }
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("body").on("change", ".roleStatus", function (e) {
+            var RoleID = $(this).data("roleid");
+            var RoleStatus = $(this).is(":checked");
+            var data = {
+                "RoleID": RoleID,
+                "IsActive": RoleStatus
+            };
+            $.ajax({
+                url: "/Settings/UpdateRoleStatus",
+                type: "post",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result["Status"] == true) {
+                        toastr["success"](result["Message"]);
+                    }
+                    else {
+                        toastr["error"](result["Message"]);
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+                }
+            });
+        })
+
+
+    })
+</script>

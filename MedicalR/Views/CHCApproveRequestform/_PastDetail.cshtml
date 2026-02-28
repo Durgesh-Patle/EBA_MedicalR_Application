@@ -1,0 +1,43 @@
+﻿@model IEnumerable<MedicalR.Models.CHC.CHCRequest>
+<table id="dtInterview" class="table table-sm" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+
+            @*<th class="th-sm"><input type="checkbox"></th>*@
+            <th class="th-sm">Name of Employee</th>
+            <th class="th-sm">Date of Checkup</th>
+            <th class="th-sm">Name of CHC Center</th>
+            <th class="th-sm">Name of the Spouse</th>
+            <th class="th-sm">Date of Checkup(Spouse)</th>
+            <th class="th-sm">Name of CHC Center (Spouse)</th>
+            <th class="th-sm">Status</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+
+                @*<th scope="row"><input type="checkbox"></th>*@
+                <td>@item.employeename</td>
+                <td>@Html.Label(item.date_of_checkup.ToShortDateString())</td>
+                <td>@item.hosname</td>
+                <td>@item.name_of_spouse</td>
+                <td>@Html.Label(item.spouse_dt_of_checkup.ToShortDateString())</td>
+                <td>@item.phosname</td>
+                <td>@item.status</td>
+
+            </tr>
+        }
+
+
+    </tbody>
+</table>
+@if (Model.Count() == 0)
+{
+    <div class="no-data-found">No Data Found</div>
+}
+
+

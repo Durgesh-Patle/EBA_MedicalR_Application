@@ -1,0 +1,890 @@
+﻿@model MedicalR.Models.CHC.CHCRequest
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/CHCRequestform">Statistics</a> </li>
+        @*<li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Request form</strong></a> </li>*@
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 bg-light"> </div>
+    <div class="row">
+        <div class="col-md-3 shadow p-0">
+            <hr class="mb-0 mt-0 border-top-0">
+            <div class="list-group list-group-flush" id="client-sidebar-info">
+
+
+            </div>
+        </div>
+        <div class="col-md-9 mt-3">
+            <ul class="nav nav-pills mb-3" id="clients-tab" role="tablist">
+                <li class="nav-item" role="presentation" data-tab="info"> <a href="javascript:void(0);" class="nav-link active" data-target="/CHCRequestform/_NewRequest_Edit/@ViewBag.Client_ID">New Request</a> </li>
+                <li class="nav-item" role="presentation" data-tab="PastDetail"> <a href="javascript:void(0);" class="nav-link" data-target="/CHCRequestform/_PastDetail/@ViewBag.Client_ID?PageID=1">Past Details</a> </li>
+
+            </ul>
+            <hr>
+
+            <div class="tab-content" id="client-tabContent">
+
+            </div>
+        </div>
+    </div>
+
+</article>
+<input type="hidden" value="0" id="employee_id" class="hdnRelevantID" />
+<input type="hidden" value="@ViewBag.Client_ID" id="emplid" class="hdnRelevantID" />
+<input type="hidden" value="@ViewBag.EmpCode" id="EmpCode" class="hdnRelevantID" />
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    var clientID = @ViewBag.Client_ID;
+    var activeTab = window.location.hash.substring(1);
+    if(activeTab=="" || clientID>0)
+    {
+        activeTab="info";
+        window.location.hash = '#'+activeTab;
+
+    }
+    var activeView = $("#clients-tab li[data-tab='"+activeTab+"']").find("a.nav-link").data("target");
+    LoadClientViews(activeView);
+    LoadEmpsidebarViews();
+
+    function LoadClientViews(targetView)
+    {
+        $("#clients-tab a").removeClass("active");
+        $("#clients-tab a[data-target='" + targetView + "']").addClass("active");
+        $("#loader").show();
+        $.ajax({
+            url: targetView,
+            type: "post",
+            data :{"clientID":clientID},
+            dataType: "html",
+            success: function (result) {
+                $("#client-tabContent").html(result);
+                $('#client-tabContent table').DataTable();
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                $("#loader").hide();
+            }
+
+        });
+    }
+    function BindCHC() {
+        $("#chc_centid").empty();
+        var chc_centerid = $("#chc_centerid").val().trim();
+        var chc_centername = $("#chc_centerid option:selected").text().trim();
+        $("#chc_centid").append("<option value='" + chc_centerid + "'>" + chc_centername + "</option>");
+
+    }
+    function LoadEmpsidebarViews()
+    {
+        $.ajax({
+            url: "/CHCRequestform/_Empsidebarinfo_Edit",
+            type: "post",
+            dataType: "html",
+            success: function (result) {
+                $("#client-sidebar-info").html(result);
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+            }
+
+        });
+    }
+    $(document).ready(function () {
+        $("#clients-tab a.nav-link").click(function () {
+            var tab = $(this).parent().data("tab");
+            window.location.hash = '#' + tab;
+
+            var targetView = $(this).data("target");
+            LoadClientViews(targetView);
+
+        })
+        function autospousedatefill() {
+            debugger;
+            var date_of_checkup = $("#date_of_checkup").val().trim();
+            $("#spouse_dt_of_checkup").val(date_of_checkup);
+
+        }
+        function check_date_of_checkup_validity(date_of_checkup, curr_date) {
+
+            var temp_date_of_checkup = new Date(date_of_checkup);
+
+            // Determine the time difference between two dates
+            var millisBetween = temp_date_of_checkup.getTime() - curr_date.getTime();
+
+            // Determine the number of days between two dates
+            var days = millisBetween / (1000 * 3600 * 24);
+            //var calculate_days=  Math.round(Math.abs(days));
+            //if (calculate_days < 8) {
+            //    toastr["error"]("Kindly apply before 8 working days from date of checkup");
+            //    return Math.round(Math.abs(days));
+            //}
+            return Math.round(Math.abs(days));
+        };
+        // added by santosh
+        $("body").on("click", "#Update", function () {
+            debugger;
+            //$(this).css("pointer-events", "none");
+            var btn = $(this);
+            var retStatus = true;
+            $(".has-error").html("");
+            var buttonValue = Boolean(Number($(this).data("val")));
+            var is_save_for_later = buttonValue;
+            var relationship = $("#relationship").val();
+            var val_curdate = new Date(new Date());
+            if (relationship == "Self and Spouse") {
+                var id = $("#id").val();
+                var emplid = $("#emplid").val();
+                var created_by = $("#created_by").val();
+                var mob_no = $("#mob_no").val();
+                var office_tel_no = $("#office_tel_no").val();
+                var date_of_birth = $("#date_of_birth").val();
+                var age = $("#age").val();
+                var date_of_checkup = $("#date_of_checkup").val();
+                if (date_of_checkup == "") {
+                    $("#date_of_checkup").parent().find(".has-error").html("Required*");
+                    toastr["error"]("Date of checkup required for self !")
+                    $("#date_of_checkup").focus();
+                    return;
+                }
+                else {
+                    var val_dt_of_checkup = new Date(date_of_checkup);
+                    if (val_dt_of_checkup < val_curdate) {
+                        toastr["error"]("Date of checkup can't be past date !");
+                        $("#date_of_checkup").focus();
+                        return;
+                    }
+                }
+                var chc_centerid = $("#chc_centerid").val();
+                if (chc_centerid == 0 || chc_centerid === undefined) {
+                    $("#chc_centerid").parent().find(".has-error").html("Required*");
+                    toastr["error"]("Please select your prefered CHC Center !")
+                    $("#chc_centerid").focus();
+                    return;
+                }
+                var otherchc_empl = $("#txtboth_chc_centerid").val();
+
+                if (chc_centerid === "4" && otherchc_empl === "") {
+                    toastr["error"]("Please enter chc center !")
+                    $("#txtboth_chc_centerid").focus();
+                    return;
+                }
+
+                var name_of_spouse = $("#name_of_spouse").val();
+                var dob_spouse = $("#dob_spouse").val();
+                if (dob_spouse == "" || dob_spouse === undefined) {
+                    toastr["error"]("Spouse date of birth is required !");
+                    $("#dob_spouse").focus();
+                    return;
+                }
+                var spouse_age = $("#spouse_age").val();
+                var spouse_dt_of_checkup = $("#spouse_dt_of_checkup").val();
+
+                if (spouse_dt_of_checkup == "") {
+                    $("#spouse_dt_of_checkup").parent().find(".has-error").html("Required*");
+                    toastr["error"]("Date of checkup required for Spouse !")
+                    $("#spouse_dt_of_checkup").focus();
+                    return;
+                }
+                else {
+                    var val_dt_of_checkup = new Date(spouse_dt_of_checkup);
+                    if (val_dt_of_checkup < val_curdate) {
+                        toastr["error"]("Date of checkup can't be past date !");
+                        $("#spouse_dt_of_checkup").focus();
+                        return;
+                    };
+                };
+                var otherchc_sps = $("#txtsps_chc_centid").val();
+
+                var chc_centid = $("#chc_centid").val();
+
+
+                var relationship = $("#relationship").val();
+                var created_by = $("#created_by").val();
+                var day_diff = check_date_of_checkup_validity(date_of_checkup, val_curdate);
+                if (day_diff < 8) {
+                    toastr["error"]("Kindly apply before 8 working days from date of checkup");
+                    return;
+                };
+
+
+                setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+
+                var formData = new FormData();
+                formData.append("id", id);
+                formData.append("emplid", emplid);
+                formData.append("mob_no", mob_no);
+                formData.append("office_tel_no", office_tel_no);
+                formData.append("date_of_birth", date_of_birth);
+                formData.append("age", age);
+                formData.append("date_of_checkup", date_of_checkup);
+                formData.append("chc_centerid", chc_centerid);
+                formData.append("name_of_spouse", name_of_spouse);
+                formData.append("dob_spouse", dob_spouse);
+                formData.append("spouse_age", spouse_age);
+                formData.append("spouse_dt_of_checkup", spouse_dt_of_checkup);
+                formData.append("chc_centid", chc_centid);
+                formData.append("relationship", relationship);
+                formData.append("created_by", created_by);
+                formData.append("otherchc_empl", otherchc_empl);
+                formData.append("otherchc_sps", otherchc_sps);
+                formData.append("is_save_for_later", is_save_for_later);
+
+
+
+                $(btn).attr("data-loading", "");
+
+                // var url = "/Clients/UpdateClient";
+
+                if (clientID > 0) {
+                    url = "/CHCRequestform/AddCHCRequest";
+                }
+
+                $.ajax({
+                    url: url,
+                    type: "Post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                            window.location.href = "/CHCRequestform";
+                            //if (buttonValue == 1) {
+                            //    window.location.href = "/CHCRequestform";
+                            //}
+                            //else if (buttonValue == 2) {
+                            //    $("#client-tabContent input").val('');
+                            //    $("#client-tabContent textarea").val('');
+                            //    $("#client-tabContent select").val('');
+                            //}
+                            //else {
+                            //    LoadEmpsidebarViews();
+                            //}
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(btn).removeAttr("data-loading");
+
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        $(btn).removeAttr("data-loading");
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+            else {
+                $(this).css("pointer-events", "unset");
+            }
+            if (relationship == "self") {
+                var id = $("#id").val();
+                var emplid = $("#emplid").val();
+                var created_by = $("#created_by").val();
+                var mob_no = $("#mob_no").val();
+                var office_tel_no = $("#office_tel_no").val();
+                var date_of_birth = $("#date_of_birth").val();
+                var age = $("#age").val();
+                var date_of_checkup = $("#date_of_checkup").val();
+                if (date_of_checkup == "") {
+                    $("#dateofself").parent().find(".has-error").html("Required*");
+                    toastr["error"]("Date of checkup required for Self !")
+                    $("#dateofself").focus();
+                    return;
+                }
+                else {
+                    var val_dt_of_checkup = new Date(date_of_checkup);
+                    if (val_dt_of_checkup < val_curdate) {
+                        toastr["error"]("Date of checkup can't be past date !");
+                        $("#dateofself").focus();
+                        return;
+                    }
+                }
+                var chc_centerid = $("#chc_centerid").val();
+                var otherchc_empl = $("#txt_chc_centerid_self").val();
+                var relationship = $("#relationship").val();
+                // var created_by = $("#created_by").val();
+                if (chc_centerid == 0 || chc_centerid === undefined) {
+                    $("#chc_centerid").parent().find(".has-error").html("Required*");
+                    toastr["error"]("Please select your prefered center !")
+                    $("#chc_centerid").focus();
+                    return;
+                }
+
+                if (chc_centerid === "4" && otherchc_empl === "") {
+                    toastr["error"]("Please enter chc center !")
+                    $("#txt_chc_centerid_self").focus();
+                    return;
+                }
+
+                var day_diff = check_date_of_checkup_validity(date_of_checkup, val_curdate);
+                if (day_diff < 8) {
+                    toastr["error"]("Kindly apply before 8 working days from date of checkup");
+                    return;
+                }
+
+                setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+                var formData = new FormData();
+                formData.append("id", clientID);
+                formData.append("emplid", emplid);
+                formData.append("mob_no", mob_no);
+                formData.append("office_tel_no", office_tel_no);
+                formData.append("date_of_birth", date_of_birth);
+                formData.append("age", age);
+                formData.append("date_of_checkup", date_of_checkup);
+                formData.append("chc_centerid", chc_centerid);
+                formData.append("relationship", relationship);
+                formData.append("created_by", created_by);
+                //  formData.append("otherchc_empl", otherchc_empl);
+                formData.append("is_save_for_later", is_save_for_later);
+
+
+                $(btn).attr("data-loading", "");
+
+                // var url = "/Clients/UpdateClient";
+
+                if (clientID > 0) {
+                    url = "/CHCRequestform/AddCHCRequest";
+                }
+
+                $.ajax({
+                    url: url,
+                    type: "Post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                            window.location.href = "/CHCRequestform";
+                            //if (buttonValue == 1) {
+                            //    window.location.href = "/CHCRequestform";
+                            //}
+                            //else if (buttonValue == 2) {
+                            //    $("#client-tabContent input").val('');
+                            //    $("#client-tabContent textarea").val('');
+                            //    $("#client-tabContent select").val('');
+                            //}
+                            //else {
+                            //    LoadEmpsidebarViews();
+                            //}
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(btn).removeAttr("data-loading");
+
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        $(btn).removeAttr("data-loading");
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+            else {
+                $(this).css("pointer-events", "unset");
+            }
+
+            if (relationship == "spouse") {
+
+                var id = $("#id").val();
+                var emplid = $("#emplid").val();
+                var created_by = $("#created_by").val();
+                var name_of_spouse = $("#name_of_spouse").val();
+                var dob_spouse = $("#dob_spouse").val();
+                var spouse_age = $("#spouse_age").val();
+                var spouse_dt_of_checkup = $("#spouse_dt_of_checkup").val();
+                var created_by = $("#empcode").val();
+                if (spouse_dt_of_checkup == "") {
+                    $("#spouse_dt_ofcheckup").parent().find(".has-error").html("Required*");
+                    toastr["error"]("Date of checkup required for Spouse !")
+                    $("#spouse_dt_ofcheckup").focus();
+                    return;
+                }
+                else {
+                    var val_dt_of_checkup = new Date(spouse_dt_of_checkup);
+                    if (val_dt_of_checkup < val_curdate) {
+                        toastr["error"]("Date of checkup can't be past date !");
+                        $("#spouse_dt_ofcheckup").focus();
+                        return;
+                    }
+                }
+                var chc_centid = $("#chc_centid").val();
+                var otherchc_sps = $("#txt_chccentid").val();
+
+                var relationship = $("#relationship").val();
+                var created_by = $("#created_by").val();
+                if (chc_centid == 0 || chc_centid === undefined) {
+                    $("#chccentid").parent().find(".has-error").html("Required*");
+                    toastr["error"]("Please select your prefered CHC center !")
+                    $("#chccentid").focus();
+                    return;
+                }
+
+                if (chc_centid === "4" && otherchc_empl === "") {
+                    toastr["error"]("Please enter chc center !")
+                    $("#otherchc_sps").focus();
+                    return;
+                }
+
+                var day_diff = check_date_of_checkup_validity(spouse_dt_of_checkup, val_curdate);
+                if (day_diff < 8) {
+                    toastr["error"]("Kindly apply before 8 working days from date of checkup");
+                    return;
+                }
+
+                setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+                var formData = new FormData();
+                formData.append("id", clientID);
+                formData.append("emplid", emplid);
+                formData.append("name_of_spouse", name_of_spouse);
+                formData.append("dob_spouse", dob_spouse);
+                formData.append("spouse_age", spouse_age);
+                formData.append("spouse_dt_of_checkup", spouse_dt_of_checkup);
+                formData.append("chc_centid", chc_centid);
+                formData.append("relationship", relationship);
+                formData.append("created_by", created_by);
+                formData.append("otherchc_sps", otherchc_sps);
+                formData.append("is_save_for_later", is_save_for_later);
+                $(btn).attr("data-loading", "");
+                if (clientID > 0) {
+                    url = "/CHCRequestform/AddCHCRequest";
+                }
+                $.ajax({
+                    url: url,
+                    type: "Post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                            window.location.href = "/CHCRequestform";
+                            //if (buttonValue == 1) {
+                            //    window.location.href = "/CHCRequestform";
+                            //}
+                            //else if (buttonValue == 2) {
+                            //    $("#client-tabContent input").val('');
+                            //    $("#client-tabContent textarea").val('');
+                            //    $("#client-tabContent select").val('');
+                            //}
+                            //else {
+                            //    LoadEmpsidebarViews();
+                            //}
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(btn).removeAttr("data-loading");
+
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        $(btn).removeAttr("data-loading");
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+            else {
+                $(this).css("pointer-events", "unset");
+            }
+
+        })
+
+        //commented by santosh Update function
+        //$("body").on("click", "#Update", function () {
+        //    $(this).css("pointer-events", "none");
+        //    var btn = $(this);
+        //    var retStatus = true;
+        //    $(".has-error").html("");
+        //    var buttonValue = Boolean(Number($(this).data("val")));
+        //    var is_save_for_later = buttonValue;
+        //    var relationship = $("#relationship").val().trim();
+        //    if (relationship == "Self and Spouse")
+        //    {
+
+        //        var id = $("#id").val().trim();
+        //        var mob_no = $("#mob_no").val().trim();
+        //        var office_tel_no = $("#office_tel_no").val().trim();
+        //        var date_of_birth = $("#date_of_birth").val().trim();
+        //        var age = $("#age").val().trim();
+        //        var date_of_checkup = $("#date_of_checkup").val().trim();
+        //        var chc_centerid = $("#chc_centerid").val().trim();
+        //        var name_of_spouse = $("#name_of_spouse").val().trim();
+        //        var dob_spouse = $("#dob_spouse").val().trim();
+        //        var spouse_age = $("#spouse_age").val().trim();
+        //        var spouse_dt_of_checkup = $("#spouse_dt_of_checkup").val().trim();
+        //        var chc_centid = $("#chc_centid").val().trim();
+        //        var relationship = $("#relationship").val().trim();
+
+
+
+        //        if (chc_centerid == "") {
+        //            $("#chc_centerid").parent().find(".has-error").html("Required*");
+        //            retStatus = false;
+        //        }
+
+        //        if (retStatus == true) {
+        //            setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+        //            var formData = new FormData();
+
+        //            formData.append("id", id);
+        //            formData.append("mob_no", mob_no);
+        //            formData.append("office_tel_no", office_tel_no);
+        //            formData.append("date_of_birth", date_of_birth);
+        //            formData.append("age", age);
+        //            formData.append("date_of_checkup", date_of_checkup);
+        //            formData.append("chc_centerid", chc_centerid);
+        //            formData.append("name_of_spouse", name_of_spouse);
+        //            formData.append("dob_spouse", dob_spouse);
+        //            formData.append("spouse_age", spouse_age);
+        //            formData.append("spouse_dt_of_checkup", spouse_dt_of_checkup);
+        //            formData.append("chc_centid", chc_centid);
+        //            formData.append("relationship", relationship);
+
+
+        //            $(btn).attr("data-loading", "");
+
+        //            // var url = "/Clients/UpdateClient";
+
+        //            if (clientID > 0) {
+        //                url = "/CHCRequestform/UpdateCHCRequest";
+        //            }
+
+        //            $.ajax({
+        //                url: url,
+        //                type: "Post",
+        //                data: formData,
+        //                dataType: "json",
+        //                contentType: false,
+        //                processData: false,
+        //                success: function (result) {
+        //                    if (result["Status"] == true) {
+        //                        toastr["success"](result["Message"]);
+        //                        if (buttonValue == 1) {
+        //                            window.location.href = "/CHCRequestform";
+        //                        }
+        //                        else if (buttonValue == 2) {
+        //                            $("#client-tabContent input").val('');
+        //                            $("#client-tabContent textarea").val('');
+        //                            $("#client-tabContent select").val('');
+        //                        }
+        //                        else {
+        //                            LoadEmpsidebarViews();
+        //                        }
+        //                    }
+        //                    else {
+        //                        toastr["error"](result["Message"]);
+        //                    }
+        //                    $(btn).removeAttr("data-loading");
+
+        //                },
+        //                error: function (xhr) {
+        //                    if (xhr.status === 401) {
+        //                        window.location.reload();
+        //                        return;
+        //                    }
+        //                    $(btn).removeAttr("data-loading");
+        //                    toastr["error"]("Something went wrong. Please try after some time.");
+        //                }
+        //            });
+        //        }
+        //        else {
+        //            $(this).css("pointer-events", "unset");
+        //        }
+        //    }
+        //    if (relationship == "self")
+        //    {
+        //        var id = $("#id").val().trim();
+        //        var mob_no = $("#mob_no").val().trim();
+        //        var office_tel_no = $("#office_tel_no").val().trim();
+        //        var date_of_birth = $("#date_of_birth").val().trim();
+        //        var age = $("#age").val().trim();
+        //        var date_of_checkup = $("#date_of_checkup").val().trim();
+        //        var chc_centerid = $("#chc_centerid").val().trim();
+        //        var relationship = $("#relationship").val().trim();
+
+
+
+
+        //        if (chc_centerid == "") {
+        //            $("#chc_centerid").parent().find(".has-error").html("Required*");
+        //            retStatus = false;
+        //        }
+
+        //        if (retStatus == true) {
+        //            setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+        //            var formData = new FormData();
+
+        //            formData.append("id", id);
+        //            formData.append("mob_no", mob_no);
+        //            formData.append("office_tel_no", office_tel_no);
+        //            formData.append("date_of_birth", date_of_birth);
+        //            formData.append("age", age);
+        //            formData.append("date_of_checkup", date_of_checkup);
+        //            formData.append("chc_centerid", chc_centerid);
+        //            formData.append("relationship", relationship);
+
+
+
+        //            $(btn).attr("data-loading", "");
+
+        //            // var url = "/Clients/UpdateClient";
+
+        //            if (clientID > 0) {
+        //                url = "/CHCRequestform/UpdateCHCRequest";
+        //            }
+
+        //            $.ajax({
+        //                url: url,
+        //                type: "Post",
+        //                data: formData,
+        //                dataType: "json",
+        //                contentType: false,
+        //                processData: false,
+        //                success: function (result) {
+        //                    if (result["Status"] == true) {
+        //                        toastr["success"](result["Message"]);
+        //                        if (buttonValue == 1) {
+        //                            window.location.href = "/CHCRequestform";
+        //                        }
+        //                        else if (buttonValue == 2) {
+        //                            $("#client-tabContent input").val('');
+        //                            $("#client-tabContent textarea").val('');
+        //                            $("#client-tabContent select").val('');
+        //                        }
+        //                        else {
+        //                            LoadEmpsidebarViews();
+        //                        }
+        //                    }
+        //                    else {
+        //                        toastr["error"](result["Message"]);
+        //                    }
+        //                    $(btn).removeAttr("data-loading");
+
+        //                },
+        //                error: function (xhr) {
+        //                    if (xhr.status === 401) {
+        //                        window.location.reload();
+        //                        return;
+        //                    }
+        //                    $(btn).removeAttr("data-loading");
+        //                    toastr["error"]("Something went wrong. Please try after some time.");
+        //                }
+        //            });
+        //        }
+        //        else {
+        //            $(this).css("pointer-events", "unset");
+        //        }
+        //    }
+        //    if (relationship == "spouse")
+        //    {
+        //        var id = $("#id").val().trim();
+
+        //        var name_of_spouse = $("#name_of_spouse").val().trim();
+        //        var dob_spouse = $("#dob_spouse").val().trim();
+        //        var spouse_age = $("#spouse_age").val().trim();
+        //        var spouse_dt_of_checkup = $("#spouse_dt_of_checkup").val().trim();
+        //        var chc_centid = $("#chc_centid").val().trim();
+        //        var relationship = $("#relationship").val().trim();
+
+
+
+        //        if (chc_centid == "") {
+        //            $("#chc_centid").parent().find(".has-error").html("Required*");
+        //            retStatus = false;
+        //        }
+
+        //        if (retStatus == true) {
+        //            setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+        //            var formData = new FormData();
+
+        //            formData.append("id", id);
+
+        //            formData.append("name_of_spouse", name_of_spouse);
+        //            formData.append("dob_spouse", dob_spouse);
+        //            formData.append("spouse_age", spouse_age);
+        //            formData.append("spouse_dt_of_checkup", spouse_dt_of_checkup);
+        //            formData.append("chc_centid", chc_centid);
+        //            formData.append("relationship", relationship);
+
+
+        //            $(btn).attr("data-loading", "");
+
+        //            // var url = "/Clients/UpdateClient";
+
+        //            if (clientID > 0) {
+        //                url = "/CHCRequestform/UpdateCHCRequest";
+        //            }
+
+        //            $.ajax({
+        //                url: url,
+        //                type: "Post",
+        //                data: formData,
+        //                dataType: "json",
+        //                contentType: false,
+        //                processData: false,
+        //                success: function (result) {
+        //                    if (result["Status"] == true) {
+        //                        toastr["success"](result["Message"]);
+        //                        if (buttonValue == 1) {
+        //                            window.location.href = "/CHCRequestform";
+        //                        }
+        //                        else if (buttonValue == 2) {
+        //                            $("#client-tabContent input").val('');
+        //                            $("#client-tabContent textarea").val('');
+        //                            $("#client-tabContent select").val('');
+        //                        }
+        //                        else {
+        //                            LoadEmpsidebarViews();
+        //                        }
+        //                    }
+        //                    else {
+        //                        toastr["error"](result["Message"]);
+        //                    }
+        //                    $(btn).removeAttr("data-loading");
+
+        //                },
+        //                error: function (xhr) {
+        //                    if (xhr.status === 401) {
+        //                        window.location.reload();
+        //                        return;
+        //                    }
+        //                    $(btn).removeAttr("data-loading");
+        //                    toastr["error"]("Something went wrong. Please try after some time.");
+        //                }
+        //            });
+        //        }
+        //        else {
+        //            $(this).css("pointer-events", "unset");
+        //        }
+        //    }
+        //})
+        //$("body").on("click", "#Delete", function () {
+        //    $(this).css("pointer-events", "none");
+        //    var btn = $(this);
+        //    var retStatus = true;
+        //    $(".has-error").html("");
+        //    var buttonValue = $(this).data("val");
+        //    var emplid = clientID;
+        //    var mob_no = $("#mob_no").val().trim();
+        //    var office_tel_no = $("#office_tel_no").val().trim();
+        //    var date_of_birth = $("#date_of_birth").val().trim();
+        //    var age = $("#age").val().trim();
+        //    var date_of_checkup = $("#date_of_checkup").val().trim();
+        //    var chc_centerid = $("#chc_centerid").val().trim();
+        //    var name_of_spouse = $("#name_of_spouse").val().trim();
+        //    var dob_spouse = $("#dob_spouse").val().trim();
+        //    var spouse_age = $("#spouse_age").val().trim();
+        //    var spouse_dt_of_checkup = $("#spouse_dt_of_checkup").val().trim();
+        //    var chc_centid = $("#chc_centid").val().trim();
+
+
+
+        //    if (retStatus == true) {
+        //        setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+        //        var formData = new FormData();
+
+        //        formData.append("emplid", clientID);
+        //        formData.append("mob_no", mob_no);
+        //        formData.append("office_tel_no", office_tel_no);
+        //        formData.append("date_of_birth", date_of_birth);
+        //        formData.append("age", age);
+        //        formData.append("date_of_checkup", date_of_checkup);
+        //        formData.append("chc_centerid", chc_centerid);
+        //        formData.append("name_of_spouse", name_of_spouse);
+        //        formData.append("dob_spouse", dob_spouse);
+        //        formData.append("spouse_age", spouse_age);
+        //        formData.append("spouse_dt_of_checkup", spouse_dt_of_checkup);
+        //        formData.append("chc_centid", chc_centid);
+
+
+
+        //        $(btn).attr("data-loading", "");
+
+        //        // var url = "/Clients/UpdateClient";
+
+        //        if (clientID > 0) {
+        //            url = "/CHCRequestform/UpdateCHCRequest";
+        //        }
+
+        //        $.ajax({
+        //            url: url,
+        //            type: "Post",
+        //            data: formData,
+        //            dataType: "json",
+        //            contentType: false,
+        //            processData: false,
+        //            success: function (result) {
+        //                if (result["Status"] == true) {
+        //                    toastr["success"](result["Message"]);
+        //                    if (buttonValue == 1) {
+        //                        window.location.href = "/CHCRequestform";
+        //                    }
+        //                    else if (buttonValue == 2) {
+        //                        $("#client-tabContent input").val('');
+        //                        $("#client-tabContent textarea").val('');
+        //                        $("#client-tabContent select").val('');
+        //                    }
+        //                    else {
+        //                        LoadEmpsidebarViews();
+        //                    }
+        //                }
+        //                else {
+        //                    toastr["error"](result["Message"]);
+        //                }
+        //                $(btn).removeAttr("data-loading");
+
+        //            },
+        //            error: function (xhr) {
+        //                if (xhr.status === 401) {
+        //                    window.location.reload();
+        //                    return;
+        //                }
+        //                $(btn).removeAttr("data-loading");
+        //                toastr["error"]("Something went wrong. Please try after some time.");
+        //            }
+        //        });
+        //    }
+        //    else {
+        //        $(this).css("pointer-events", "unset");
+        //    }
+        //})
+    });
+
+
+
+
+</script>
+

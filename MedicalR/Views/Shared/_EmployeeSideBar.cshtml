@@ -1,0 +1,122 @@
+﻿<div class="list-group list-group-flush" id="employeeSidebar">
+
+    <div class="list-group-item list-group-item-action">
+        <div class="media">
+            <div class="media-body">
+                <p class="mb-1">
+                    <strong>EmplID</strong> :
+                    <span id="sb_employeecode"></span>
+                </p>
+                <h5 id="sb_username"></h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-group-item list-group-item-action">
+        <h6 class="font-weight-bold">
+            Appln.No
+            <span class="small"><br /> New-1</span>
+        </h6>
+    </div>
+
+    <div class="list-group-item list-group-item-action">
+        <h6 class="font-weight-bold">
+            Band
+            <span class="small">
+                <br />
+                <span id="sb_band"></span>
+            </span>
+        </h6>
+    </div>
+
+    <div class="list-group-item list-group-item-action">
+        <h6 class="font-weight-bold">
+            Department
+            <span class="small">
+                <br />
+                <span id="sb_department"></span>
+            </span>
+        </h6>
+    </div>
+
+    <div class="list-group-item list-group-item-action">
+        <h6 class="font-weight-bold">
+            Location
+            <span class="small">
+                <br />
+                <span id="sb_location"></span>
+            </span>
+        </h6>
+    </div>
+
+    <div class="list-group-item list-group-item-action">
+        <h6 class="font-weight-bold">
+            Email
+            <span class="small">
+                <br />
+                <a href="#" id="sb_email"></a>
+            </span>
+        </h6>
+    </div>
+
+    <div class="list-group-item list-group-item-action">
+        <h6 class="font-weight-bold">
+            Designation
+            <span class="small">
+                <br />
+                <span id="sb_designation"></span>
+            </span>
+        </h6>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        loadEmployeeSidebar();
+
+        function loadEmployeeSidebar() {
+
+            $.ajax({
+                url: '/Common/GetEmployeeSideBarDetails/',
+                type: 'POST',
+                dataType: 'json',
+
+                success: function (response) {
+
+                    console.log("Sidebar Response:", response);
+
+                    // If your API returns { data: {...} }
+                    // then use: var data = response.data;
+                    var data = response;
+
+                    if (!data) return;
+
+                    $("#sb_employeecode").text(data.employeecode || '');
+                    $("#sb_username").text(data.username || '');
+                    $("#sb_band").text(data.Band || '');
+                    $("#sb_department").text(data.Department || '');
+                    $("#sb_location").text(data.locationcode || '');
+                    $("#sb_designation").text(data.Designation || '');
+
+                    if (data.email) {
+                        $("#sb_email")
+                            .text(data.email)
+                            .attr("href", "mailto:" + data.email);
+                    } else {
+                        $("#sb_email").text('');
+                    }
+                },
+
+                error: function (xhr) {
+                    console.error("Sidebar load error:", xhr.responseText);
+                    toastr.error("Failed to load employee details.");
+                }
+            });
+        }
+
+    });
+</script>

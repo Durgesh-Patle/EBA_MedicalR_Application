@@ -1,0 +1,80 @@
+﻿@using MedicalR.CustomHelper;
+@using MedicalR.Models.UserManagement;
+@{
+    ViewBag.Title = "Intermediate App";
+    Layout = null;
+}
+<style>
+    .flex-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+        .flex-container > div {
+            background-color: #f1f1f1;
+            margin: 30px;
+            padding: 70px;
+            font-size: 20px;
+            border-radius: 10px;
+            border: 1.5px solid grey;
+            margin-top: 145px;
+        }
+</style>
+<div class="form-horizontal">
+
+    <div class="form-group">
+        <h2>Dashboard</h2>
+        <a href="/Home/Logout?emp_code=@HttpContext.Current.Session["login_user"].ToString()" style="text-align:right">Logout</a>
+    </div>
+</div>
+<hr />
+<div class="flex-container">
+    @{
+        if (@HttpContext.Current.Session["login_user2"].ToString() != "traveldesk" && @HttpContext.Current.Session["login_user2"].ToString() != "abhishekm")
+        {
+            <div><a href="/@ViewBag.eba_url">Medical Reimbursement System</a></div>
+
+        }
+    }
+
+    @if (@HttpContext.Current.Session["login_user2"].ToString() != "abhishekm")
+    {
+        <div><a href="https://tms.utiamc.com:93/Login/Index?EmpCode=@HttpContext.Current.Session["login_user"].ToString()">Tour Management System</a></div>
+    }
+
+    @{
+        if (@HttpContext.Current.Session["login_user2"].ToString() != "traveldesk")
+        {
+            <div><a href="https://ams.utiamc.com/Login/Index?login_id=@HttpContext.Current.Session["login_user"].ToString()">Asset Management System</a></div>
+        }
+        if (@HttpContext.Current.Session["login_user2"].ToString() != "traveldesk" && @HttpContext.Current.Session["login_user2"].ToString() != "abhishekm")
+        {
+            <div><a href="https://edf.utiamc.com/Login/Index?login_id=@HttpContext.Current.Session["login_user"].ToString()">Employee Declaration Forms</a></div>
+        }
+    }
+
+</div>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        debugger
+        var pageWidth = window.innerWidth;
+        var pageHeight = window.innerHeight;
+
+       // alert("Page Width: " + pageWidth + ", Page Height: " + pageHeight);
+
+        // If you need to send this data to your server, you can use AJAX
+        // Uncomment the following code if you need to send the dimensions to your server
+
+        /*
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/your-endpoint-to-handle-dimensions", true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.send(JSON.stringify({
+            width: pageWidth,
+            height: pageHeight
+        }));
+        */
+    });</script>

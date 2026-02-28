@@ -1,0 +1,285 @@
+﻿@model MedicalR.Models.CommonSettings.HospitalListModel
+
+@{
+    ViewBag.Title = "Hospital_Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/settings/Hospital_list">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Hospital name</strong></a> </li>
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Enter Hospital Information</h3>
+        </div>
+    </div>
+    <hr>
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="">Hospital Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Name" placeholder="Hospital Name" value="@Model.Name">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Hospital Address </label>
+                    <input type="text" class="form-control" id="Address" placeholder="Hospital Address" value="@Model.Address">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">City </label>
+                    @*<input type="text" class="form-control" id="City" placeholder="City Name" value="@Model.City">*@
+                    <select class="form-control select2" id="City">
+                        @foreach (var item in ViewBag.HosCityList)
+                        {
+                            <option value="@item.Name" @(Model.City == item.Name ? "selected" : "")>@item.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Pin Code </label>
+                    <input type="text" class="form-control" id="Pincode" placeholder="City Name" value="@Model.Pincode">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Hospital Bank Name </label>
+                    <input type="text" class="form-control" id="hosp_bank_name" value="@Model.hosp_bank_name">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Hospital Bank Account Number </label>
+                    <input type="text" class="form-control" id="hosp_bank_accno" value="@Model.hosp_bank_accno">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Hospital Bank IFSC Code </label>
+                    <input type="text" class="form-control" id="bank_ifsc_code" value="@Model.bank_ifsc_code">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Email1 </label>
+                    <input type="text" class="form-control" id="email1" value="@Model.email1">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Email2 </label>
+                    <input type="text" class="form-control" id="email2" value="@Model.email2">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Men's Package</label>
+                    <input type="text" class="form-control" id="mens_package" value="@Model.mens_package">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="">Women's Package</label>
+                    <input type="text" class="form-control" id="womens_package" value="@Model.womens_package">
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-1">
+                <label for="">Is Credit Facility</label>
+            </div>
+            <div class="form-group col-md-1">
+                @if (@Model.is_credit_facility == true)
+                {
+                    <input type="checkbox" checked id="is_credit_facility">
+                }
+                else
+                {
+                    <input type="checkbox" id="is_credit_facility">
+                }
+
+            </div>
+            <div class="form-group col-md-1">
+                <label for="">Is Cashless:</label>
+            </div>
+            <div class="form-group col-md-1">
+                @if (@Model.is_cashless == true)
+                {
+                    <input type="checkbox" checked id="is_cashless">
+                }
+                else
+                {
+                    <input type="checkbox" id="is_cashless">
+                }
+
+            </div>
+        </div>
+
+        <div class="row pt-3">
+            <input type="hidden" id="HospitalID" value="@Model.id" />
+            <div class="col-md-12 mt-5">
+                <a href="javascript:void(0)" class="btn btn-primary" id="AddHospital" data-val="1">Save</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="javascript:void(0)" class="btn btn-primary" id="DelHospital" data-val="2">Delete</a>
+            </div>
+        </div>
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#DelHospital").click(function () {
+
+          var buttonValue = $(this).data("val");
+            var RetStatus = true;
+          $(".has-error").html("");
+          var id = $("#HospitalID").val().trim();
+          var Name = $("#Name").val().trim();
+          var Address = $("#Address").val().trim();
+          var City = $("#City").val().trim();
+          var Pincode = $("#Pincode").val().trim();
+
+
+          if (Name == "")
+            {
+              $("#Name").parent().find(".has-error").html("Required*");
+              $("#Name").focus();
+               RetStatus = false;
+            }
+
+
+            if(RetStatus==true)
+            {
+                var data = {
+                    "id":id,
+                    "Name": Name,
+                    "Address": Address,
+                    "City": City,
+                    "Pincode": Pincode
+
+                };
+                $.ajax({
+                    url: "/Settings/HospitalStatus",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+
+                           window.location.href = "@Url.Action("Hospital_list","Settings")";
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+      $("#AddHospital").click(function () {
+
+          var buttonValue = $(this).data("val");
+            var RetStatus = true;
+          $(".has-error").html("");
+          var id = $("#HospitalID").val().trim();
+          var Name = $("#Name").val().trim();
+          var Address = $("#Address").val().trim();
+          var City = $("#City").val().trim();
+          var Pincode = $("#Pincode").val().trim();
+          var hosp_bank_name = $("#hosp_bank_name").val().trim();
+          var hosp_bank_accno = $("#hosp_bank_accno").val().trim();
+          var bank_ifsc_code = $("#bank_ifsc_code").val().trim();
+          var email1 = $("#email1").val().trim();
+          var email2 = $("#email2").val().trim();
+          var mens_package = $("#mens_package").val();
+          var womens_package = $("#womens_package").val();
+          if ($("#is_credit_facility").prop('checked') == true) {
+              var is_credit_facility = true;
+          }
+          else {
+              var is_credit_facility = false;
+          }
+
+          if ($("#is_cashless").prop('checked') == true) {
+              var is_cashless = true;
+          }
+
+          else {
+              var is_cashless = false;
+          }
+
+          if (Name == "")
+            {
+              toastr["error"]("Name can not be blank !");
+              return;
+               RetStatus = false;
+            }
+          if (Address == "") {
+
+              toastr["error"]("Address can not be blank !");
+              return;
+              RetStatus = false;
+
+          }
+          if (email1 == "") {
+
+              toastr["error"]("Email1 can not be blank !");
+              return;
+              RetStatus = false;
+          }
+
+            if(RetStatus==true)
+            {
+                var data = {
+                    "id": id,
+                    "Name": Name,
+                    "Address": Address,
+                    "City": City,
+                    "Pincode": Pincode,
+                    "hosp_bank_name": hosp_bank_name,
+                    "hosp_bank_accno": hosp_bank_accno,
+                    "bank_ifsc_code": bank_ifsc_code,
+                    "is_credit_facility": is_credit_facility,
+                    "is_cashless": is_cashless,
+                    "email1": email1,
+                    "email2": email2,
+                    "mens_package": mens_package,
+                    "womens_package": womens_package
+                };
+                $.ajax({
+                    url: "/Settings/UpdateHospital",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+
+                           window.location.href = "@Url.Action("Hospital_list","Settings")";
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+    })
+</script>

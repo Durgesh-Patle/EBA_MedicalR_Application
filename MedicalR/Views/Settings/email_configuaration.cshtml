@@ -1,0 +1,82 @@
+﻿@model IEnumerable<MedicalR.Models.EmailConfiguration.EmailConfigurationModel>
+@{
+    ViewBag.Title = "Email Configuration";
+}
+
+<article class="col-md-12">
+    <div class="p-2">
+        <div class=""> <a href="/settings/email-configuaration/add" class="btn btn-secondary float-right ml-1">+</a> &nbsp;<a href="email-settings.html" class="btn btn-secondary float-right">Import</a> </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Action</th>
+                <th scope="col">Name</th>
+                <th scope="col">Account Type</th>
+                <th scope="col">Email ID</th>
+                <th scope="col">Port Number</th>
+                <th scope="col">Server</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr>
+                <th scope="row">
+                    <a href="/settings/email-configuaration/@item.UserID/edit"><i class="fa fa-edit"></i></a>
+                    <label class="switch">
+                        <input type="checkbox" @(item.IsActive == true ? "checked" : "") class="emailConfigurationStatus" data-emailConfigurationID="@item.UserEmailSettingsID">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td><a href="/settings/email-configuaration/@item.UserID/edit">@item.Name</a></td>
+                <td>@item.AccountType</td>
+                <td>@item.Email</td>
+                <td>@item.Port</td>
+                <td>@item.Server</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.Count() == 0)
+    {
+        <div class="no-data-found">No Data Found</div>
+    }
+</article>
+<script>
+    $(document).ready(function () {
+
+        $("body").on("change", ".emailConfigurationStatus", function (e) {
+            var EmailConfigurationID = $(this).data("emailconfigurationid");
+            var EmailConfigurationtatus = $(this).is(":checked");
+            var data = {
+                "UserEmailSettingsID": EmailConfigurationID,
+                "IsActive": EmailConfigurationtatus
+            };
+            $.ajax({
+                url: "/Settings/UpdateEmailConfigurationStatus",
+                type: "post",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result["Status"] == true) {
+                        toastr["success"](result["Message"]);
+                    }
+                    else {
+                        toastr["error"](result["Message"]);
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+                }
+            });
+        })
+
+
+    })
+</script>

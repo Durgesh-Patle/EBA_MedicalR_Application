@@ -1,0 +1,712 @@
+﻿
+@{
+    ViewBag.Title = "job_boards";
+}
+<article class="col-md-12 mt-3">
+    <h3>Job Boards List</h3>
+    <p>Job Boards are an excellent resource for both agency recruiters and corporate hiring teams. FreeITStaffing Recruit has integrated with several premium job boards across all geographies to ensure that, your job posting gets a wider scope of visibility, which also accelerates your process of finding the right candidates.</p>
+    <p>FreeITStaffing Recruit only acts as a facilitator and is not an official representative of the listed Job boards. These integrations have been crafted as an added feature for our users. Please note that the pricing and terms for each individual job boards as opted by the users, may vary at the discretion of the service providers providing such job listing services, as some are paid and some are offered free.</p>
+    Also note that all consent for listing, providing services and any validation of jobs into job boards are at the discretion of the service providers, and NOT FreeITStaffing Recruit.
+    </p>
+    <p>Please choose the job boards you wish to publish your jobs</p>
+    <div class="p-2">
+        <div class="">
+            <select class="custom-select col-sm-2" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                <option selected="">Worldwide</option>
+                <option value=" ">India</option>
+                <option value=" ">USA</option>
+                <option value=" ">UK</option>
+            </select>
+            <select class="custom-select col-sm-2" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                <option selected="">Select</option>
+                <option value=" ">Free</option>
+                <option value=" ">Paid</option>
+                <option value=" ">Sponsor</option>
+            </select>
+            <select class="custom-select col-sm-2" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                <option selected="">Select</option>
+                <option value=" ">Adzuna</option>
+                <option value=" ">ApplymyJOBS</option>
+                <option value=" ">Bayt</option>
+            </select>
+            <!--<a href="jobopenings-add.html" class="btn btn-secondary float-right ml-1">+</a> &nbsp;-->
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col" width="25%">Company</th>
+                <th scope="col" width="15%">Select</th>
+                <th scope="col" width="60%"> </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><img src="../includes/img/jobboard/board1.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round" data-toggle="modal" data-target="#exampleModal"></span>
+                    </label>
+                </th>
+                <td>Adzuna aims to provide a smarter solution for recruiters across the globe by analysing powerful data about the job market and presenting recruiters the power to understand the industry.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board2.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>ApplymyJOBS helps Recruiters post required positions and receive resumes automatically from job seekers who are looking for  jobs based on required skill set.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board3.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Bayt is the #1 job site in the Middle East and North Africa, offering a complete range of end-to-end employment solutions and career planning tools.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board4.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>BroadBean Post jobs to your preferred channels and track the source. It sounds simple, because it is with Broadbean.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board5.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>CareerBuilder the largest online job site in the U.S., but more than just a job board. It helps match the right talent with the right opportunity.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board6.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Careerjet Scanning over 58000 websites everyday, operating in over 90 countries and 28 different languages, CareerJet is a necessity for every recruiter.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board7.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>CareerOne operates specially within Australia</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board8.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>CareerStructure.com is your online job advertising platform that helps you source candidates in the construction sector.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board9.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>caterer.com , being UK's one of the leading job boards, helps you shortlist candidates within the hospitality industry.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board10.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>craigslist helps you find your next great hire for your jobs.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board11.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>CV-Library is the UK's leading independent job site. Candidates are able to apply directly to over 145,000 live vacancies from across the UK, covering over 70 different sectors.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board12.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>CWJobs.co.uk helps you attract job seekers in the IT sector by posting your job adverts and shortlisting them in the quickest way possible.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board13.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Dice operates in and for the USA and Canada, fetching jobs for countless job seekers. Roll with the best. Roll the Dice.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board14.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>DrJobs is a leading job search engine that offers unlimited opportunities to jobseekers and acts as a bridge that connects employers and jobseekers</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board15.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Expertini.Com differs from other job-hunting websites by adding an element of socialising. Through socializing recruiters and candidates can form a professional rapport.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board16.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Faces2hire Employers can post unlimited number of jobs for FREE; no limits, no credit cards. Add Job-Seekers to your favorites and save them for another time to find the best fit</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board17.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>FlexJobs lets you access a broader community of individuals that value remote work.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board18.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Glassdoor is your free inside look at jobs and companies. Salary details, company reviews, and interview questions - all posted anonymously by employees and job seekers.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board19.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Jobs on Google let your job postings found by millions of job seekers who search for jobs on google everyday</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board20.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Healthcarejobs.ie helps you match the right candidate with the right job opening.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board21.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Healthjobs.co.uk lets you find the right talent in the health care sector for your job openings.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board22.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Indeed is the world’s #1 job site welcoming over 180 million unique visitors each month. With more than 16 million jobs to explore in every industry and location, Indeed is the easiest way for people to find all the most relevant jobs online.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board23.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>IrishJobs.ie suggests the best talent for all your job requisitions.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board24.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Jobat is your best partner to find active job seekers.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board25.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Jobboom has been helping employers meet their recruitment goals for nearly 20 years. Their matching tool ensures a perfect fit between candidates and your job requirements.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board26.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Jobillico is one of the leading job boards in Canada and helps you find the best talent.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board27.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>JobisJob drives high quality potential applicants into your websites and delivers clicks that convert.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board28.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>JobRapido With over 60 million registered users and 25 million job adverts, jobrapido is the place to go for job-seekers and employers.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board29.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>jobs.ch is the leading player in Switzerland's online employment market, offering various recruiting solutions. In addition to job portals, the portfolio of JobCloud also contains seminal technologies</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board30.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Jobs.ie gets 1.8 million monthly visits and over million Job Alerts. You can rest assured that your job postings are seen by the right candidates, at the right time. </td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board31.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Jobsite has a fast and effective job posting to help you reach the most skilled and relevant professionals.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board32.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Jooble When you perform a search with Jooble, you'll get links to job postings from more than 500+ different job sites throughout the world that are the most relevant to your search terms.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board33.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Jora is an exclusive job search engine for Recruiters to advertise jobs and also helps job seekers to find jobs across various verticals sourced from many job sites. Their aim is to make job search easier and efficient all around the world.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board34.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>LogicMelon is there to simplify sourcing for you by allowing you to enter the job requirement once on a simple posting form, available directly from within Zoho Recruit. Finding that perfect candidate is easily achievable when using LogicMelon.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board35.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>MojeDelo is the right place if you're looking for a fast and effective way to find candidates.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board36.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Monster is one of the most visited employment websites in the United States and one of the largest in the world.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board37.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Monster APAC Post jobs, search resumes, screen candidates and streamline your entire hiring process with Recruit’s Monster Asia&Pacific integration.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board38.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Monster INDIA India's leading online career and recruitment resource with its cutting edge technology connects job seekers and recruiters across industry verticals, experience levels and geographies.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board39.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Monster GULF connects you to real world opportunities, helping you achieve your goals and realize dreams.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board40.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Monster-Organic is one of the most visited employment websites in the United States and one of the largest in the world.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board41.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Naukri With over 47.5 million searchable resumes and the largest online database, Naukri is the go-to place for every employer and job-seeker</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board42.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>neuvoo makes sure that your job postings are seen by the right job seekers so are able to find your next hire.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board43.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Nexxt understands how to promote your job openings in all right places, so you get in front of the candidates who would be a great fit.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board44.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Nurses.co.uk one of the leading job boards to search for over 1000s of nursing and home manager jobs in the UK.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board45.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>OLX is a global online platform for advertisement. Give your jobs maximum visibility by posting them in OLX.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board46.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Pnet is the quickest and most cost efficient way to source the right people for the job. Advertise your vacancies on South Africa's #1 job portal. </td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board47.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>PostJobFree has been serving employers and job seekers worldwide find each other since 2007. PostJobFree distributes your jobs to popular job sites.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board48.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Recruit Ireland helps you get in front of the right people wherever they are.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board49.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Recruit.net allows job seekers to instantly find millions of jobs from thousands of web sites with a single search. Recruit.net also delivers job listings from corporate web sites, job boards, recruitment agencies and numerous other sources.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board50.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>reed.co.uk has the UK's largest candidate database, expertise in 20 specialist sectors and offers the longest guarantees in the world. Post your vacancy online and receive applicants directly to your inbox with Reed.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board51.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Resume-Library is the fastest-growing job board in America, offering simple, fast and reliable hiring solutions to over 6,000 companies. Jobs posted on Resume-Library will be shared across their partner network of 100+ relevant job sites.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board52.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Retailchoice.com is one of the leading job sites to post your jobs online and source passive candidates in the retail industry.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board53.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Seek make up the worlds largest online employment marketplace, focused on facilitating the matching between jobseekers and employment opportunities, and helping hirers find candidates for advertised roles.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board54.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>StepStone helps you publish your jobs on leading job boards in over 130 countries.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board55.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>TechFetch is one of the fastest growing networks connecting technology recruiters and technology talent.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board56.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>TipTopJob is the premier online recruitment site where Jobs can be posted to swiftly hire people and fill in vacancies. Employers can advertise jobs throughout the UK and worldwide on one of the top job sites, making it easier to find qualified, committed staff.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board57.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>totaljobs is one of the UK's leading jobs boards, attracting around 6 million jobseekers every month on the hunt for one of 110,000 live job ads the site carries at any one time. This is the perfect place to start a job search.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board58.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Trovit 's search engine brings in job openings from several websites and displays them everything in one single page, making the Recruiter's work easy.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board59.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>VDAB operates in Belgium, covering the Flemish region of Europe. Providing jobs and training to the right candidates at the right time, VDAB gives recruiters a versatile talent pool.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board60.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>WhatJobs get to you the best applicants for your job requisitions.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board61.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>ZipRecruiter is an online job distribution and job board service that aggregates applications from job boards and provides tools for applicant tracking and screening.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board62.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Zoek is the new job search site and app that uses state of the art technology to find you the perfect job match. Zoek for recruiters & hirers is the new faster, smarter way to target matched candidates to your jobs without spending a single penny.</td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <h5><strong>Can't find your favorite job board? Don't worry! We'll provide you with an XML feed using which you can post on any job board you wish to. Request New Job Board</strong></h5>
+    <br>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col" width="25%">Social Networks</th>
+                <th scope="col" width="15%">Select</th>
+                <th scope="col" width="60%"> </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><img src="../includes/img/jobboard/board63.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Facebook is the world’s largest social network, with more than 1 billion users. It enables you to connect with other users and track updates and social activities.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board64.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>LinkedIn Limited Listings let you post jobs for free on the world's largest professional network.</td>
+            </tr>
+            <tr>
+                <td><img src="../includes/img/jobboard/board65.jpg" width="180"></td>
+                <th scope="row">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <td>Twitter is a free microblogging service with more than 288 million monthly active users. It allows the users to send and read short 280-character messages.</td>
+            </tr>
+        </tbody>
+    </table>
+</article>
+

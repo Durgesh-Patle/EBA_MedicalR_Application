@@ -1,0 +1,190 @@
+﻿@model MedicalR.Models.RoleManagement.RoleViewModel
+@{
+    ViewBag.Title = "Edit Role";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/settings/roles">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Roles Privileges</strong></a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Enter Roles Privileges Information</h3>
+        </div>
+    </div>
+    <h6 class="pt-3"><strong>Create System Role</strong></h6>
+    <hr>
+    <form>
+        <div class="col-md-6">
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="">Role Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="RoleName" placeholder="Role Name" value="@Model.RoleName">
+                    <label class="has-error"></label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label for="">Role Description</label>
+                    <textarea type="text" class="form-control" id="RoleDescription" placeholder="Role Description">@Model.RoleDescription</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!--Table 1 start here-->
+        <table class="table border text-center">
+            <thead>
+                <tr>
+                    <th colspan="6" scope="col"><span class="pull-left">Assign Rights</span> </th>
+                </tr>
+                <tr>
+                    <th scope="col" class="text-left"></th>
+                    <th scope="col" class="bg-light">Full Access</th>
+                    <th scope="col">Assigned Records</th>
+
+                </tr>
+            </thead>
+            <tbody class="Assign_Rights_tbody">
+                <tr>
+                    <th scope="row" class="text-left">Clients</th>
+                    <td class="bg-light"><input type="checkbox" class="chkClientsRoleFull" @(Model.RoleRightDetails.Clients.FullAccess == true ? "checked" : "")></td>
+                    <td><input type="checkbox" class="chkClientsRoleAssigned" @(Model.RoleRightDetails.Clients.AssignedRecords == true ? "checked" : "")></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-left">Client POC</th>
+                    <td class="bg-light"><input type="checkbox" class="chkClientPocRoleFull" @(Model.RoleRightDetails.ClientPoc.FullAccess == true ? "checked" : "")></td>
+                    <td><input type="checkbox" class="chkClientPocRoleAssigned" @(Model.RoleRightDetails.ClientPoc.AssignedRecords == true ? "checked" : "")></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-left">Candidates</th>
+                    <td class="bg-light"><input type="checkbox" class="chkCandidatesRoleFull" @(Model.RoleRightDetails.Candidates.FullAccess == true ? "checked" : "")></td>
+                    <td><input type="checkbox" class="chkCandidatesRoleAssigned" @(Model.RoleRightDetails.Candidates.AssignedRecords == true ? "checked" : "")></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-left">Job Openings</th>
+                    <td class="bg-light"><input type="checkbox" class="chkJobOpeningsRoleFull" @(Model.RoleRightDetails.JobOpenings.FullAccess == true ? "checked" : "")></td>
+                    <td><input type="checkbox" class="chkJobOpeningsRoleAssigned" @(Model.RoleRightDetails.JobOpenings.AssignedRecords == true ? "checked" : "")></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-left">Interviews</th>
+                    <td class="bg-light"><input type="checkbox" class="chkInterviewsRoleFull" @(Model.RoleRightDetails.Interviews.FullAccess == true ? "checked" : "")></td>
+                    <td><input type="checkbox" class="chkInterviewsRoleAssigned" @(Model.RoleRightDetails.Interviews.AssignedRecords == true ? "checked" : "")></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-left">Reports</th>
+                    <td class="bg-light"><input type="checkbox" class="chkReportsRoleFull" @(Model.RoleRightDetails.Reports.FullAccess == true ? "checked" : "")></td>
+                    <td><input type="checkbox" class="chkReportsRoleAssigned" @(Model.RoleRightDetails.Reports.AssignedRecords == true ? "checked" : "")></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-left">Settings</th>
+                    <td class="bg-light"><input type="checkbox" class="chkSettingsRoleFull" @(Model.RoleRightDetails.Settings.FullAccess == true ? "checked" : "")></td>
+                    <td><input type="checkbox" class="chkSettingsRoleAssigned" @(Model.RoleRightDetails.Settings.AssignedRecords == true ? "checked" : "")></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div class="row">
+            <input type="hidden" id="RoleID" value="@Model.RoleID" />
+            <div class="col-md-12 mt-5"> <a href="javascript:void(0)" class="btn btn-primary" id="SaveRole" data-val="1">Update </a> </div>
+        </div>
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#SaveRole").click(function () {
+
+            var RetStatus = true;
+            $(".has-error").html("");
+            var RoleID = $("#RoleID").val();
+            var RoleName = $("#RoleName").val().trim();
+            var RoleDescription = $("#RoleDescription").val();
+
+            var RoleRights = {
+                'Clients': {
+                    'FullAccess': $(".chkClientsRoleFull").is(':checked'),
+                    'AssignedRecords': $(".chkClientsRoleAssigned").is(':checked')
+                },
+                'ClientPoc': {
+                    'FullAccess': $(".chkClientPocRoleFull").is(':checked'),
+                    'AssignedRecords': $(".chkClientPocRoleAssigned").is(':checked')
+                },
+                'Candidates': {
+                    'FullAccess': $(".chkCandidatesRoleFull").is(':checked'),
+                    'AssignedRecords': $(".chkCandidatesRoleAssigned").is(':checked')
+                },
+                'JobOpenings': {
+                    'FullAccess': $(".chkJobOpeningsRoleFull").is(':checked'),
+                    'AssignedRecords': $(".chkJobOpeningsRoleAssigned").is(':checked')
+                },
+                'Interviews': {
+                    'FullAccess': $(".chkInterviewsRoleFull").is(':checked'),
+                    'AssignedRecords': $(".chkInterviewsRoleAssigned").is(':checked')
+                },
+                'Reports': {
+                    'FullAccess': $(".chkReportsRoleFull").is(':checked'),
+                    'AssignedRecords': $(".chkReportsRoleAssigned").is(':checked')
+                },
+                'Settings': {
+                    'FullAccess': $(".chkSettingsRoleFull").is(':checked'),
+                    'AssignedRecords': $(".chkSettingsRoleAssigned").is(':checked')
+                }
+            };
+
+            if (RoleName == "") {
+                $("#RoleName").parent().find(".has-error").html("Required*");
+                $("#RoleName").focus();
+                RetStatus = false;
+            }
+
+            if (RetStatus == true) {
+                var data = {
+                    "RoleID": RoleID,
+                    "RoleName": RoleName,
+                    "RoleDescription": RoleDescription,
+                    "RoleRights": JSON.stringify(RoleRights)
+                };
+                $.ajax({
+                    url: "/Settings/UpdateRole",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+
+        $(".Assign_Rights_tbody input[type=checkbox]").change(function () {
+            if ($(this).is(":checked")) {
+                $(this).parents("tr").eq(0).find("input[type=checkbox]").attr("checked", false);
+                $(this).prop("checked", true);
+            }
+        })
+
+
+    })
+</script>
+

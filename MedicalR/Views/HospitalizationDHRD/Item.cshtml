@@ -1,0 +1,389 @@
+﻿@{
+    ViewBag.Title = "Item";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+
+    <div class="form-row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+                <li class="nav-item"> <a class="nav-link" href="/MedicalBillsException/Index">Hospitalization DHRD</a> </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+    </div>
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+            <label>EmplID</label>
+            <input type="text" id="empl_code" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Name</label>
+            <input type="text" id="employeename" class="form-control" disabled />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Band Level</label>
+            <input type="text" id="band_level" class="form-control" disabled />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Name of Patient</label>
+            <select id="patient_id" class="form-control"></select>
+        </div>
+
+    </div>
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+            <label>Nature of Illness</label>
+            <input type="text" id="nature_of_illness" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>From Date</label>
+            <input type="date" id="from_date" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>To Date</label>
+            <input type="date" id="to_date" class="form-control" />
+        </div>
+
+    </div>
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+            <label>Name of Hospital</label>
+            <input type="text" id="name_of_hospital" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Bill No</label>
+            <input type="text" id="bill_no" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Bill Date</label>
+            <input type="date" id="bill_date" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Whether Hospital Awarded I.T.Rebate Certificate</label>
+            <select id="rebate_certificate" class="form-control">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+            <label>Medical Claim Forwarded by DHRD in Rs.</label>
+            <input type="number" id="medical_claim" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Amount Sanction by TMO in Rs.</label>
+            <input type="number" id="amount_sanction" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Balance Amount (Unsettled) in Rs.</label>
+            <input type="number" id="balance_amount" class="form-control" />
+        </div>
+
+    </div>
+
+    <h6 class="pt-3"><strong>Application Status - Information</strong></h6>
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+            <label>Send Date To TMO</label>
+            <input type="date" id="send_date_to_tmo" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Received Date from TMO</label>
+            <input type="date" id="received_date_from_tmo" class="form-control" />
+        </div>
+
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <button type="button" id="btnSave" class="btn btn-primary">
+                Save/Update
+            </button>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        var employeeId = 0; 
+
+        var pageId = getIdFromUrl();
+
+        loadInitial(pageId);
+
+        if (pageId > 0) {
+            $("#empl_code").prop("disabled", true);
+        }
+
+
+        //loadHospitals();
+
+        //function loadHospitals() {
+
+        //    $.get('/Common/GetCFHospitals', function (data) {
+
+        //        console.log(data, "Hospital List");
+
+        //        // Agar dropdown banana ho future me to yaha se bind kar sakte ho
+        //    })
+        //        .fail(function () {
+        //            toastr.error("Hospital list load failed!");
+        //        });
+        //}
+
+
+        // LOAD INITIAL (EDIT)
+        function loadInitial(id) {
+
+            $.post('/HospitalizationDHRD/GetItem', { id: id }, function (res) {
+
+                if (!res || res.id <= 0) return;
+
+                $("#empl_code").val(res.employee_code).prop("disabled", true);
+
+                employeeId = res.employee_id;
+
+                $("#employeename").val(res.employeename);
+                $("#band_level").val(res.band_level);
+                $("#nature_of_illness").val(res.nature_of_illness);
+                $("#name_of_hospital").val(res.name_of_hospital);
+                $("#bill_no").val(res.bill_no);
+                $("#medical_claim").val(res.medical_claim_forwd_dhrd_inrs);
+                $("#amount_sanction").val(res.amount_sanction_by_tmo_inrs);
+                $("#balance_amount").val(res.balance_amount);
+                $("#rebate_certificate").val(res.wheather_hospital_awarded_i_t_rebate);
+
+                setDate("#from_date", res.from_date);
+                setDate("#to_date", res.to_date);
+                setDate("#bill_date", res.bill_date);
+                setDate("#send_date_to_tmo", res.send_date_to_tmo);
+                setDate("#received_date_from_tmo", res.received_date_from_tmo);
+
+                loadPatients(res.employee_id, res.patient_id);
+
+            });
+        }
+
+        // EMPLOYEE FETCH
+        $("#empl_code").keyup(function () {
+
+            var code = $(this).val();
+
+            if (code.length === 4) {
+
+                $.post('/HospitalizationDHRD/GetDetailsByEmpl_Code',
+                    { empl_code: code },
+                    function (res) {
+
+                        var data = JSON.parse(res); 
+
+                        //console.log(data, "ressssss");
+                        employeeId = data.employee_id;
+
+                        $("#employeename").val(data.employeename);
+                        $("#band_level").val(data.band_level);
+
+                        //console.log(data.employee_id, "Passed Iddd");
+
+                        loadPatients(data.employee_id);
+                    });
+            }
+        });
+
+        $("#medical_claim, #amount_sanction").on("input", function () {
+
+            var claim = parseFloat($("#medical_claim").val()) || 0;
+            var sanction = parseFloat($("#amount_sanction").val()) || 0;
+
+            $("#balance_amount").val(claim - sanction);
+        });
+
+        // LOAD PATIENTS
+        function loadPatients(employee_id, selectedId) {
+
+            console.log(employee_id, "employee_id");
+
+            if (!employee_id || employee_id === 0) {
+                console.warn("Invalid employee_id:", employee_id);
+                return;
+            }
+
+            $.post('/Common/GetHospExPatients',
+                { employee_id: employee_id },
+                function (data) {
+
+                    $("#patient_id").empty();
+                    $("#patient_id").append('<option value="0">Select</option>');
+
+                    $.each(data, function (i, item) {
+
+                        var selected = (selectedId == item.id) ? "selected" : "";
+
+                        $("#patient_id").append(
+                            '<option value="' + item.id + '" ' + selected + '>' +
+                            item.name +
+                            '</option>'
+                        );
+                    });
+                });
+        }
+
+        // SAVE
+        $("#btnSave").click(function () {
+
+            var model = collectFormData();
+
+            if (!validate(model)) return;
+
+            $.post('/HospitalizationDHRD/Save',
+                { model: model },
+                function (res) {
+
+                    if (res.Status) {
+                        toastr.success("Data updated successfully!");
+                        window.location.href = '/HospitalizationDHRD';
+                    } else {
+                        toastr.error("Something went wrong!");
+                    }
+                });
+        });
+
+        // VALIDATION
+        function validate(m) {
+
+            if (!m.employee_code) {
+                toastr.error("Employee code required!");
+                return false;
+            }
+
+            if (!m.from_date) {
+                toastr.error("From date required!");
+                return false;
+            }
+
+            if (!m.name_of_hospital) {
+                toastr.error("Hospital name required!");
+                return false;
+            }
+
+            if (!m.bill_no) {
+                toastr.error("Bill number required!");
+                return false;
+            }
+
+
+            if (!m.patient_id || m.patient_id == 0) {
+                toastr.error("Please select patient name!");
+                return false;
+            }
+
+            if (!m.nature_of_illness) {
+                toastr.error("Nature of illness cannot be blank!");
+                return false;
+            }
+
+            if (m.from_date && m.to_date &&
+                new Date(m.from_date) > new Date(m.to_date)) {
+
+                toastr.error("To date cannot be less than From date!");
+                return false;
+            }
+
+            return true;
+        }
+
+        // COLLECT DATA
+        function collectFormData() {
+
+            return {
+                id: pageId,
+                employee_id: employeeId, 
+                employee_code: $("#empl_code").val(),
+                employeename: $("#employeename").val(),
+                band_level: $("#band_level").val(),
+                patient_id: $("#patient_id").val(),
+                nature_of_illness: $("#nature_of_illness").val(),
+                from_date: $("#from_date").val(),
+                to_date: $("#to_date").val(),
+                name_of_hospital: $("#name_of_hospital").val(),
+                bill_no: $("#bill_no").val(),
+                bill_date: $("#bill_date").val(),
+                wheather_hospital_awarded_i_t_rebate: $("#rebate_certificate").val(),
+                medical_claim_forwd_dhrd_inrs: $("#medical_claim").val(),
+                amount_sanction_by_tmo_inrs: $("#amount_sanction").val(),
+                balance_amount: $("#balance_amount").val(),
+                send_date_to_tmo: $("#send_date_to_tmo").val(),
+                received_date_from_tmo: $("#received_date_from_tmo").val()
+            };
+        }
+
+        function getIdFromUrl() {
+            var parts = window.location.pathname.split('/');
+            var id = parseInt(parts[parts.length - 1]);
+            return isNaN(id) ? 0 : id;
+        }
+
+        function setDate(selector, value) {
+
+            if (!value) return;
+
+            var date;
+
+            // Handle MVC /Date(...)/
+            if (typeof value === "string" && value.indexOf("/Date(") === 0) {
+
+                var timestamp = parseInt(value.replace("/Date(", "").replace(")/", ""));
+                date = new Date(timestamp);
+
+            } else {
+                date = new Date(value);
+            }
+
+            // Stop if invalid OR year <= 1900
+            if (isNaN(date.getTime()) || date.getFullYear() <= 1900) {
+                $(selector).val("");  // clear invalid value
+                return;
+            }
+
+            var formatted =
+                date.getFullYear() + "-" +
+                String(date.getMonth() + 1).padStart(2, '0') + "-" +
+                String(date.getDate()).padStart(2, '0');
+
+            $(selector).val(formatted);
+        }
+
+    });
+</script>

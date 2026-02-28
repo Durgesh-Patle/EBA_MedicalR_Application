@@ -1,0 +1,143 @@
+﻿@model IEnumerable<MedicalR.Models.RetiredEmployee.RetiredempTransModel>
+@{
+    ViewBag.Title = "Trans_Sanction_Grid";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 headerstatics">
+            <ul class="nav">
+                <li class="nav-item"> <a class="nav-link text-dark" href="Request Form.html">Statistics ></a> </li>
+                <li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/ReitredEmployee/0/add"><strong>Lot Wise Approval</strong></a> </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+        <article class="col-md-12">
+            <div class="row">
+                <div class="form-group col-md-6"></div>
+                <div class="form-group col-md-4"></div>
+                <button type="button" class="btn btn-primary" id="exportSubmit">Print</button>
+            </div>
+            <div></div>
+            <form id="exportData" action="/ReitredEmployee/Sanc_GetExportToExcel" style="display:none">
+                <input type="text" value="lot" name="lot" />
+                @*<input type="text" value="" name="ToDate" />*@
+            </form>
+            <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+
+                        <th class="th-sm">Lot No</th>
+                        <th class="th-sm">Lot Date</th>
+                        <th class="th-sm">Sanc.Amt</th>
+                        <th class="th-sm">Action</th>
+
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+
+                            <td>@item.lot_no</td>
+                            <td>@item.disp_lot_date</td>
+                            <td>@item.sanc_amt</td>
+
+                            <td><button type="button" class="btn btn-primary" value="@item.lot_no" id="btnapprove" onclick="Approve(this.value)">Approve</button></td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+        </article>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="~/Includes/js/jspdf.min.js"></script>
+    <script src="~/Includes/js/html2canvas.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#dtBasicExample').DataTable();
+            $('.dataTables_length').addClass('bs-select');
+
+            $("#exportSubmit").click(function () {
+
+                //
+                var lots = $("#lot").val();
+                //var ToDate = $("#TO_DATE").val();
+
+                $("#exportData input[name=lot]").val("test");
+                //$("#exportData input[name=ToDate]").val(ToDate);
+                $("#exportData").submit();
+            })
+        });
+
+        function getPDF() {
+
+            $.ajax({
+                url: "/ReitredEmployee/EmplApprovalList",
+                type: "post",
+                //data: { name: name },
+                data: JSON.stringify(),
+                contentType: "application/json; charset=utf-8",
+                //dataType: "file",
+                dataType: "json",
+                success: function (data) {
+
+                    var blob = new Blob([data]);
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "SanctionList.html";
+                    link.click();
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+                }
+            });
+        };
+        function Approve(lotno) {
+            var lot_no = lotno;
+            var data = {
+                "lot_no": lot_no,
+
+            };
+            //  window.location.href = "/ReitredEmployee/EmplAnnexure/" + lotno;
+            $.ajax({
+                url: "/ReitredEmployee/ApproveLotno",
+                type: "post",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result["Status"] == true) {
+                        toastr["success"](result["Message"]);
+
+                        window.location.reload();
+                    }
+                    else {
+                        toastr["error"](result["Message"]);
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+                }
+            });
+        };
+    </script>
+
+</div>

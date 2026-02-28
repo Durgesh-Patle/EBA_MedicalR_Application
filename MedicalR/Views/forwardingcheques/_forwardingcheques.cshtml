@@ -1,0 +1,64 @@
+﻿@model MedicalR.Models.CHC.CHCBillProcess
+<form>
+    <div class="form-row">
+        @*<div class="form-group col-md-4">
+            <label for="">Status: </label>
+            <input type="text" class="form-control" id="status">
+
+        </div>*@
+        <div class="form-group col-md-6">
+            <label for="">Lot Date: </label>
+            <input type="date" class="form-control" id="lot_date" placeholder="dd/mm/yyyy">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="">Lot No: </label>
+            <input type="text" class="form-control" id="lot_no">
+        </div>
+    </div>
+
+    <div class="form-row">
+       
+        <div class="form-group col-md-6">
+
+            <label for="">Name of CHC Center:</label>
+            <select class="form-control" id="chc_centerid">
+                <option value="@Model.chc_centerid">@Model.hosname</option>
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="">Amount: </label>
+            <input type="text" class="form-control" id="amount" value="@Model.amount">
+        </div>
+
+    </div>
+
+
+    <div class="form-row">
+
+        <div class="form-group col-md-6">
+            <label for="">Cheque No: <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="cheque_no">
+
+        </div>
+        <div class="form-group col-md-6">
+            <label for="">Cheque Date: <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="cheque_date" placeholder="dd/mm/yyyy">
+
+        </div>
+
+
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="form-group col-md-4"></div>
+        <div class="form-group col-md-4"> <a href="javascript:void(0)" class="btn btn-primary" id="Approve" data-val="1">Save<span class="spinner"></span></a> </div>
+        @*<div class="form-group col-md-4"> <a href="javascript:void(0)" class="btn btn-primary" id="Hold" data-val="1">On Hold<span class="spinner"></span></a> </div>*@
+
+    </div>
+
+</form>
+
+

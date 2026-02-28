@@ -1,0 +1,179 @@
+﻿@model MedicalR.Models.UserManagement.UserDetailModel
+@{
+    ViewBag.Title = "Profile";
+}
+
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3> Profile</h3>
+        </div>
+    </div>
+    <form>
+        <div class="col-md-6">
+            <div class="form-row pt-3">
+                <div class="form-group col-md-10">
+                    <label for="">Upload Photo</label>
+                    <div class="custom-file">
+                        <input class="custom-file-input" id="ProfileImg" type="file" accept=".png,.jpg,.jpeg">
+                        <label class="custom-file-label" for="ProfileImg">Upload Photo</label>
+                    </div>
+                </div>
+                <div class="form-group pt-3 col-md-2"> <img id="ProfileImgPreview" src="@(!string.IsNullOrEmpty(Model.PhotoURL) ? Model.PhotoURL : "/Includes/img/logo.png")" width="100%" class="border"> </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="">Name </label>
+                    <input type="text" class="form-control" id="UserName" placeholder="Name" value="@Model.UserName">
+                    <label class="has-error"></label>
+                 </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group">
+                        <label for="">Email</label>
+                        <input type="email" class="form-control" id="EmailID" placeholder="Email" value="@Model.EmailID">
+                        <label class="has-error"></label>
+                     </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group">
+                        <label for="">MobileNo</label>
+                        <input type="number" class="form-control" id="MobileNo" placeholder="MobileNo"  value="@Model.MobileNo">
+                        <label class="has-error"></label>
+                      </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <div class="form-group">
+                        <label for="">Role Type <span class="text-danger">*</span></label>
+                        <select class="form-control" id="RoleID" disabled>
+                            <option value="">Role Type</option>
+                            <option value="0" @(Model.RoleID == 0 ? "selected" : "")>Admin</option>
+                            @foreach (var item in ViewBag.RoleType)
+                            {
+                                <option value="@item.RoleID" @(Model.RoleID == item.RoleID ? "selected" : "")>@item.RoleName</option>
+                            }
+                        </select>
+                        <label class="has-error"></label>
+                    </div>
+                </div>
+
+
+                <div class="form-group col-md-12">
+                    <div class="form-group">
+                        <label for="">User ID : </label>
+                        <label for="">@Model.UserID</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <input type="hidden" id="PhotoURL_GoogleID" value="@Model.PhotoURL_GoogleID" />
+                <input type="hidden" id="RoleID" value="@Model.RoleID" />
+                <input type="hidden" id="PhotoURL" value="@Model.PhotoURL" />
+                <div class="col-md-12 mt-3"> <a href="javascript:void(0)" class="btn btn-primary" id="updateProfile">Update <span class="spinner"></span></a> </div>
+            </div>
+        </div>
+    </form>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+</article>
+
+<script>
+    $(document).ready(function () {
+
+        $("#updateProfile").click(function () {
+            var Btn = $(this);
+            var RetStatus = true;
+            $(".has-error").html("");
+            var UserName = $("#UserName").val().trim();
+            var MobileNo = $("#MobileNo").val().trim();
+            var RoleID = $("#RoleID").val().trim();
+            var EmailID = $("#EmailID").val().trim();
+            var PhotoURL_GoogleID = $("#PhotoURL_GoogleID").val().trim();
+            var PhotoURL = $("#PhotoURL").val().trim();
+            var ProfileImg = $("#ProfileImg")[0].files;
+            if (UserName == "")
+            {
+                $("#UserName").parent().find(".has-error").html("Required*");
+                $("#UserName").focus();
+                RetStatus = false;
+            }
+
+            if (EmailID == "") {
+                $("#EmailID").parent().find(".has-error").html("Required*");
+                $("#EmailID").focus();
+                RetStatus = false;
+            }
+            else
+            {
+                if(isEmail(EmailID)==false)
+                {
+                    $("#EmailID").parent().find(".has-error").html("Invalid Email ID");
+                    $("#EmailID").focus();
+                    RetStatus = false;
+                }
+            }
+
+
+            if(RetStatus==true)
+            {
+                var formData = new FormData();
+                if (ProfileImg.length > 0) {
+                    for (var i = 0; i < ProfileImg.length; i++) {
+                        formData.append(ProfileImg[i].name, ProfileImg[i]);
+                    }
+                }
+                formData.append("UserName", UserName);
+                formData.append("EmailID", EmailID);
+                formData.append("MobileNo", MobileNo);
+                formData.append("RoleID", RoleID);
+                formData.append("PhotoURL_GoogleID", PhotoURL_GoogleID);
+                formData.append("PhotoURL", PhotoURL);
+                $(Btn).attr("data-loading", "");
+                $.ajax({
+                    url: "/Settings/UpdateProfile",
+                    type: "post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(Btn).removeAttr("data-loading");
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        $(Btn).removeAttr("data-loading");
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+        $("#ProfileImg").change(function () {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#ProfileImgPreview').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+    })
+</script>

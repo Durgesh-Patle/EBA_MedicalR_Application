@@ -1,0 +1,107 @@
+﻿@model IEnumerable<MedicalR.Models.MedicalR.TrackingMedicalBillsModel>
+    @{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <div class="container-fluid headtop">
+        <div class="row">
+            <div class="col-md-12 p-0">
+                <ul class="nav">
+                    <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics  ></strong></a> </li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Tracking Medical Bills</a> </li>
+                </ul>
+                <hr class="m-0">
+            </div>
+
+            <article class="col-md-12">
+                <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                    <thead>
+
+                        <tr>
+                            @*
+                            <th class="th-sm"><input type="checkbox"></th>*@
+                            <th class="th-sm">Appln.No</th>
+                            <th class="th-sm">Empl Code</th>
+                            <th class="th-sm">Name of Employee</th>
+                            <th class="th-sm">Name Of Patient</th>
+                            <th class="th-sm">Relationship</th>
+                            <th class="th-sm">Total Claimed Rs.</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            @*
+                            <th class="th-sm"><input type="checkbox"></th>*@
+                            <td>@item.appln_no</td>
+                            <td>@item.employeecode</td>
+                            <td><span style="cursor:pointer" onclick="openBar()"></span> <a href="/TrackingMedicalBills/Detail/@item.id">@item.employeename</a></td>
+                            <td>@item.patient_name</td>
+                            <td>@item.family_relation_code</td>
+                            <td>@item.total_claimed_rs</td>
+
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (Model.Count() == 0)
+                {
+                <div class="no-data-found">No Data Found</div>
+                }
+            </article>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+
+
+        $(document).ready(function () {
+            $('#dtBasicExample').DataTable();
+            $('.dataTables_length').addClass('bs-select');
+
+
+        });
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".select2").select2();
+
+            // Custom sort: remove A- and sort numerically
+            $.fn.dataTable.ext.type.order['appln-no-pre'] = function (d) {
+                return parseInt(d.replace("A-", ""), 10);
+            };
+
+            var table = $('#dtUserList').DataTable({
+                columnDefs: [
+                    { targets: 0, type: 'appln-no' } // Apply only to Appln.No column
+                ]
+            });
+
+            $('.dataTables_length').addClass('bs-select');
+
+            $('#tableSearch').on('keyup', function () {
+                table.search(this.value).draw();
+            });
+        });
+    </script>
+
+    @*
+    <script>
+        $(document).ready(function () {
+            $(".select2").select2();
+
+            var table = $('#dtUserList').DataTable();
+            $('.dataTables_length').addClass('bs-select');
+            $('#tableSearch').on('keyup', function () {
+                table.search(this.value).draw();
+            })
+
+        });
+    </script>*@

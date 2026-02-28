@@ -1,0 +1,193 @@
+﻿@model MedicalR.Models.CHC.CHCRequest
+
+<form>
+    <div class="form-row">
+        <div class="form-group col-md-3"></div>
+        <h6 class="pt-3"><strong>Comprehensive Health Checkup</strong></h6>
+
+    </div>
+    <hr>
+    @if (Model.relationship == "Self and Spouse")
+    {
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Name of the Employee: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="name_of_spouse" placeholder="Name" disabled value="@Model.employeename">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Mob/Telephone No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="mob_no" placeholder="Mob/Tele No" value="@Model.mob_no">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Office Telephone No: </label>
+                <input type="text" class="form-control" id="office_tel_no" readonly placeholder="Telephone No" value="@Model.office_tel_no">
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Date of Checkup: <span class="text-danger">*</span></label>
+                @*<input type="text" class="form-control" id="date_of_checkup" value="@Model.date_of_checkup">*@
+                @Html.TextBoxFor(m => @Model.date_of_checkup, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Name of CHC Center:</label>
+                <select class="form-control" id="chc_centerid" disabled>
+                    <option value="@Model.chc_centerid">@Model.hosname</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Appointment No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="appointmentno_empl">
+            </div>
+        </div>
+        <div class="form-row">
+            <p><b> Please Furnish below the information for your Spouse:</b></p>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Name of the Spouse: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="name_of_spouse" placeholder="Name" readonly value="@Model.name_of_spouse">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Birth of Spouse: <span class="text-danger">*</span></label>
+                @*<input type="text" class="form-control" id="dob_spouse" placeholder="dd-mm-yyyy" value="@Model.dob_spouse">*@
+                @Html.TextBoxFor(m => @Model.dob_spouse, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Age of Spouse(In Completed year): <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="spouse_age" readonly placeholder="" value="@Model.spouse_age">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Checkup(Spouse): <span class="text-danger">*</span></label>
+                @*<input type="text" class="form-control" id="spouse_dt_of_checkup" value="@Model.spouse_dt_of_checkup">*@
+                @Html.TextBoxFor(m => @Model.spouse_dt_of_checkup, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Name of CHC Center (Spouse):</label>
+                <select class="form-control" id="chc_centid" disabled>
+                    <option value="@Model.chc_centid">@Model.phosname</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Appointment No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="appointmentno_spouse">
+            </div>
+        </div>
+        @*<div class="form-row">
+            <div class="form-group col-md-12">
+                <label for="">Remark for Rejection (if any)</label>
+                <input type="text" class="form-control" id="rejection_remark">
+            </div>
+        </div>*@
+    }
+    @if (Model.relationship == "self")
+    {
+        <div class="form-row">
+
+            <div class="form-group col-md-4">
+                <label for="">Name of the Employee: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="name_of_spouse" placeholder="Name" value="@Model.employeename">
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Mob/Telephone No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="mob_no" readonly placeholder="Mob/Tele No" value="@Model.mob_no">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Office Telephone No: </label>
+                <input type="text" class="form-control" id="office_tel_no" readonly placeholder="Telephone No" value="@Model.office_tel_no">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Checkup: <span class="text-danger">*</span></label>
+                @*<input type="text" class="form-control" id="date_of_checkup" value="@Model.date_of_checkup">*@
+                @Html.TextBoxFor(m => @Model.date_of_checkup, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Name of CHC Center:</label>
+                <select class="form-control" id="chc_centerid" disabled>
+                    <option value="@Model.chc_centerid">@Model.hosname</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Appointment No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="appointmentno_empl">
+            </div>
+        </div>
+
+        @*<div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="">Remark for Rejection (if any)</label>
+                    <input type="text" class="form-control" id="rejection_remark">
+                </div>
+            </div>*@
+    }
+    @if (Model.relationship == "spouse")
+    {
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Name of the Employee: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="name_of_spouse" placeholder="Name" disabled value="@Model.employeename">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Name of the Spouse: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="name_of_spouse" placeholder="Name" value="@Model.name_of_spouse">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Birth of Spouse: <span class="text-danger">*</span></label>
+                @*<input type="text" class="form-control" id="dob_spouse" placeholder="dd-mm-yyyy" value="@Model.dob_spouse">*@
+                @Html.TextBoxFor(m => @Model.dob_spouse, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Age of Spouse(In Completed year): <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="spouse_age" readonly placeholder="" value="@Model.spouse_age">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Checkup(Spouse): <span class="text-danger">*</span></label>
+                @*<input type="text" class="form-control" id="spouse_dt_of_checkup" value="@Model.spouse_dt_of_checkup">*@
+                @Html.TextBoxFor(m => @Model.spouse_dt_of_checkup, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Name of CHC Center (Spouse):</label>
+                <select class="form-control" id="chc_centid" disabled>
+                    <option value="@Model.chc_centid">@Model.phosname</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Appointment No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="appointmentno_spouse">
+            </div>
+        </div>
+
+        @*<div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="">Remark for Rejection (if any)</label>
+                    <input type="text" class="form-control" id="rejection_remark">
+                </div>
+            </div>*@
+    }
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="">Remark for Rejection (if any)</label>
+            <input type="text" class="form-control" id="rejection_remark">
+        </div>
+    </div>
+    <div class="row">
+        <input type="text" hidden class="form-control" id="relationship" value="@Model.relationship">
+        <input type="text" hidden class="form-control" id="emplid" value="@Model.emplid">
+
+
+        <div class="form-group col-md-4"></div>
+        <div class="form-group col-md-2"> <a href="javascript:void(0)" class="btn btn-primary" id="Reject" data-val="1">Reject<span class="spinner"></span></a> </div>
+        @if (Model.status == "Approved")
+        {
+            @*<div class="form-group col-md-2"> <a href="javascript:void(0)" class="btn btn-primary" id="Approve" data-val="1" style="pointer-events: none">Approve<span class="spinner"></span></a> </div>*@
+        }
+        else
+        {
+            <div class="form-group col-md-2"> <a href="javascript:void(0)" class="btn btn-primary" id="Approve" data-val="1">Approve<span class="spinner"></span></a> </div>
+        }
+    </div>
+
+</form>
+
+

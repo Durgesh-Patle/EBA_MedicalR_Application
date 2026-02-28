@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewBag.Title = "Claim Request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .headerstatics {
+        margin-top: 45px;
+    }
+</style>
+<!--Header end-->
+<div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 headerstatics">
+                <ul class="nav">
+                    <li class="nav-item"> <a class="nav-link text-dark" href="Request Form.html">Statistics</a> </li>
+                    <li class="nav-item"> <a class="nav-link" href="/MedicalRequest"><strong>Request Form</strong></a> </li>
+                </ul>
+                <hr class="m-0">
+            </div>
+            <article class="col-md-12">
+                <div class="row pt-2 bg-light"> </div>
+                <div class="row">
+                    <div class="col-md-2 shadow p-0">
+                        <hr class="mb-0 mt-0 border-top-0">
+                        @{
+                            Html.RenderPartial("_EmployeeSideBar");
+                        }
+                    </div>
+                    <div class="col-md-10 mt-3 pl-4">
+                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+
+                            <li class="nav-item" role="presentation"> <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#one" role="tab" aria-controls="two" aria-selected="true">New Request</a> </li>
+                            <li class="nav-item" role="presentation"> <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#two" role="tab" aria-controls="six" aria-selected="false">Past details</a> </li>
+                        </ul>
+                        <div class="tab-content" id="pills-tabContent">
+                            <hr>
+                            <!--<div class="tab-pane fade show active" id="one" role="tabpanel" aria-labelledby="pills-home-tab">New Request</div>-->
+                            @*-------------------New Request tab started--------------------*@
+
+                            <div class="tab-pane fade show active" id="one" role="tabpanel" aria-labelledby="one">
+                                @{
+                                    Html.RenderPartial("_NewRequest");
+                                }
+
+
+                            </div>
+                            @*---------------------New Request tab end here-------------------*@
+                            <div class="tab-pane fade show" id="two" role="tabpanel" aria-labelledby="two">
+                                @{
+                                    Html.RenderPartial("_PastDetails");
+                                }
+
+
+                            </div>
+                            @*-------------------------Notes tab start here-----------------------*@
+                            @*-------------------------Notes tab end here--------------------------*@
+                            @*-------------------------Attachment tab start here---------------------*@
+                            @*-------------------------attachment tab end here----------------------*@
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="myModal">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+
+                                <h4 style="text-align:center" class="form-control" id="modalTitle"><strong>Instructions:</strong></h4>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <p><strong>1. The claim should be submitted within 1 month of completion of treatment.</strong></p>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <p><strong>2. There should be one claim for one patient even in case of multiple treatments/visits.</strong></p>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <p><strong>3. Claims should invariably be supported by all reciepted bills in original,prescription of doctors,consultant,report of laboratries,hospital,X-Ray films (in original and copies of X-Ray report) and cash memos for each patient seperately.</strong></p>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <p><strong>4. Give complete details and breakup of treatment of dental,pathological and radiological tests such as dates,rates,period and number of times and particular of drugs and injection.,quantity etc.  .</strong></p>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div style="text-align:center" class="modal-footer">
+                                <button type="button" class="btn btn-info" data-dismiss="modal" id="btnOk">OK</button>
+                            </div>
+
+                            <!-- /.modal-content -->
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</div>

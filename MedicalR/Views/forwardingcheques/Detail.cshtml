@@ -1,0 +1,205 @@
+﻿
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/forwardingcheques">Statistics</a> </li>
+        @*<li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Request form</strong></a> </li>*@
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 bg-light"> </div>
+    <div class="row">
+        <div class="col-md-3 shadow p-0">
+            <hr class="mb-0 mt-0 border-top-0">
+            <div class="list-group list-group-flush" id="client-sidebar-info">
+
+
+            </div>
+        </div>
+        <div class="col-md-9 mt-3">
+            <ul class="nav nav-pills mb-3" id="clients-tab" role="tablist">
+                <li class="nav-item" role="presentation" data-tab="info"> <a href="javascript:void(0);" class="nav-link active" data-target="/forwardingcheques/_forwardingcheques/@ViewBag.Client_ID">Forwarding cheques</a> </li>
+
+                @*<li class="nav-item" role="presentation" data-tab="info"> <a href="javascript:void(0);" class="nav-link active" data-target="/MedicalRequest/_NewRequest">New Request</a> </li>*@
+                @*<li class="nav-item @(@ViewBag.Client_ID > 0 ? "" :"disabled")" role="presentation" data-tab="Details"> <a href="javascript:void(0);" class="nav-link" data-target="/Notes/_SearchNotes?PageID=1">Past Details</a> </li>
+                    <li class="nav-item @(@ViewBag.Client_ID > 0 ? "" :"disabled")" role="presentation" data-tab="notes"> <a href="javascript:void(0);" class="nav-link" data-target="/Notes/_SearchNotes?PageID=1">Notes</a> </li>
+                    <li class="nav-item @(@ViewBag.Client_ID > 0 ? "" :"disabled")" role="presentation" data-tab="attachments"> <a href="javascript:void(0);" class="nav-link" data-target="/Attachments/_SearchAttachments?PageID=1">Attachments</a> </li>*@
+
+            </ul>
+            <hr>
+
+            <div class="tab-content" id="client-tabContent">
+
+            </div>
+        </div>
+    </div>
+
+</article>
+<input type="hidden" value="0" id="employee_id" class="hdnRelevantID" />
+<input type="hidden" value="@ViewBag.Client_ID" id="emplid" class="hdnRelevantID" />
+<input type="hidden" value="@ViewBag.EmpCode" id="EmpCode" class="hdnRelevantID" />
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    var clientID = @ViewBag.Client_ID;
+    var activeTab = window.location.hash.substring(1);
+    if(activeTab=="" || clientID>0)
+    {
+        activeTab="info";
+        window.location.hash = '#'+activeTab;
+
+    }
+    var activeView = $("#clients-tab li[data-tab='"+activeTab+"']").find("a.nav-link").data("target");
+    LoadClientViews(activeView);
+    LoadEmpsidebarViews();
+
+    function LoadClientViews(targetView)
+    {
+        $("#clients-tab a").removeClass("active");
+        $("#clients-tab a[data-target='" + targetView + "']").addClass("active");
+        $("#loader").show();
+        $.ajax({
+            url: targetView,
+            type: "post",
+            data :{"clientID":clientID},
+            dataType: "html",
+            success: function (result) {
+                $("#client-tabContent").html(result);
+                $('#client-tabContent table').DataTable();
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                $("#loader").hide();
+            }
+
+        });
+    }
+    function LoadEmpsidebarViews()
+    {
+        $.ajax({
+            url: "/forwardingcheques/_Empsidebarinfo",
+            type: "post",
+            dataType: "html",
+            success: function (result) {
+                $("#client-sidebar-info").html(result);
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+            }
+
+        });
+    }
+    $(document).ready(function () {
+
+        $("body").on("click", "#Approve", function () {
+            $(this).css("pointer-events", "none");
+            var btn = $(this);
+            var retStatus = true;
+            $(".has-error").html("");
+            var buttonValue = $(this).data("val");
+
+               // var emplid = $("#emplid").val().trim();
+            var lot_no = $("#lot_no").val().trim();
+            var lot_date = $("#lot_date").val().trim();
+            var chc_centerid = $("#chc_centerid").val().trim();
+            var amount = $("#amount").val().trim();
+            var cheque_no = $("#cheque_no").val().trim();
+            var cheque_date = $("#cheque_date").val().trim();
+
+
+
+            if (cheque_no == "") {
+                $("#cheque_no").parent().find(".has-error").html("Required*");
+                retStatus = false;
+            }
+            if (cheque_date == "") {
+                $("#cheque_date").parent().find(".has-error").html("Required*");
+                retStatus = false;
+            }
+
+            if (retStatus == true) {
+                setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+                 var formData = new FormData();
+
+                 formData.append("lot_no", lot_no);
+                 formData.append("lot_date", lot_date);
+                 formData.append("chc_centerid", chc_centerid);
+                 formData.append("amount", amount);
+                 formData.append("cheque_no", cheque_no);
+                 formData.append("cheque_date", cheque_date);
+
+
+                $(btn).attr("data-loading", "");
+
+                // var url = "/Clients/UpdateClient";
+
+                if (clientID > 0) {
+                    url = "/forwardingcheques/forwardcheque";
+                }
+
+                $.ajax({
+                    url: url,
+                    type: "Post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                            if (buttonValue == 1) {
+                                window.location.href = "/forwardingcheques";
+                            }
+                            else if (buttonValue == 2) {
+                                $("#client-tabContent input").val('');
+                                $("#client-tabContent textarea").val('');
+                                $("#client-tabContent select").val('');
+                            }
+                            else {
+                                LoadEmpsidebarViews();
+                            }
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(btn).removeAttr("data-loading");
+
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        $(btn).removeAttr("data-loading");
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+            else {
+                $(this).css("pointer-events", "unset");
+            }
+        })
+
+
+    });
+
+
+
+
+</script>
+

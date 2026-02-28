@@ -1,0 +1,118 @@
+﻿@model MedicalR.Models.MedicalR.TrackingMedicalBillsModel
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+
+        <article class="col-md-12">
+            <div class="col-md-12 p-0">
+                <ul class="nav">
+                    <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics  ></strong></a> </li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Tracking Medical Bills</a> </li>
+                </ul>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="form-group col-md-2">
+                    <label for="">Empl Code: </label>
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="text" class="form-control" readonly id="" value="@Model.employeecode">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="">Appln.Ref.No.: </label>
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="text" class="form-control" readonly id="" value="@Model.appln_no">
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label for="">Batch No.: </label>
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="text" class="form-control" readonly id="" value="@Model.batch_no">
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="form-group col-md-2">
+                    <label for="">Claimed Amount Rs: </label>
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="text" class="form-control" id="" readonly value="@Model.total_claimed_rs">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="">Name of Employee:</label>
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="text" class="form-control" id="" readonly value="@Model.employeename">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="">Date Of Request: </label>
+                </div>
+                <div class="form-group col-md-2">
+                    @*<input type="text" class="form-control" id="" value="@Model.date_of_request">*@
+                    @Html.TextBoxFor(m => @Model.date_of_request, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                </div>
+            </div>
+            <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th class="th-sm">Sr.No</th>
+                        <th class="th-sm">Status/Stage</th>
+                        <th class="th-sm">Action Date</th>
+                        <th class="th-sm">Officer's Code</th>
+                        <th class="th-sm">Name of Officer</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.EmplStatus_list)
+                    {
+                    <tr>
+                        <td>@item.activityid</td>
+                        <td>@item.status_text</td>
+                        <td>@Html.Label(item.date_of_request.ToShortDateString())</td>
+                        <td>@item.employeecode</td>
+                        <td>@item.ack_officername</td>
+
+                    </tr>
+
+                    }
+
+
+                </tbody>
+            </table>
+        </article>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+
+    $(document).ready(function () {
+        $('#dtBasicExample').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+
+
+    });
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        $(".select2").select2();
+
+        var table = $('#dtUserList').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+        $('#tableSearch').on('keyup', function () {
+            table.search(this.value).draw();
+        })
+    });
+</script>

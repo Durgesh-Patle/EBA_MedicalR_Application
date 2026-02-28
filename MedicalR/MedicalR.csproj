@@ -1,0 +1,741 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CD0263C0-1E32-45F5-A8F9-5B6F45B85B62}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MedicalR</RootNamespace>
+    <AssemblyName>MedicalR</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort>44322</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.9.0.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.9.0\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="ClosedXML, Version=0.105.0.0, Culture=neutral, PublicKeyToken=fd1eb21b62ae805b, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClosedXML.0.105.0\lib\netstandard2.0\ClosedXML.dll</HintPath>
+    </Reference>
+    <Reference Include="ClosedXML.Parser, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1d5f7376574c51ec, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClosedXML.Parser.2.0.0\lib\netstandard2.0\ClosedXML.Parser.dll</HintPath>
+    </Reference>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.2.1.66\lib\net461\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=3.4.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.3.4.1\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml.Framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.Framework.3.4.1\lib\net46\DocumentFormat.OpenXml.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus, Version=8.4.2.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.8.4.2\lib\net462\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.Interfaces, Version=8.4.0.0, Culture=neutral, PublicKeyToken=a694d7f3b0907a61, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.Interfaces.8.4.0\lib\net462\EPPlus.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelNumberFormat, Version=1.1.0.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelNumberFormat.1.1.0\lib\net20\ExcelNumberFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.1\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.8.0.0\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.8.0.0\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql, Version=8.0.7.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Npgsql.8.0.7\lib\netstandard2.0\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="RBush, Version=4.0.0.0, Culture=neutral, PublicKeyToken=c77e27b81f4d0187, processorArchitecture=MSIL">
+      <HintPath>..\packages\RBush.Signed.4.0.0\lib\net47\RBush.dll</HintPath>
+    </Reference>
+    <Reference Include="SixLabors.Fonts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d998eea7b14cab13, processorArchitecture=MSIL">
+      <HintPath>..\packages\SixLabors.Fonts.1.0.0\lib\netstandard2.0\SixLabors.Fonts.dll</HintPath>
+    </Reference>
+    <Reference Include="Spire.Barcode">
+      <HintPath>..\..\Working PROJECTS\Medical R G _medicalR\Medical R G\packages\Spire.Office.5.9.2\lib\xamarinios\Spire.Barcode.dll</HintPath>
+    </Reference>
+    <Reference Include="Spire.Doc">
+      <HintPath>..\packages\Spire.Office.5.9.2\lib\MonoAndroid\Spire.Doc.dll</HintPath>
+    </Reference>
+    <Reference Include="Spire.XLS">
+      <HintPath>..\..\Working PROJECTS\Medical R G _medicalR\Medical R G\packages\Spire.Office.5.9.2\lib\xamarinios\Spire.XLS.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.8.0.0\lib\net462\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.0\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.Cryptography.Xml, Version=8.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Xml.8.0.2\lib\net462\System.Security.Cryptography.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.8.0.5\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Channels, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Channels.8.0.0\lib\net462\System.Threading.Channels.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.2.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.9\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.9.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.9\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.9\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.9\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.9\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.9\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease">
+      <Private>True</Private>
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime">
+      <Private>True</Private>
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\CHCAdmin\CHCApproveRequestformController.cs" />
+    <Compile Include="Controllers\CHCAdmin\CHCBillProcessController.cs" />
+    <Compile Include="Controllers\CHCAdmin\CreditEmployeesSalaryAccController.cs" />
+    <Compile Include="Controllers\CHCAdmin\forwardingchequesController.cs" />
+    <Compile Include="Controllers\CHCAdmin\GenrateLotController.cs" />
+    <Compile Include="Controllers\CHCAdmin\LotwiseApprovalController.cs" />
+    <Compile Include="Controllers\CHC\CHCRequestformController.cs" />
+    <Compile Include="Controllers\CommonController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IntermediateAppController.cs" />
+    <Compile Include="Controllers\MedicalBillsException\HospitalizationCFController.cs" />
+    <Compile Include="Controllers\MedicalBillsException\HospitalizationDHRDController.cs" />
+    <Compile Include="Controllers\MedicalBillsException\MedicalBillsExceptionController.cs" />
+    <Compile Include="Controllers\MedicalR\BatchCreationController.cs" />
+    <Compile Include="Controllers\MedicalR\EditCheckingMedicalBillsController.cs" />
+    <Compile Include="Controllers\MedicalR\MedicalAcknowlledgeController.cs" />
+    <Compile Include="Controllers\MedicalR\MedicalPaymentDetailsController.cs" />
+    <Compile Include="Controllers\MedicalR\MedicalRequestController.cs" />
+    <Compile Include="Controllers\MedicalR\ProcessPaymentController.cs" />
+    <Compile Include="Controllers\MedicalR\SanctionMedicalBillsController.cs" />
+    <Compile Include="Controllers\MedicalR\TrackingMedicalBillsController.cs" />
+    <Compile Include="Controllers\MedicalR\UpdateBatchController.cs" />
+    <Compile Include="Controllers\MedicalR\UploadDependentsController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\RetiredEmp\ReitredEmployeeController.cs" />
+    <Compile Include="Controllers\RetiredEmp\RetiredEmplSpecialCaseController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="CustomHelper\AD_Authentication.cs" />
+    <Compile Include="CustomHelper\AESGenerator.cs" />
+    <Compile Include="CustomHelper\CommonHelper.cs" />
+    <Compile Include="CustomHelper\CustomAuthorize.cs" />
+    <Compile Include="CustomHelper\EmailHelper.cs" />
+    <Compile Include="CustomHelper\ExceptionLogging.cs" />
+    <Compile Include="CustomHelper\FileConverter.cs" />
+    <Compile Include="CustomHelper\FileUploadHelper.cs" />
+    <Compile Include="CustomHelper\GoogleDriveHelper.cs" />
+    <Compile Include="CustomHelper\HelperLogs.cs" />
+    <Compile Include="CustomHelper\MessageHelper.cs" />
+    <Compile Include="CustomHelper\ResumeParsingHelper.cs" />
+    <Compile Include="CustomHelper\SessionManager.cs" />
+    <Compile Include="CustomHelper\UserManager.cs" />
+    <Compile Include="DataAccessLayer\DAL\Attachment\DALAttachment.cs" />
+    <Compile Include="DataAccessLayer\DAL\CHCAdmin\DALCHCApproveRequestform.cs" />
+    <Compile Include="DataAccessLayer\DAL\CHC\DALChcRequest.cs" />
+    <Compile Include="DataAccessLayer\DAL\CommonSettings\DALCommonSetting.cs" />
+    <Compile Include="DataAccessLayer\DAL\EmailConfiguration\DALEmailConfiguration.cs" />
+    <Compile Include="DataAccessLayer\DAL\ForgetPassword\DALForgetPassword.cs" />
+    <Compile Include="DataAccessLayer\DAL\ForgetPass\DALForgetPassword.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalBillsException\DALHospitalizationDHRD.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalBillsException\DALHospitalizationFC.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalBillsException\DALMedicalBillsException.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALAcknowledge.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALBatchCreation.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALEditCheckingBills.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALEmployeFamilyDetails.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALMedicalPaymentDetails.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALMedicalRequest.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALProcessPayment.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALQueryModule.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALSanctionMedicalBills.cs" />
+    <Compile Include="DataAccessLayer\DAL\MedicalR\DALTrackingMedicalBills.cs" />
+    <Compile Include="Controllers\MedicalR\QueryModuleController.cs" />
+    <Compile Include="DataAccessLayer\DAL\Notes\DALNotes.cs" />
+    <Compile Include="DataAccessLayer\DAL\RetiredEmployee\DALRetiredEmployee.cs" />
+    <Compile Include="DataAccessLayer\DAL\RetiredEmployee\Reports\DALReports.cs" />
+    <Compile Include="DataAccessLayer\DAL\RoleManagement\DALRoleManagement.cs" />
+    <Compile Include="DataAccessLayer\DAL\TemplateModule\DALTemplateModule.cs" />
+    <Compile Include="DataAccessLayer\DAL\UserManagement\DALUserManagement.cs" />
+    <Compile Include="DataAccessLayer\IDAL\Attachment\IDALAttachment.cs" />
+    <Compile Include="DataAccessLayer\IDAL\CHCAdmin\IDALCHCApproveRequestform.cs" />
+    <Compile Include="DataAccessLayer\IDAL\CHC\IDALChcRequest.cs" />
+    <Compile Include="DataAccessLayer\IDAL\CommonSettings\IDALCommonSetting.cs" />
+    <Compile Include="DataAccessLayer\IDAL\EmailConfiguration\IDALEmailConfiguration.cs" />
+    <Compile Include="DataAccessLayer\IDAL\EmailInterviewInfo\IDALEmailInterviewInfo.cs" />
+    <Compile Include="DataAccessLayer\IDAL\ForgetPassword\IDALForgetPassword.cs" />
+    <Compile Include="DataAccessLayer\IDAL\ForgetPass\IDALForgetPassword.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalBillsException\IDALMedicalBillsException.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALAcknowledge.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALBatchCreation.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALEditCheckingBills.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALEmployeFamilyDetails.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALMedicalPaymentDetails.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALMedicalRequest.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALProcessPayment.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALQueryModule.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALSanctionMedicalBills.cs" />
+    <Compile Include="DataAccessLayer\IDAL\MedicalR\IDALTrackingMedicalBills.cs" />
+    <Compile Include="DataAccessLayer\IDAL\Notes\IDALNotes.cs" />
+    <Compile Include="DataAccessLayer\IDAL\Reports\IDALReports.cs" />
+    <Compile Include="DataAccessLayer\IDAL\RetiredEmployee\IDALRetiredEmployee.cs" />
+    <Compile Include="DataAccessLayer\IDAL\RoleManagement\IDALRoleManagement.cs" />
+    <Compile Include="DataAccessLayer\IDAL\TemplateModule\IDALTemplateModule.cs" />
+    <Compile Include="DataAccessLayer\IDAL\UserManagement\IDALUserManagement.cs" />
+    <Compile Include="EmailSettings\EmailHelper.cs" />
+    <Compile Include="EmailSettings\EmailProcess.cs" />
+    <Compile Include="EmailSettings\EmailSetupModel.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Attachment\AttachmentModel.cs" />
+    <Compile Include="Models\Attachment\AttachmentTypeModel.cs" />
+    <Compile Include="Models\CHC\CHCBillProcess.cs" />
+    <Compile Include="Models\CHC\CHCRequest.cs" />
+    <Compile Include="Models\Common.cs" />
+    <Compile Include="Models\CommonSettings\CityModel.cs" />
+    <Compile Include="Models\CommonSettings\CompanyProfileModel.cs" />
+    <Compile Include="Models\CommonSettings\ComposeEmailModel.cs" />
+    <Compile Include="Models\CommonSettings\CountryModel.cs" />
+    <Compile Include="Models\CommonSettings\DoctorList.cs" />
+    <Compile Include="Models\CommonSettings\DropdownModel.cs" />
+    <Compile Include="Models\CommonSettings\ExpenceTypeModel.cs" />
+    <Compile Include="Models\CommonSettings\HospitalListModel.cs" />
+    <Compile Include="Models\CommonSettings\IndustryTypeModel.cs" />
+    <Compile Include="Models\CommonSettings\ObjectionModel.cs" />
+    <Compile Include="Models\CommonSettings\PasswordModel.cs" />
+    <Compile Include="Models\CommonSettings\SkillModel.cs" />
+    <Compile Include="Models\CommonSettings\SocialMediaModel.cs" />
+    <Compile Include="Models\CommonSettings\SourceModel.cs" />
+    <Compile Include="Models\CommonSettings\StateModel.cs" />
+    <Compile Include="Models\EmailConfiguration\EmailConfigurationModel.cs" />
+    <Compile Include="Models\Helper.cs" />
+    <Compile Include="Models\MedicalBillsException\AdditionalSanction.cs" />
+    <Compile Include="Models\MedicalBillsException\HospitilizationCr.cs" />
+    <Compile Include="Models\MedicalBillsException\HospitilizationDHRD.cs" />
+    <Compile Include="Models\MedicalR\BatchCreationModel.cs" />
+    <Compile Include="Models\MedicalR\ClaimRequestModel.cs" />
+    <Compile Include="Models\MedicalR\EditCheckingBillsModel.cs" />
+    <Compile Include="Models\MedicalR\EmpFamilydetail.cs" />
+    <Compile Include="Models\MedicalR\ExpenseType.cs" />
+    <Compile Include="Models\MedicalR\HeadsOfExpense.cs" />
+    <Compile Include="Models\MedicalR\Hospitallist.cs" />
+    <Compile Include="Models\MedicalR\JsonNetResult.cs" />
+    <Compile Include="Models\MedicalR\MedicalAcknowledgeModel.cs" />
+    <Compile Include="Models\MedicalR\MedicalPaymentDetailsModel.cs" />
+    <Compile Include="Models\MedicalR\MedicalRequest.cs" />
+    <Compile Include="Models\MedicalR\ProcessPaymentModel.cs" />
+    <Compile Include="Models\MedicalR\SanctionMedicalBillsModel.cs" />
+    <Compile Include="Models\MedicalR\TrackingMedicalBillsModel.cs" />
+    <Compile Include="Models\MedicalR\TreatmentType.cs" />
+    <Compile Include="Models\MedicalR\UpdateBatchModel.cs" />
+    <Compile Include="Models\MedicalR\UploadFamilyDetailsModel.cs" />
+    <Compile Include="Models\Notes\NotesModel.cs" />
+    <Compile Include="Models\Reports\CompanyPocReport.cs" />
+    <Compile Include="Models\Reports\CompanyUsageReport.cs" />
+    <Compile Include="Models\Reports\DeliveryReport.cs" />
+    <Compile Include="Models\Reports\InterviewOwnerClientWise.cs" />
+    <Compile Include="Models\Reports\InterviewOwnerWithFeedback.cs" />
+    <Compile Include="Models\Reports\JDStatusReport.cs" />
+    <Compile Include="Models\ResponseModel.cs" />
+    <Compile Include="Models\RetiredEmployee\ReimburseAmtModel.cs" />
+    <Compile Include="Models\RetiredEmployee\RempDemiseModel.cs" />
+    <Compile Include="Models\RetiredEmployee\RetiredEmployeeModel.cs" />
+    <Compile Include="Models\RetiredEmployee\RetiredempTransModel.cs" />
+    <Compile Include="Models\RoleManagement\RoleRightDetailModel.cs" />
+    <Compile Include="Models\RoleManagement\RoleViewModel.cs" />
+    <Compile Include="Models\TemplateModule\TemplateFieldEnum.cs" />
+    <Compile Include="Models\TemplateModule\TemplateModel.cs" />
+    <Compile Include="Models\UserManagement\LoginDetailModel.cs" />
+    <Compile Include="Models\UserManagement\LoginViewModel.cs" />
+    <Compile Include="Models\UserManagement\RegisterModel.cs" />
+    <Compile Include="Models\UserManagement\ResetPassword.cs" />
+    <Compile Include="Models\UserManagement\UserDetailModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\bootstrap-grid.css" />
+    <Content Include="Content\bootstrap-grid.min.css" />
+    <Content Include="Content\bootstrap-grid.rtl.css" />
+    <Content Include="Content\bootstrap-grid.rtl.min.css" />
+    <Content Include="Content\bootstrap-reboot.css" />
+    <Content Include="Content\bootstrap-reboot.min.css" />
+    <Content Include="Content\bootstrap-reboot.rtl.css" />
+    <Content Include="Content\bootstrap-reboot.rtl.min.css" />
+    <Content Include="Content\bootstrap-utilities.css" />
+    <Content Include="Content\bootstrap-utilities.min.css" />
+    <Content Include="Content\bootstrap-utilities.rtl.css" />
+    <Content Include="Content\bootstrap-utilities.rtl.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\bootstrap.rtl.css" />
+    <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="favicon.ico" />
+    <Content Include="Global.asax" />
+    <Content Include="Content\Site.css" />
+    <Content Include="Includes\css\bootstrap.min.css" />
+    <Content Include="Includes\css\dataTables.bootstrap4.min.css" />
+    <Content Include="Includes\css\editor.css" />
+    <Content Include="Includes\css\jquery-ui.min.css" />
+    <Content Include="Includes\css\style.css" />
+    <Content Include="Includes\css\toastr.min.css" />
+    <Content Include="Includes\js\bootstrap.bundle.min.js" />
+    <Content Include="Includes\js\common.js" />
+    <Content Include="Includes\js\dataTables.bootstrap4.min.js" />
+    <Content Include="Includes\js\editor.js" />
+    <Content Include="Includes\js\html2canvas.js" />
+    <Content Include="Includes\js\jquery-3.6.4.min.js" />
+    <Content Include="Includes\js\jquery-ui-1.13.2.min.js" />
+    <Content Include="Includes\js\jquery.dataTables.min.js" />
+    <Content Include="Includes\js\jspdf.min.js" />
+    <Content Include="Includes\js\toastr.min.js" />
+    <Content Include="Scripts\bootstrap.bundle.js" />
+    <Content Include="Scripts\bootstrap.bundle.min.js" />
+    <Content Include="Scripts\bootstrap.esm.js" />
+    <Content Include="Scripts\bootstrap.esm.min.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="wkhtmltopdf\ApprovalList.html" />
+    <Content Include="wkhtmltopdf\BankAdvise.html" />
+    <Content Include="wkhtmltopdf\BatchDetail.html" />
+    <Content Include="wkhtmltopdf\CHCBankAdvise.html" />
+    <Content Include="wkhtmltopdf\CHCBankAdvise_BRANCH.html" />
+    <Content Include="wkhtmltopdf\CHCBankAdvise_MUMBAI.html" />
+    <Content Include="wkhtmltopdf\CHCOfficeNote.html" />
+    <Content Include="wkhtmltopdf\CHCOfficeNoteMum.html" />
+    <Content Include="wkhtmltopdf\Default.html" />
+    <Content Include="wkhtmltopdf\DHRD_BankAdvise_BRANCH.html" />
+    <Content Include="wkhtmltopdf\DHRD_MedicalRExOffice_Note.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\ApprovalList.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\BankAdvise.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\BatchDetail.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\CHCBankAdvise_BRANCH.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\CHCBankAdvise_MUMBAI.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\CHCOfficeNote.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\CHCOfficeNoteMum.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\CHCOfficeNote_old.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\Default.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\DHRD_BankAdvise_BRANCH.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\DHRD_MedicalRExOffice_Note.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\EditCheckingBill.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\EditCheckingGrid.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\EMS_Error_Log_.txt" />
+    <Content Include="wkhtmltopdf\downloadFormat\ExceptioBankAdvise_MUMBAI.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\MedicalRBank_Advise.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\MedicalREmailNotification_Error_Log_.txt" />
+    <Content Include="wkhtmltopdf\downloadFormat\MedicalRExOffice_Note.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\MedicalROffice_Note.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\MedicalR_Sanctioned.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\MedicalR_SanctionMedicalBills.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\medical_request_print - Copy %282%29.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\medical_request_print - Copy.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\medical_request_print.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\medical_request_print_99.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\OfficeNote.html" />
+    <Content Include="wkhtmltopdf\downloadFormat\OfficeNote_old.html" />
+    <Content Include="wkhtmltopdf\EditCheckingBill.html" />
+    <Content Include="wkhtmltopdf\EditCheckingGrid.html" />
+    <Content Include="wkhtmltopdf\ExceptioBankAdvise_MUMBAI.html" />
+    <Content Include="wkhtmltopdf\MedicalRBank_Advise.html" />
+    <Content Include="wkhtmltopdf\MedicalRExOffice_Note.html" />
+    <Content Include="wkhtmltopdf\MedicalROffice_Note.html" />
+    <Content Include="wkhtmltopdf\MedicalR_Sanctioned.html" />
+    <Content Include="wkhtmltopdf\MedicalR_SanctionMedicalBills.html" />
+    <Content Include="wkhtmltopdf\medical_request_print.html" />
+    <Content Include="wkhtmltopdf\OfficeNote.html" />
+    <Content Include="wkhtmltopdf\wkhtmltopdf.exe" />
+    <Content Include="wkhtmltopdf\wkhtmltox.dll" />
+    <Content Include="DataAccessLayer\DAL\UserManagement\DALUserManagement.cs.mine" />
+    <Content Include="DataAccessLayer\DAL\UserManagement\DALUserManagement.cs.r114" />
+    <Content Include="DataAccessLayer\DAL\UserManagement\DALUserManagement.cs.r130" />
+    <Content Include="Models\MedicalR\desktop.ini" />
+    <None Include="Scripts\jquery-3.7.0.intellisense.js" />
+    <Content Include="Scripts\jquery-3.7.0.js" />
+    <Content Include="Scripts\jquery-3.7.0.min.js" />
+    <Content Include="Scripts\jquery-3.7.0.slim.js" />
+    <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="wkhtmltopdf\wkhtml.zip" />
+    <Content Include="Views\IntermediateApp\Index.cshtml" />
+    <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\Settings\Index.cshtml" />
+    <Content Include="Views\Settings\Hospital_list.cshtml" />
+    <Content Include="Views\Settings\Hospital_AddNew.cshtml" />
+    <Content Include="Views\Settings\Hospital_Edit.cshtml" />
+    <Content Include="Views\Settings\add_template_module.cshtml" />
+    <Content Include="Views\Settings\add_email_configuaration.cshtml" />
+    <Content Include="Views\Settings\add_role.cshtml" />
+    <Content Include="Views\Settings\add_user.cshtml" />
+    <Content Include="Views\Settings\add_vendor.cshtml" />
+    <Content Include="Views\Settings\change_password.cshtml" />
+    <Content Include="Views\Settings\company_information.cshtml" />
+    <Content Include="Views\Settings\contact_us.cshtml" />
+    <Content Include="Views\Settings\data_templates.cshtml" />
+    <Content Include="Views\Settings\Doctor_AddNew.cshtml" />
+    <Content Include="Views\Settings\Doctor_Edit.cshtml" />
+    <Content Include="Views\Settings\Doctor_List.cshtml" />
+    <Content Include="Views\Settings\edit_email_configuaration.cshtml" />
+    <Content Include="Views\Settings\edit_role.cshtml" />
+    <Content Include="Views\Settings\edit_template_module.cshtml" />
+    <Content Include="Views\Settings\edit_user.cshtml" />
+    <Content Include="Views\Settings\edit_vendor.cshtml" />
+    <Content Include="Views\Settings\email_configuaration.cshtml" />
+    <Content Include="Views\Settings\Expence_Type.cshtml" />
+    <Content Include="Views\Settings\Expense_AddNew.cshtml" />
+    <Content Include="Views\Settings\Expense_Edit.cshtml" />
+    <Content Include="Views\Settings\job_boards.cshtml" />
+    <Content Include="Views\Settings\Objection.cshtml" />
+    <Content Include="Views\Settings\Objection_AddNew.cshtml" />
+    <Content Include="Views\Settings\Objection_Edit.cshtml" />
+    <Content Include="Views\Settings\profile.cshtml" />
+    <Content Include="Views\Settings\roles.cshtml" />
+    <Content Include="Views\Settings\template_module.cshtml" />
+    <Content Include="Views\Settings\users.cshtml" />
+    <Content Include="Views\Settings\vendors.cshtml" />
+    <Content Include="Views\ReitredEmployee\RetiredEmp.cshtml" />
+    <Content Include="Views\ReitredEmployee\BankAdvise.cshtml" />
+    <Content Include="Views\ReitredEmployee\CheckingVerify.cshtml" />
+    <Content Include="Views\ReitredEmployee\EditChecking.cshtml" />
+    <Content Include="Views\ReitredEmployee\EmplAnnexure.cshtml" />
+    <Content Include="Views\ReitredEmployee\GenrateLot.cshtml" />
+    <Content Include="Views\ReitredEmployee\OfficeNote.cshtml" />
+    <Content Include="Views\ReitredEmployee\QueryModel.cshtml" />
+    <Content Include="Views\ReitredEmployee\Reimburse_AddNew.cshtml" />
+    <Content Include="Views\ReitredEmployee\Reimburse_Amt.cshtml" />
+    <Content Include="Views\ReitredEmployee\Reimburse_Edit.cshtml" />
+    <Content Include="Views\ReitredEmployee\Rempdemise_Edit.cshtml" />
+    <Content Include="Views\ReitredEmployee\Remptrans_AddNew.cshtml" />
+    <Content Include="Views\ReitredEmployee\Remptrans_Edit.cshtml" />
+    <Content Include="Views\ReitredEmployee\Retiredemp_AddNew.cshtml" />
+    <Content Include="Views\ReitredEmployee\RetiredEmp_Edit.cshtml" />
+    <Content Include="Views\ReitredEmployee\RetiredEmpDemise.cshtml" />
+    <Content Include="Views\ReitredEmployee\RetiredempDemise_AddNew.cshtml" />
+    <Content Include="Views\ReitredEmployee\Trans_RetiredEmp.cshtml" />
+    <Content Include="Views\ReitredEmployee\Trans_Sanction_Grid.cshtml" />
+    <Content Include="Views\ReitredEmployee\Trans_Sanctioned.cshtml" />
+    <Content Include="Views\ReitredEmployee\YearWisePaymentDetails.cshtml" />
+    <Content Include="Views\RetiredEmplSpecialCase\DataEntrySpecialCase.cshtml" />
+    <Content Include="Views\RetiredEmplSpecialCase\DataEntry.cshtml" />
+    <Content Include="Views\RetiredEmplSpecialCase\DataEntryEdit.cshtml" />
+    <Content Include="Views\CHCRequestform\Index.cshtml" />
+    <Content Include="Views\CHCRequestform\_Empsidebarinfo.cshtml" />
+    <Content Include="Views\CHCRequestform\_Empsidebarinfo_Edit.cshtml" />
+    <Content Include="Views\CHCRequestform\_NewRequest.cshtml" />
+    <Content Include="Views\CHCRequestform\_NewRequest_Edit - Copy.cshtml" />
+    <Content Include="Views\CHCRequestform\_NewRequest_Edit.cshtml" />
+    <Content Include="Views\CHCRequestform\_Notes.cshtml" />
+    <Content Include="Views\CHCRequestform\_PastDetail.cshtml" />
+    <Content Include="Views\CHCRequestform\Attachments.cshtml" />
+    <Content Include="Views\CHCRequestform\Detail.cshtml" />
+    <Content Include="Views\CHCRequestform\Edit.cshtml" />
+    <Content Include="Views\CHCApproveRequestform\Index.cshtml" />
+    <Content Include="Views\CHCBillProcess\Index.cshtml" />
+    <Content Include="Views\forwardingcheques\Index.cshtml" />
+    <Content Include="Views\CHCApproveRequestform\_ApproveRequest.cshtml" />
+    <Content Include="Views\CHCApproveRequestform\_Empsidebarinfo.cshtml" />
+    <Content Include="Views\CHCApproveRequestform\_Notes.cshtml" />
+    <Content Include="Views\CHCApproveRequestform\_PastDetail.cshtml" />
+    <Content Include="Views\CHCApproveRequestform\Attachments.cshtml" />
+    <Content Include="Views\CHCApproveRequestform\Detail.cshtml" />
+    <Content Include="Views\CHCBillProcess\_Empsidebarinfo.cshtml" />
+    <Content Include="Views\CHCBillProcess\_ProcessPayment.cshtml" />
+    <Content Include="Views\CHCBillProcess\BankAdvise.cshtml" />
+    <Content Include="Views\CHCBillProcess\Detail.cshtml" />
+    <Content Include="Views\CHCBillProcess\LetterForBank.cshtml" />
+    <Content Include="Views\CHCBillProcess\OfficeNote.cshtml" />
+    <Content Include="Views\CHCBillProcess\QueryModel.cshtml" />
+    <Content Include="Views\forwardingcheques\_Empsidebarinfo.cshtml" />
+    <Content Include="Views\forwardingcheques\_forwardingcheques.cshtml" />
+    <Content Include="Views\forwardingcheques\Detail.cshtml" />
+    <Content Include="Views\GenrateLot\LotGenration.cshtml" />
+    <Content Include="Views\CreditEmployeesSalaryAcc\_Empsidebarinfo.cshtml" />
+    <Content Include="Views\CreditEmployeesSalaryAcc\_ProcessPayment.cshtml" />
+    <Content Include="Views\CreditEmployeesSalaryAcc\BankAdvise.cshtml" />
+    <Content Include="Views\CreditEmployeesSalaryAcc\Detail.cshtml" />
+    <Content Include="Views\CreditEmployeesSalaryAcc\EnclosureEmplSummary.cshtml" />
+    <Content Include="Views\CreditEmployeesSalaryAcc\Index.cshtml" />
+    <Content Include="Views\LotwiseApproval\Index.cshtml" />
+    <Content Include="Views\Report\Index.cshtml" />
+    <Content Include="Views\Report\EmployeeWisePaymentReport.cshtml" />
+    <Content Include="Views\Report\MedicalRBatchSummaryReport.cshtml" />
+    <Content Include="Views\Report\SettlementReport.cshtml" />
+    <Content Include="Views\Report\SettlementSummaryReport.cshtml" />
+    <Content Include="Views\MedicalBillsException\Index.cshtml" />
+    <Content Include="Views\MedicalBillsException\_Empsidebarinfo.cshtml" />
+    <Content Include="Views\MedicalBillsException\_HospitalizationDHRDAdd.cshtml" />
+    <Content Include="Views\MedicalBillsException\AdditionalPayment.cshtml" />
+    <Content Include="Views\MedicalBillsException\Detail.cshtml" />
+    <Content Include="Views\MedicalBillsException\HospCrRecoveryfrmEmpl.cshtml" />
+    <Content Include="Views\MedicalBillsException\HospitalizationCrDetail.cshtml" />
+    <Content Include="Views\MedicalBillsException\HospitalizationCrIndex.cshtml" />
+    <Content Include="Views\MedicalBillsException\HospitalizationDHRDDetail.cshtml" />
+    <Content Include="Views\MedicalBillsException\HospitalizationDHRDIndex.cshtml" />
+    <Content Include="Views\MedicalBillsException\HospitilizationCrSidebar.cshtml" />
+    <Content Include="Views\MedicalBillsException\HospitilizationDHRDSidebar.cshtml" />
+    <Content Include="Views\MedicalBillsException\Item.cshtml" />
+    <Content Include="Views\HospitalizationCF\Index.cshtml" />
+    <Content Include="Views\HospitalizationCF\Item.cshtml" />
+    <Content Include="Views\HospitalizationDHRD\Index.cshtml" />
+    <Content Include="Views\HospitalizationDHRD\Item.cshtml" />
+    <Content Include="Views\MedicalRequest\_Attachment.cshtml" />
+    <Content Include="Views\MedicalRequest\_EmplSideBarDetails.cshtml" />
+    <Content Include="Views\MedicalRequest\_NewRequestbkp.cshtml" />
+    <Content Include="Views\MedicalRequest\_PastDetails.cshtml" />
+    <Content Include="Views\MedicalRequest\_SearchUser.cshtml" />
+    <Content Include="Views\MedicalRequest\ApplicationHistory.cshtml" />
+    <Content Include="Views\MedicalRequest\ApplicationItem.cshtml" />
+    <Content Include="Views\MedicalRequest\Detail.cshtml" />
+    <Content Include="Views\MedicalRequest\Index.cshtml" />
+    <Content Include="Views\MedicalRequest\Item.cshtml" />
+    <Content Include="Views\Shared\_EmployeeSideBar.cshtml" />
+    <Content Include="Views\SanctionMedicalBills\Annexure.cshtml" />
+    <Content Include="Views\SanctionMedicalBills\Detail.cshtml" />
+    <Content Include="Views\SanctionMedicalBills\Index.cshtml" />
+    <Content Include="Views\SanctionMedicalBills\OfficeNote.cshtml" />
+    <Content Include="Views\MedicalAcknowlledge\_AckNewRequest.cshtml" />
+    <Content Include="Views\MedicalAcknowlledge\_Attachment.cshtml" />
+    <Content Include="Views\MedicalAcknowlledge\Index.cshtml" />
+    <Content Include="Views\MedicalAcknowlledge\Item.cshtml" />
+    <Content Include="Views\BatchCreation\BatchItems.cshtml" />
+    <Content Include="Views\BatchCreation\Index.cshtml" />
+    <Content Include="Views\UpdateBatch\Index.cshtml" />
+    <Content Include="Views\EditCheckingMedicalBills\Detail.cshtml" />
+    <Content Include="Views\EditCheckingMedicalBills\Index.cshtml" />
+    <Content Include="Views\ProcessPayment\BankAdvise.cshtml" />
+    <Content Include="Views\ProcessPayment\EmployeeSummary.cshtml" />
+    <Content Include="Views\ProcessPayment\Index.cshtml" />
+    <Content Include="Views\MedicalPaymentDetails\Index.cshtml" />
+    <Content Include="Views\QueryModule\Index.cshtml" />
+    <Content Include="Views\MedicalRequest\_NewRequest.cshtml" />
+    <Content Include="Views\TrackingMedicalBills\Index.cshtml" />
+    <Content Include="Views\TrackingMedicalBills\Detail.cshtml" />
+    <Content Include="Views\UploadDependents\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="fonts\" />
+    <Folder Include="Views\Common\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\bootstrap.rtl.min.css.map" />
+    <Content Include="Content\bootstrap.rtl.css.map" />
+    <Content Include="Content\bootstrap.min.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\bootstrap-utilities.rtl.min.css.map" />
+    <Content Include="Content\bootstrap-utilities.rtl.css.map" />
+    <Content Include="Content\bootstrap-utilities.min.css.map" />
+    <Content Include="Content\bootstrap-utilities.css.map" />
+    <Content Include="Content\bootstrap-reboot.rtl.min.css.map" />
+    <Content Include="Content\bootstrap-reboot.rtl.css.map" />
+    <Content Include="Content\bootstrap-reboot.min.css.map" />
+    <Content Include="Content\bootstrap-reboot.css.map" />
+    <Content Include="Content\bootstrap-grid.rtl.min.css.map" />
+    <Content Include="Content\bootstrap-grid.rtl.css.map" />
+    <Content Include="Content\bootstrap-grid.min.css.map" />
+    <Content Include="Content\bootstrap-grid.css.map" />
+    <None Include="packages.config" />
+    <Content Include="Scripts\bootstrap.min.js.map" />
+    <Content Include="Scripts\bootstrap.js.map" />
+    <Content Include="Scripts\bootstrap.esm.min.js.map" />
+    <Content Include="Scripts\bootstrap.esm.js.map" />
+    <Content Include="Scripts\bootstrap.bundle.min.js.map" />
+    <Content Include="Scripts\bootstrap.bundle.js.map" />
+    <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
+    <Content Include="Scripts\jquery-3.7.0.min.map" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>53921</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>https://localhost:44322/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

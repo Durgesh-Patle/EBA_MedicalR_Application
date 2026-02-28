@@ -1,0 +1,65 @@
+﻿
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Upload Dependent Details</h2>
+        </div>
+        <div class="col-md-6 text-right">
+            <a href="@Url.Action("DownloadExcel", "UploadDependents")" style="margin-top: 28px;" class="btn btn-success">Download Template</a>
+        </div>
+    </div>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="mb-3">
+                <label for="uploadedFile" class="form-label">Choose File:</label>
+                <div class="input-group">
+                    <input type="file" class="form-control" id="uploadedFile" name="UploadedFile" accept=".xlsx, .xls" required />
+                    <button type="submit" id="ddlsubmit" style="margin-left: 10px;" class="btn btn-primary">Start Upload</button>
+                </div>
+                <br />
+                <div class="float-center" id="showloder" style="display: none;">
+                    <span style="color: blueviolet">Data is being uploaded</span>
+                    <img src="~/images/loader.gif" style="width:20px;height:20px;" id="syncLoader" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $('#ddlsubmit').click(function () {
+        var formData = new FormData();
+        var totalFiles = document.getElementById("uploadedFile").files.length;
+
+        for (var i = 0; i < totalFiles; i++) {
+            var file = document.getElementById("uploadedFile").files[i];
+
+            formData.append("uploadedFile", file);
+        }
+        $('#showloder').show();
+        $.ajax({
+            type: 'post',
+            url: '/UploadDependents/UploadFile',
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                debugger;
+                alert(response);
+                $('#showloder').hide();
+                window.location.reload();
+
+            },
+            error: function (response) {
+                alert("errror" + response);
+                $('#showloder').hide();
+            }
+        });
+    });
+
+</script>

@@ -1,0 +1,569 @@
+﻿@model IEnumerable<MedicalR.Models.MedicalR.EditCheckingBillsModel>
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="javascript:void(0);">
+                    <strong>Statistics</strong>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="BatchItemsView-add.html">
+                    Sanction medical bills(View Details)
+                </a>
+            </li>
+        </ul>
+        <hr class="m-0">
+        <br />
+    </div>
+
+    <!-- Employee Details -->
+    <div class="form-row">
+
+        <div class="form-group col-md-2">
+            <label>Appln.No:</label>
+            <input type="text" class="form-control" id="appln_no" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Email Address:</label>
+            <input type="text" class="form-control" id="email" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Name:</label>
+            <input type="text" class="form-control" id="employeename" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Department:</label>
+            <input type="text" class="form-control" id="department_name" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Location:</label>
+            <input type="text" class="form-control" id="national_location" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Band:</label>
+            <input type="text" class="form-control" id="band_level" readonly>
+        </div>
+
+    </div>
+
+    <!-- Patient Details -->
+    <div class="form-row">
+
+        <div class="form-group col-md-2">
+            <label>Name of Patient:</label>
+            <input type="text" class="form-control" id="patient_name" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Relationship:</label>
+            <input type="text" class="form-control" id="family_relation_code" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Nature of Illness:</label>
+            <input type="text" class="form-control" id="nature_of_illness" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Treatment Type:</label>
+            <input type="text" class="form-control" id="treatment_type" readonly>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>Is treatment taken out of Head Quarters?</label>
+            <input type="checkbox" id="is_treatment_taken_out_of_head_quaters" disabled>
+        </div>
+
+    </div>
+
+    <h6 class="pt-3">
+        <strong>Details of Claim (For the Treatment Taken)</strong>
+    </h6>
+    <hr>
+
+    <!-- Dynamic Expense Rendering Area -->
+    <div id="expenseContainer"></div>
+
+    <hr>
+
+    <!-- Grand Totals -->
+    <div class="row">
+        <div class="form-group col-md-4"></div>
+
+        <div class="form-group col-md-4">
+            <label>
+                Total Claimed Rs.:
+                <span id="grandClaimedTotal">0</span>
+            </label>
+        </div>
+
+        <div class="form-group col-md-4">
+            <label>
+                Sanc. Rs.:
+                <span id="grandTotal">0</span>
+            </label>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- Final Objection Section -->
+    <div class="row">
+
+        <div class="form-group col-md-6">
+            <label>Objection Code</label>
+            <select id="final_objection_code" class="form-control"></select>
+        </div>
+
+        <div class="form-group col-md-6">
+            <label>Remark (If any)</label>
+            <input type="text" id="final_objection_remark" class="form-control" />
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="row">
+        <div class="form-group col-md-4"></div>
+
+        <div class="form-group col-md-2">
+            <button type="button"
+                    class="btn btn-primary"
+                    id="btnObjection">
+                Objection
+            </button>
+        </div>
+
+        <div class="form-group col-md-2">
+            <button type="button"
+                    class="btn btn-success"
+                    id="btnSanctioned">
+                Sanctioned
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+    var model = {};
+    var objection_codes = [];
+
+
+    $(document).ready(function () {
+
+        var id = getIdFromUrl();
+
+        console.log(id, "idddd");
+
+        $.when(
+            getItem(id),
+            getObjectionCodes()
+        ).done(function (itemRes, objectionRes) {
+
+            model = itemRes[0];
+            objection_codes = objectionRes[0];
+
+            console.log(model, "itemRes");
+            console.log(objection_codes, "objectionRes[0]");
+
+            renderPage();
+        });
+    });
+
+    function getIdFromUrl() {
+        //var url = window.location.href;
+        //var matches = url.match(/\d+/g);
+        //return matches ? parseInt(matches[0]) : 0;
+
+        var id = 0;
+        var urls = window.location.href.split('?')[0].split('/');
+        id = parseInt(eval(urls[urls.length - 1].match(/\d+/g))[0]);
+        return id ? id : 0;
+    }
+
+    function getItem(id) {
+        return $.ajax({
+            url: "/SanctionMedicalBills/GetItem",
+            type: "POST",
+            data: { id: id }
+        });
+    }
+
+    function getObjectionCodes() {
+        return $.ajax({
+            url: "/Common/GetObjectionCodes",
+            type: "GET"
+        });
+    }
+
+    function renderFinalObjectionDropdown() {
+
+        var ddl = $("#final_objection_code");
+        ddl.empty();
+        ddl.append('<option value="0">Select</option>');
+
+        $.each(objection_codes, function (i, obj) {
+            var selected = obj.id == model.objection_code_id ? "selected" : "";
+            ddl.append(`<option value="${obj.id}" ${selected}>${obj.name}</option>`);
+        });
+    }
+
+
+    function renderPage() {
+
+        $("#appln_no").val(model.appln_no);
+        $("#email").val(model.email);
+        $("#employeename").val(model.employeename);
+        $("#department_name").val(model.department_name);
+        $("#national_location").val(model.national_location);
+        $("#band_level").val(model.band_level);
+        $("#patient_name").val(model.patient_name);
+        $("#family_relation_code").val(model.family_relation_code);
+        $("#nature_of_illness").val(model.nature_of_illness);
+        $("#treatment_type").val(model.treatment_type);
+
+        if (model.is_treatment_taken_out_of_head_quaters) {
+            $("#is_treatment_taken_out_of_head_quaters").prop("checked", true);
+        }
+
+        renderExpenseDetails();
+        renderFinalObjectionDropdown();
+
+        $("#final_objection_remark").val(model.objection_remark || "");
+
+        if (model.is_payment_released) {
+            $("#btnObjection").hide();
+            $("#btnSanctioned").hide();
+        }
+    }
+
+    $("#final_objection_code").change(function () {
+        model.objection_code_id = parseInt($(this).val());
+    });
+
+    $("#final_objection_remark").on("keyup change", function () {
+        model.objection_remark = $(this).val();
+    });
+
+
+    function renderExpenseDetails() {
+
+        var container = $("#expenseContainer");
+        container.empty();
+
+        $.each(model.expense_type_detalis, function (i, expense) {
+
+            var tableRows = "";
+
+            $.each(expense.request_claim_expense_items, function (j, item) {
+
+                //console.log(item, "Itemssssss");
+
+                tableRows += `
+                                <tr>
+                                    <td>${formatDate(item.only_date)}</td>
+                                    <td>${formatDate(item.to_date)}</td>
+
+                                    <td>${item.head_of_expense_name || ''}</td>
+                                    
+
+                                    <td>${item.bill_no}</td>
+                                    <td>${item.amt_claimed_rs}</td>
+                                    <td>
+                                    <input type="number" class="form-control sanction-input"
+                                    data-expense="${i}" data-item="${j}"
+                                    value="${item.amt_sanctioned_rs || 0}">
+                                    </td>
+                                    <td>${item.remark || ''}</td>
+                                    <td>${buildObjectionDropdown(item.objection_code_id, item.amt_claimed_rs, item.amt_sanctioned_rs)}</td>
+                                    <td>
+                                   <input type="text"
+                                           class="form-control ma-remark"
+                                           ${item.amt_claimed_rs == item.amt_sanctioned_rs ? "disabled" : ""}
+                                           value="${item.ma_remark || ''}">
+                                    </td>
+                                </tr>
+                                `;
+            });
+
+            var html = `
+
+                     <div class="expense-section mb-4">
+
+                            <!-- Expense Type -->
+                            <div class="row mb-2">
+                                <div class="col-md-12">
+                                    <label class="font-weight-bold">Expense Type:</label>
+                                    <div class="form-control bg-light mt-1" style="max-width:400px;">
+                                        ${expense.expense_type_name || ''}
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Head</th>
+                                        
+                                        <th>Bill No</th>
+                                        <th>Claimed</th>
+                                        <th>Sanctioned</th>
+                                        <th>Remark</th>
+                                        <th>Objection</th>
+                                        <th>Remarks (MA)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tableRows}
+                                </tbody>
+                            </table>
+                        </div>
+
+                          <!-- Totals Row -->
+                            <div class="row mt-2">
+                                <div class="col-md-6 text-center">
+                                    Total Claimed Rs.: ${expense.total_claimed_rs || 0}
+                                </div>
+                                <div class="col-md-6 text-center">
+                                    Sanc. Rs.:
+                                    <span class="expense-total" data-expense="${i}">
+                                        ${expense.total_sanctioned_rs || 0}
+                                    </span>
+                                </div>
+                            </div>
+                </div>
+                `;
+
+
+            container.append(html);
+        });
+
+        bindSanctionChange();
+    }
+
+    $("#btnObjection").click(function () {
+        save(false);
+    });
+
+    $("#btnSanctioned").click(function () {
+        save(true);
+    });
+
+
+    function buildObjectionDropdown(selectedId, claimed, sanctioned) {
+
+        var disabled = claimed == sanctioned ? "disabled" : "";
+
+        var options = `<select class="form-control objection-select" ${disabled}>`;
+
+        $.each(objection_codes, function (i, obj) {
+            var selected = obj.id == selectedId ? "selected" : "";
+            options += `<option value="${obj.id}" ${selected}>${obj.name}</option>`;
+        });
+
+        options += `</select>`;
+        return options;
+    }
+
+    
+    function bindSanctionChange() {
+
+        $(".sanction-input").on("keyup change", function () {
+
+            var expenseIndex = $(this).data("expense");
+            var itemIndex = $(this).data("item");
+
+            var value = parseFloat($(this).val()) || 0;
+
+            model.expense_type_detalis[expenseIndex]
+                .request_claim_expense_items[itemIndex]
+                .amt_sanctioned_rs = value;
+
+            calculateTotals();
+
+            var claimed = model.expense_type_detalis[expenseIndex]
+                .request_claim_expense_items[itemIndex]
+                .amt_claimed_rs;
+
+            if (claimed == value) {
+                $(this).closest("tr").find(".objection-select").prop("disabled", true);
+                $(this).closest("tr").find(".ma-remark").prop("disabled", true);
+            } else {
+                $(this).closest("tr").find(".objection-select").prop("disabled", false);
+                $(this).closest("tr").find(".ma-remark").prop("disabled", false);
+            }
+
+        });
+
+        $(".objection-select").off().on("change", function () {
+
+            var expenseIndex = $(this).closest("tr")
+                .find(".sanction-input").data("expense");
+
+            var itemIndex = $(this).closest("tr")
+                .find(".sanction-input").data("item");
+
+            model.expense_type_detalis[expenseIndex]
+                .request_claim_expense_items[itemIndex]
+                .objection_code_id = parseInt($(this).val());
+        });
+
+        $(".ma-remark").off().on("keyup change", function () {
+
+            var expenseIndex = $(this).closest("tr")
+                .find(".sanction-input").data("expense");
+
+            var itemIndex = $(this).closest("tr")
+                .find(".sanction-input").data("item");
+
+            model.expense_type_detalis[expenseIndex]
+                .request_claim_expense_items[itemIndex]
+                .ma_remark = $(this).val();
+        });
+    }
+
+    function calculateTotals() {
+
+        var grandTotal = 0;
+
+        $.each(model.expense_type_detalis, function (i, expense) {
+
+            var hideFromTo = expense.expense_type_code !== "#PHYC#";
+
+            var expenseTotal = 0;
+
+            $.each(expense.request_claim_expense_items, function (j, item) {
+                expenseTotal += parseFloat(item.amt_sanctioned_rs || 0);
+            });
+
+            expense.total_sanctioned_rs = expenseTotal;
+            grandTotal += expenseTotal;
+
+            $(`.expense-total[data-expense='${i}']`).text(expenseTotal.toFixed(2));
+        });
+
+        $("#grandTotal").text(grandTotal.toFixed(2));
+        model.total_sanctioned_rs = grandTotal;
+    }
+
+    function save(isSanctioned) {
+
+        if (!isSanctioned) {
+
+            if (!validateObjections()) return;
+        }
+
+        $.ajax({
+            url: "/SanctionMedicalBills/Save",
+            type: "POST",
+            //data: {
+            //    model: model,
+            //    is_sanctioned: isSanctioned
+            //},
+            data: JSON.stringify({
+                model: model,
+                is_sanctioned: isSanctioned
+            }),
+            contentType: "application/json",
+
+            success: function (res) {
+                if (res.Status) {
+                    alert(res.Message);
+                    window.location.href = "/SanctionMedicalBills";
+                } else {
+                    alert(res.Message);
+                }
+            }
+        });
+    }
+
+    function validateObjections() {
+
+        var valid = true;
+
+        $.each(model.expense_type_detalis, function (i, expense) {
+
+            $.each(expense.request_claim_expense_items, function (j, item) {
+
+                var claimed = parseFloat(item.amt_claimed_rs);
+                var sanctioned = parseFloat(item.amt_sanctioned_rs || 0);
+
+                var difference = Math.abs(claimed - sanctioned);
+
+                //if (difference < 1 && (!item.objection_code_id || item.objection_code_id == 0)) {
+                if (claimed !== sanctioned && (!item.objection_code_id || item.objection_code_id == 0)) {
+                    alert("Please select objection code");
+                    valid = false;
+                    return false;
+                }
+
+            });
+        });
+
+        if (!model.objection_code_id || model.objection_code_id == 0) {
+            alert("Please select final objection code");
+            return false;
+        }
+
+        if (!model.objection_remark) {
+            alert("Please enter final objection remark");
+            return false;
+        }
+
+        return valid;
+    }
+
+    function formatDate(dateString) {
+
+        if (!dateString) return "";
+
+        var dateObj;
+
+        // Handle .NET /Date(1651017600000)/
+        if (typeof dateString === "string" && dateString.indexOf("/Date") === 0) {
+            var timestamp = parseInt(dateString.replace(/[^0-9]/g, ""));
+            dateObj = new Date(timestamp);
+        }
+        else {
+            dateObj = new Date(dateString);
+        }
+
+        if (isNaN(dateObj.getTime())) {
+            console.log("Invalid Date:", dateString);
+            return "";
+        }
+
+        var day = ("0" + dateObj.getDate()).slice(-2);
+
+        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        var month = months[dateObj.getMonth()];
+        var year = dateObj.getFullYear();
+
+        return day + "-" + month + "-" + year;
+    }
+
+
+
+</script>
+

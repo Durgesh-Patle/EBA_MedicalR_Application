@@ -1,0 +1,299 @@
+﻿
+@{
+    ViewBag.Title = "Add Template";
+}
+
+<style>
+    #customtableModal .form-group {
+        width: 100%;
+    }
+
+        #customtableModal .form-group .col-md-6, #customFieldModal .form-group .col-md-6 {
+            max-width: 49% !important;
+            display: inline-block !important;
+        }
+
+    #customFieldModal .form-group {
+        width: 100%;
+    }
+
+        #customFieldModal .form-group .col-md-12 {
+            max-width: 100% !important;
+            display: inline-block !important;
+        }
+</style>
+<br />
+<br />
+<br />
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/settings/template-module">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="#"><strong>Template Module</strong></a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Template Module</h3>
+        </div>
+    </div>
+    <h6 class="pt-3"><strong>Add Module</strong></h6>
+    <hr>
+    <form>
+        <div class="form-row">
+            <div class="form-group col-md-8">
+                <label for="">Title</label>
+                <input class="form-control" id="templateTitle" placeholder="Title" type="text">
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-8">
+                <label for="">Description</label>
+                <textarea id="templateDescription"></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-8">
+                <label for="">Published</label>
+                <input type="checkbox" class="ml-3" id="templatePublish">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 mt-5">
+                <a href="#" class="btn btn-primary" id="AddTemplate" data-val="1">Add</a>
+                <a href="#" class="btn btn-primary" id="AddTemplate_New" data-val="2">Save and New</a>
+            </div>
+        </div>
+    </form>
+</article>
+
+
+<!-- Modal -->
+
+
+<div class="modal fade" id="customtableModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Table Template</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="customtableColumnRow">
+                        <div class="form-group customtableColumn">
+
+                            <div class="col-md-6">
+                                <label for="tblRows_txtEditor">Column Name</label>
+                                <input class="form-control columnName" type="text" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="tblRows_txtEditor">Column Value</label>
+                                <select class="form-control columnValue">
+                                    @foreach (var item in ViewBag.TemplateEnum)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+
+
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-primary" id="addNewColumn">+</button>
+                        </div>
+
+
+                    </div>
+
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="addCustomtable">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="customFieldModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Custom Field</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+
+                        <div class="col-md-12">
+                            <label for="customFieldValue">Select Value</label>
+                            <select class="form-control" id="customFieldValue">
+                                @foreach (var item in ViewBag.TemplateEnum)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="addCustomField">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+@*<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>*@
+
+<script>
+    var lastSelection;
+    var lastrange;
+    $(document).ready(function () {
+        $("#templateDescription").Editor();
+
+        setTimeout(function () {
+            $("#menuBarDiv_templateDescription").append('<div class="btn-group"><a href="javascript:void(0)" class="btn btn-default" title="Custom Table" style="cursor: pointer;" onclick="insertCustomTable();">CT</a></div>');
+            $("#menuBarDiv_templateDescription").append('<div class="btn-group"><a href="javascript:void(0)" class="btn btn-default" title="Custom Field" style="cursor: pointer;" onclick="insertCustomField();">CF</a></div>');
+        }, 1000);
+
+
+        $("#addCustomtable").click(function () {
+            var node = document.createElement("div");  // Create with DOM
+
+
+            var table = '<table class="table" border="1" cellspacing="1" cellpadding="1" style="width: 400px;"><thead><tr>';
+            $(".customtableColumn").each(function () {
+
+                var columnName = $(this).find(".columnName").val();
+                table += "<th>" + columnName + "</th>";
+            });
+            table += "</tr></thead><tbody><tr>";
+            $(".customtableColumn").each(function () {
+                var columnValue = $(this).find(".columnValue").val();
+                table += "<td>{" + columnValue + "}</td>";
+            });
+            table += "</tr></tbody></table>";
+            node.innerHTML = table;
+            lastrange.insertNode(node);
+            $("#customtableModal").modal("hide");
+        })
+
+        $("#addCustomField").click(function () {
+            var customFieldValue = $("#customFieldValue").val().trim();
+            var node = document.createElement("div");  // Create with DOM
+            node.innerHTML = "{" + customFieldValue + "}";
+            lastrange.insertNode(node);
+            $("#customFieldModal").modal("hide");
+        })
+
+
+        $("#addNewColumn").click(function () {
+
+            $(".customtableColumnRow").append($(".customtableColumn").last().clone());
+        })
+
+
+        $("#AddTemplate,#AddTemplate_New").click(function () {
+
+            var RetStatus = true;
+            $(".has-error").html("");
+            var ButtonValue = $(this).data("val");
+            var templateTitle = $("#templateTitle").val().trim();
+            var templateDescription = $("#templateDescription").parent().find(".Editor-editor").html();
+            var templatePublish = $("#templatePublish").is(":checked");
+
+
+            if (templateTitle == "") {
+                $("#templateTitle").parent().find(".has-error").html("Required*");
+                $("#templateTitle").focus();
+                RetStatus = false;
+            }
+
+            if (RetStatus == true) {
+                var data = {
+                    "templateTitle": templateTitle,
+                    "templateDescription": templateDescription,
+                    "templatePublish": templatePublish
+                };
+                $.ajax({
+                    url: "/Settings/AddTemplate",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result['Status'] == true) {
+                            toastr["success"](result["Message"]);
+                            if (ButtonValue == 1) {
+                                window.location.href = "/Settings/template-module";
+                            }
+                            else {
+                                ClearFields();
+                            }
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+        function ClearFields() {
+            $("#templateTitle").val('');
+            $("#templateDescription").parent().find(".Editor-editor").html("");
+        }
+    });
+
+    function insertCustomTable() {
+        getLastSelection();
+
+        $("#customtableModal").modal("show");
+    }
+
+    function insertCustomField() {
+        getLastSelection();
+
+        $("#customFieldModal").modal("show");
+    }
+
+    function getLastSelection() {
+        lastSelection = window.getSelection();
+        if (lastSelection.rangeCount == 0) {
+            $("#templateDescription").parent().find(".Editor-editor").focus();
+            lastSelection = window.getSelection();
+        }
+        lastrange = lastSelection.getRangeAt(0).cloneRange();
+    }
+</script>
+

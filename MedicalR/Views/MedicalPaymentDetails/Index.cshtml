@@ -1,0 +1,100 @@
+﻿
+@model IEnumerable<MedicalR.Models.MedicalR.MedicalPaymentDetailsModel>
+
+@{
+    ViewBag.Title = "Medical Payment Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark">
+                        <strong>Statistics ></strong>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Medical Payment Details</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+            <br />
+        </div>
+
+        <article class="col-md-12">
+
+            <table id="dtBasicExample"
+                   class="table table-hover table-bordered"
+                   width="100%">
+
+                <thead>
+                    <tr>
+
+                        <th>Employee Code</th>
+                        <th>Name Of Employee</th>
+                        <th>Type Of Treatment</th>
+                        <th>Name of Patient </th>
+                        <th>dependant</th>
+                        <th>Claimed</th>
+                        <th>Sanc amount</th>
+                        <th>UTI ToTPYT</th>
+                        <th> Bank Account.No</th>
+                        <th>Lot.No</th>
+                        <th>appln.No</th>
+                        <th>payment Dt</th>
+                        <th>Remark</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.employeecode</td>
+                                <td>@item.employeename</td>
+                                <td>@item.treatment_type</td>
+                                <td>@item.patient_name</td>
+                                <td>@item.family_relation_code</td>
+                                <td>@item.total_claimed_rs</td>
+                                <td>@item.total_claimed_rs</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>@item.appln_no</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+
+            </table>
+
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        var table = $('#dtBasicExample').DataTable({
+            responsive: false,      
+            scrollX: true,          
+            autoWidth: true,
+            pageLength: 10,
+            lengthMenu: [10, 25, 50, 100],
+            ordering: true,
+            searching: true,
+            autoWidth: false
+        });
+
+        $('.dataTables_length').addClass('bs-select');
+
+    });
+</script>

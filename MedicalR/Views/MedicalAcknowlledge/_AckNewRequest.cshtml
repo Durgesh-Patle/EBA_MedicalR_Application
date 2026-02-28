@@ -1,0 +1,363 @@
+﻿<form ng-controller="AckNewRequest">
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="">Name of Patient <span class="text-danger">*</span></label>
+            <select ng-model="model.patient_id" ng-options="item.id as item.name for item in GetPatients" class="form-control" disabled></select>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="">Treatment Type:</label>
+            <select ng-model="model.treatment_type_id" ng-options="item.id as item.name for item in treatment_types" class="form-control" disabled></select>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="">Nature of Illness: <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="Nature_of_illness" ng-model="model.nature_of_illness" placeholder="Illness" disabled>
+        </div>
+    </div>
+    <h6 class="pt-3"><strong>Details of Claim(For the Treatment Taken)</strong></h6>
+
+    <div ng-repeat="item in model.expense_type_detalis track by $index " class="row ng-scope border m-0 mt-2 mb-2">
+        <div class="col-md-12 p-2">
+            <div class="form-row">
+                <div class="form-group col-md-11">
+                    <label for=""><strong>Expense Type:</strong></label>
+                    <select ng-model="item.expense_type_id" ng-options="item.id as item.name for item in expense_types" class="form-control col-md-6" ng-change="expense_typecheck(item.expense_type_id,$index)" disabled></select>
+                </div>
+            </div>
+            <div ng-show="treatment_type_code[0].code==='#HOSPIL#' || treatment_type_code[0].code==='#MATERNITY#'">
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="">From Date: <span class="text-danger">*</span></label>
+                        <input type="date" ng-model="item.from_date" class="form-control" id="from_date" placeholder="dd-mm-yyyy" disabled>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="">To Date: <span class="text-danger">*</span></label>
+                        <input type="date" ng-model="item.to_date" class="form-control" id="to_date" placeholder="dd-mm-yyyy" disabled>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="">Name of Hospital: <span class="text-danger">*</span></label>
+                        <select ng-model="item.hospital_id" ng-options="item.id as item.name for item in hospital_list" class="form-control" disabled></select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="">Hospital Awarded I.T R Cert.?: <span class="text-danger">*</span></label>
+                        <select class="form-control" id="hosp_awarded_i_t_rebate">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row pl-3 pr-3">
+                <table class="table table-hover table-bordered border" id="hospitaltbl" cellspacing="0" width="100%">
+                    <tr>
+                        <th class="th-sm"></th>
+                        <td class="th-sm" ng-show="!ishidefrmtodates[$index]">from date </td>
+                        <td class="th-sm" ng-show="!ishidefrmtodates[$index]">To Date</td>
+                        <td class="th-sm" ng-show="!ishideOnlydates[$index]">Date</td>
+                        <th class="th-sm" ng-show="!isHideHeadofExpenses[$index]"> Heads of Expense</th>
+                        <th class="th-sm">Bill.No</th>
+                        <th class="th-sm">Amt Claimed Rs</th>
+                        <th class="th-sm">Remarks</th>
+
+                    </tr>
+                    <tbody>
+                        <tr ng-repeat="item2 in item.request_claim_expense_items track by $index">
+                            <td id="cl0"></td>
+                            <td id="c10" ng-show="!ishidefrmtodates[$parent.$index]">
+                                <input type="date" ng-model="item2.from_date" class="form-control" disabled />
+                            </td>
+                            <td id="c10" ng-show="!ishidefrmtodates[$parent.$index]">
+                                <input type="date" ng-model="item2.to_date" class="form-control" disabled />
+                            </td>
+                            <td id="c10" ng-show="!ishideOnlydates[$parent.$index]">
+                                <input type="date" ng-model="item2.only_date" class="form-control" disabled />
+                            </td>
+                            <td id="cl6" ng-show="!isHideHeadofExpenses[$parent.$index]">
+                                <select ng-model="item2.head_of_expense_id" ng-options="item2.id as item2.name for item2 in head_of_expenses[$parent.$index]" disabled class="form-control"></select>
+                            </td>
+                            <td id="cl0"> <input type="text" class="form-control" id="bill_no" placeholder="" ng-model="item2.bill_no" disabled></td>
+                            <td id="cl0"> <input type="text" class="form-control qty1" id="amt_claimed_rs" placeholder="" ng-model="item2.amt_claimed_rs" disabled ng-change="calculateTotAmt(item2.amt_claimed_rs)"></td>
+                            <td id="cl4"> <input type="text" class="form-control" id="remark" placeholder="" ng-model="item2.remark" disabled></td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!--<div class="form-group col-md-2">
+        <button type="button" class="form-control" ng-click="addNewExpenseType()">add_New</button>
+    </div>-->
+    <div class="row">
+        <div class="form-group col-md-2"></div>
+
+        <div class="form-group col-md-3">
+            <label for="">Grant Total Claimed Rs.:</label>
+        </div>
+        <div class="form-group col-md-4">
+            <input type="text" class="form-control total" id="total_claimed_rs" ng-model="model.total_claimed_rs" placeholder="">
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label for="">Enclosure:</label>
+            <input type="text" class="form-control" id="" placeholder="Enclosure">
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="form-group col-md-4">
+            <button type="button" class="form-control btn btn-primary" ng-click="ackRequest(model.id)">Acknowledge Form</button>
+        </div>
+
+    </div>
+
+</form>
+<script>
+    // var app = angular.module('myApp', []);
+    app.controller("AckNewRequest", ["$scope", "AckNewRequestFactory", "$timeout", "$location", "$window", "$filter", function ($scope, AckNewRequestFactory, $timeout, $location, $window, $validator, $filter) {
+
+
+        $scope.ishidefrmtodates = [];
+        $scope.ishideOnlydates = [];
+        $scope.isHideHeadofExpenses = [];
+
+        $scope.ishidefrmtodates[0] = true;
+        $scope.ishideOnlydates[0] = true;
+        $scope.isHideHeadofExpenses[0] = true;
+
+        var activeTab = window.location.hash.substring(1);
+        if (activeTab == "") {
+            activeTab = "NewReq";
+            window.location.hash = '#' + activeTab;
+
+        }
+        activeTab = "NewReq";
+        var activeView = $("#claim-tab li[data-tab='" + activeTab + "']").find("a.nav-link").data("target");
+        $("#claim-tab a[data-target='" + activeView + "']").addClass("active");
+
+        //$scope.GetPatients = [{ "id": 1, "name": "Roshan" }, { "id": 2, "name": "Robin" }, { "id": 1, "name": "Rohan" }];
+        $scope.hospital_list = [{ "id": 21, "name": "Asian Heart" }]
+
+        $scope.isItem = true;
+
+        $scope.$watch("model.treatment_type_id", function (newVal, oldVal) {
+
+            if (typeof newVal == "undefined" || newVal == 0)
+                return;
+            if (newVal == oldVal)
+                return;
+            $scope.treatment_type_code = $scope.treatment_types.filter(function (el) {
+                return el.id == newVal
+            });
+
+            AckNewRequestFactory.expense_types(newVal).then(function (success) {
+                $scope.expense_types = success.data;
+            });
+
+        });
+        $scope.index_val = 0;
+        $scope.$watch("expense_types.expense_type_id", function (newVal, oldVal) {
+
+            if (typeof newVal == "undefined" || newVal == 0)
+                return;
+            if (newVal == oldVal)
+                return;
+
+            AckNewRequestFactory.head_of_expenses(newVal).then(function (success) {
+                $scope.head_of_expenses = success.data;
+            });
+
+        });
+
+        $scope.expense_typecheck = function (expense_type_id, index) {
+            $scope.expense_typindex = index;
+            NewRequestFactory.head_of_expenses(expense_type_id).then(function (success) {
+
+                if ($scope.head_of_expenses === undefined) {
+                    $scope.head_of_expenses = [];
+                }
+                $scope.head_of_expenses[$scope.expense_typindex] = success.data;
+            });
+        };
+
+        $scope.deleteExpenseEntry = function (parent_index) {
+
+            $scope.model.expense_type_detalis.pop(parent_index);
+        };
+
+        $scope.addItems = function (expense_type_index) {
+
+
+
+            var obj = new Object();
+            obj.expense_type_id = 0;
+            obj.head_of_expense_id = 0;
+            obj.bill_no = "";
+            obj.amt_claimed_rs = 0;
+            obj.remark = "";
+            $scope.model.expense_type_detalis[expense_type_index].request_claim_expense_items.push(obj);
+        };
+        $scope.deleteItems = function (parent_index, child_index) {
+            $scope.model.expense_type_detalis[parent_index].request_claim_expense_items.splice(child_index, 1);
+        };
+        $scope.addNewExpenseType = function () {
+
+            var obj_exp = new Object();
+            obj_exp.expense_type_id = 0;
+            obj_exp.from_date = "";
+            obj_exp.to_date = "";
+            obj_exp.hospital_id = 0;
+            obj_exp.isHospitalAwardedCertificate = false;
+            $scope.model.expense_type_detalis.push(obj_exp);
+
+            var obj = new Object();
+            obj.expense_type_id = 0;
+            obj.head_of_expense_id = 0;
+            obj.bill_no = "";
+            obj.amt_claimed_rs = 0;
+            obj.remark = "";
+            if ($scope.model.expense_type_detalis[$scope.model.expense_type_detalis.length - 1].request_claim_expense_items === undefined) {
+                $scope.model.expense_type_detalis[$scope.model.expense_type_detalis.length - 1].request_claim_expense_items = [];
+            }
+            $scope.model.expense_type_detalis[$scope.model.expense_type_detalis.length - 1].request_claim_expense_items.push(obj);
+        };
+
+        $scope.calculateTotAmt = function (amt) {
+
+            $scope.model.total_claimed_rs = 0.0;
+            for (var k = 0; k < $scope.model.expense_type_detalis.length; k++) {
+                for (var k2 = 0; k2 < $scope.model.expense_type_detalis[k].request_claim_expense_items.length; k2++) {
+                    $scope.model.total_claimed_rs += parseFloat($scope.model.expense_type_detalis[k].request_claim_expense_items[k2].amt_claimed_rs);
+                }
+
+            }
+
+        }
+        $scope.ackRequest = function () {
+
+            $scope.model.is_acknowledged = true;
+            AckNewRequestFactory.save($scope.model).then(function (success) {
+                debugger
+                toastr["success"](success.data);
+                window.location.href = window.location.origin + '/MedicalAcknowlledge';
+            });
+        };
+        $scope.showhidefields = function (expense_type_id, index) {
+            $scope.expense_type_code = $scope.expense_types.filter(function (el) {
+                return el.id == expense_type_id
+            });
+            if ($scope.expense_type_code[0].code === "#PHYC#") {
+                $scope.ishidefrmtodates[index] = false;
+            }
+            else {
+                $scope.ishidefrmtodates[index] = true;
+            }
+
+            if ($scope.expense_type_code[0].code === '#PRC#' || $scope.expense_type_code[0].code === '#CEFV#' || $scope.expense_type_code[0].code === '#COMD#' || $scope.expense_type_code[0].code === '#HEARAID#' || $scope.expense_type_code[0].code === '#HAT#' || $scope.expense_type_code[0].code === '#SPECT#' || $scope.expense_type_code[0].code === '#INJVAC#') {
+                $scope.ishideOnlydates[index] = false;
+            }
+            else {
+                $scope.ishideOnlydates[index] = true;
+            }
+            if ($scope.expense_type_code[0].code === '#CFDT#' || $scope.expense_type_code[0].code === '#MRE#' || $scope.expense_type_code[0].code === '#HECHRG#') {
+                $scope.isHideHeadofExpenses[index] = false;
+            }
+            else {
+                $scope.isHideHeadofExpenses[index] = true;
+            }
+        }
+
+
+        AckNewRequestFactory.init(
+            function (success) {
+
+                $scope.model = success[0].data;
+                $scope.GetPatients = success[1].data;
+                $scope.treatment_types = success[2].data;
+
+                if ($scope.model.id > 0) {
+
+                    AckNewRequestFactory.expense_types($scope.model.treatment_type_id).then(function (success) {
+                        $scope.expense_types = success.data;
+                        for (var k = 0; k < $scope.model.expense_type_detalis.length; k++) {
+
+                            if ($scope.model.expense_type_detalis[k].from_date !== undefined) {
+                                $scope.model.expense_type_detalis[k].from_date = new Date($scope.model.expense_type_detalis[k].from_date);
+                            }
+                            if ($scope.model.expense_type_detalis[k].to_date !== undefined) {
+                                $scope.model.expense_type_detalis[k].to_date = new Date($scope.model.expense_type_detalis[k].to_date);
+                            }
+                            $scope.showhidefields($scope.model.expense_type_detalis[k].expense_type_id, k);
+
+                            for (var k2 = 0; k2 < $scope.model.expense_type_detalis[k].request_claim_expense_items.length; k2++) {
+                                if ($scope.model.expense_type_detalis[k].request_claim_expense_items[k2].from_date !== undefined) {
+                                    $scope.model.expense_type_detalis[k].request_claim_expense_items[k2].from_date = new Date($scope.model.expense_type_detalis[k].request_claim_expense_items[k2].from_date);
+                                }
+                                if ($scope.model.expense_type_detalis[k].request_claim_expense_items[k2].to_date !== undefined) {
+                                    $scope.model.expense_type_detalis[k].request_claim_expense_items[k2].to_date = new Date($scope.model.expense_type_detalis[k].request_claim_expense_items[k2].to_date);
+                                }
+                                if ($scope.model.expense_type_detalis[k].request_claim_expense_items[k2].only_date !== undefined) {
+                                    $scope.model.expense_type_detalis[k].request_claim_expense_items[k2].only_date = new Date($scope.model.expense_type_detalis[k].request_claim_expense_items[k2].only_date);
+                                }
+                            }
+                            AckNewRequestFactory.head_of_expenses($scope.model.expense_type_detalis[k].expense_type_id).then(function (success) {
+                                if ($scope.head_of_expenses === undefined) {
+                                    $scope.head_of_expenses = [];
+                                }
+                                $scope.head_of_expenses[k - 1] = success.data;
+                            });
+                        }
+                    });
+                    //for (var k = 0; k < $scope.model.expense_type_detalis.length; k++) {
+
+
+                    //}
+                }
+
+
+
+
+            });
+    }]);
+    app.factory("AckNewRequestFactory", ["$rootScope", "$http", "$q", function ($rootScope, $http, $q) {
+        this.init = function (success, failure) {
+            debugger
+            var id = 0;
+            var urls = window.location.href.split('?')[0].split('/');
+            id = parseInt(eval(urls[urls.length - 1].match(/\d+/g))[0]);
+            $q.all([
+                this.getItem(id),
+                this.patients(),
+                this.treatment_types()
+            ]).then(function (msg) {
+                success(msg);
+            }, failure);
+        }
+        this.getItem = function (id) {
+            return $http.post(("/MedicalAcknowlledge/GetItem"), { id: id })
+        },
+            this.patients = function () {
+                return $http.get('/Common/GetPatients/');
+            },
+            this.treatment_types = function () {
+                return $http.get('/Common/GetTreatmentTypes/');
+            }
+            ,
+            this.expense_types = function (treatment_type_id) {
+                return $http.post(('/Common/GetExpemseTypes/'), { treatment_type_id: treatment_type_id });
+            },
+            this.head_of_expenses = function (expense_type_id) {
+                return $http.post(('/Common/GetHeadOfExpenses/'), { expense_type_id: expense_type_id });
+            }
+        this.save = function (model) {
+            return $http.post(("/MedicalAcknowlledge/SingleAcknowledgeStart"), { model: model });
+        }
+        return this;
+    }]);
+</script>
+
+
+

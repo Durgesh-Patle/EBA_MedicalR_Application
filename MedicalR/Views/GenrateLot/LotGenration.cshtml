@@ -1,0 +1,196 @@
+﻿@{
+    ViewBag.Title = "LotGenration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="javascript:void(0);">
+                        <strong>Statistics ></strong>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Lot Generation</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+
+            <div class="pt-3">
+                <select id="actionSelect" class="custom-select col-sm-2">
+                    <option value="0">Select</option>
+                    <option value="1">Generate Lot</option>
+                </select>
+            </div>
+
+            <table id="dtBasicExample" class="table table-hover table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="chkAll" />
+                        </th>
+                        <th>Emplid</th>
+                        <th>Name</th>
+                        <th>CHC Name</th>
+                        <th>Bill No</th>
+                        <th>Amount</th>
+                        <th>Spouse Name</th>
+                        <th>Spouse CHC</th>
+                        <th>SPS Bill No</th>
+                        <th>SPS Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="gridBody"></tbody>
+            </table>
+
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    var CHC_DATA = [];
+    var is_any_selected = [];
+
+    $(document).ready(function () {
+
+        loadGrid();
+
+        // Row checkbox click (ackChecked)
+        $(document).on('change', '.rowCheck', function () {
+            var index = $(this).data('index');
+            var id = $(this).data('id');
+            var checked = $(this).is(':checked');
+
+            ackChecked(id, checked, index);
+        });
+
+        // Select All (allackChecked)
+        $('#chkAll').on('change', function () {
+            var checked = $(this).is(':checked');
+
+            $('.rowCheck').each(function () {
+                $(this).prop('checked', checked);
+
+                var index = $(this).data('index');
+                var id = $(this).data('id');
+
+                ackChecked(id, checked, index);
+            });
+        });
+
+        // Action dropdown
+        $('#actionSelect').change(function () {
+            if ($(this).val() == "1") {
+                save();
+            }
+        });
+    });
+
+    // ================= GRID LOAD =================
+    function loadGrid() {
+        $.ajax({
+            url: '/GenrateLot/Get_CHC_Lots_Grid_data',
+            type: 'POST',
+            success: function (res) {
+                CHC_DATA = res;
+                bindGrid(res);
+            }
+        });
+    }
+
+    // ================= GRID BIND =================
+    function val(v) {
+        return (v === null || v === undefined) ? '' : v;
+    }
+
+    function bindGrid(data) {
+        var html = '';
+        $.each(data, function (i, item) {
+            html += `
+            <tr>
+                <td>
+                    <input type="checkbox"
+                           class="rowCheck"
+                           data-index="${i}"
+                           data-id="${item.id}" />
+                </td>
+                <td>${val(item.employee_code)}</td>
+                <td>${val(item.employee_name)}</td>
+                <td>${val(item.hosname)}</td>
+                <td>${val(item.bill_no)}</td>
+                <td>${val(item.amount)}</td>
+                <td>${val(item.name_of_spouse)}</td>
+                <td>${val(item.phosname)}</td>
+                <td>${val(item.spouse_bill_no)}</td>
+                <td>${val(item.spouse_amount)}</td>
+            </tr>`;
+        });
+
+        $('#gridBody').html(html);
+    }
+
+    // ================= ackChecked =================
+    function ackChecked(request_id, flg, index) {
+
+        for (var k = 0; k < CHC_DATA.length; k++) {
+            if (CHC_DATA[k].id === request_id) {
+
+                if (flg) {
+                    CHC_DATA[k].Status2 = true;
+                    is_any_selected[index] = true;
+                } else {
+                    CHC_DATA[k].Status2 = false;
+                    is_any_selected[index] = false;
+                }
+            }
+        }
+    }
+
+    // ================= SAVE / GENERATE LOT =================
+    function save() {
+
+        var selected = CHC_DATA.filter(x => x.Status2 === true);
+
+        if (selected.length === 0) {
+            toastr.error("Please select at least 1 record!");
+            $('#actionSelect').val(0);
+            return;
+        }
+
+        var branch = selected.filter(x =>
+            x.chc_centerid === 4 || x.spouse_chc_centerid === 4
+        );
+
+        var is_only_branch = (selected.length === branch.length);
+        var is_only_mumbai_base = (selected.length > 0 && branch.length === 0);
+
+        if (!is_only_branch && !is_only_mumbai_base) {
+            toastr.error("Please generate Mumbai base or Branch base lot!");
+            $('#actionSelect').val(0);
+            return;
+        }
+
+        $.ajax({
+            url: '/GenrateLot/CHCLotGenerationStart',
+            type: 'POST',
+            data: JSON.stringify({ model: selected }),
+            contentType: 'application/json',
+            success: function (res) {
+                if (res.Status === true) {
+                    toastr.success(res.Message);
+                    location.reload();
+                } else {
+                    toastr.error(res.Message);
+                }
+            }
+        });
+    }
+</script>

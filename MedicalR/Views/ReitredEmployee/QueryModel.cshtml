@@ -1,0 +1,239 @@
+﻿@model IEnumerable<MedicalR.Models.RetiredEmployee.RetiredempTransModel>
+
+@{
+    ViewBag.Title = "QueryModel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="javascript:void(0);">
+                <strong>Query Model</strong>
+            </a>
+        </li>
+    </ul>
+    <hr class="m-0">
+</div>
+
+<article class="col-md-12">
+    <br />
+
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+
+                <div class="form-group col-md-1">
+                    <label>Lot No:</label>
+                </div>
+                <div class="form-group col-md-2">
+                    <select class="form-control" id="lot_no">
+                        <option value="">Select Lot No</option>
+                        @foreach (var item in Model)
+                        {
+                            <option value="@item.lot_no">@item.lot_no</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label>Empl Code:</label>
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="text" class="form-control" id="Empcd" />
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label>Status:</label>
+                </div>
+                <div class="form-group col-md-2">
+                    <select class="form-control" id="Emplist">
+                        <option value="">Select</option>
+                        <option value="paid">Paid List</option>
+                        <option value="unpaid">Pending List</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-md-1">
+                    <button type="button" class="btn btn-primary" onclick="ViewAnnexure()">Search</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+            <button type="button" class="btn btn-primary" onclick="ViewofficeNote()">View Office Note</button>
+            <button type="button" class="btn btn-primary" onclick="BankAdvise()">View Bank Advise</button>
+            <button type="button" class="btn btn-primary" onclick="getPDF()">Print</button>
+        </div>
+
+        <div class="PDF">
+            <table id="dtBasicExample" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Emp Code</th>
+                        <th>Name</th>
+                        <th>Fin Year</th>
+                        <th>Lot No</th>
+                        <th>Lot Date</th>
+                        <th>Amount</th>
+                        <th>Bank</th>
+                        <th>Account</th>
+                        <th>IFSC</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </form>
+
+    <form id="exportData" action="/ReitredEmployee/BankAdviseGetExportToExcel" method="post" style="display:none">
+        <input type="text" name="lot" />
+        <input type="text" name="lotno" />
+    </form>
+</article>
+
+<!-- ================= CDN SECTION ================= -->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+@*<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" />
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>*@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- ================= JS SECTION ================= -->
+
+<script>
+    $(document).ready(function () {
+        $('#dtBasicExample').DataTable();
+    });
+
+    function reInitTable() {
+        $('#dtBasicExample').DataTable().clear().destroy();
+        $('#dtBasicExample').DataTable();
+    }
+
+    function ViewAnnexure() {
+        debugger;
+        var lot_no = $("#lot_no").val().trim();
+        var Empcd = $("#Empcd").val().trim();
+        var Emplist = $("#Emplist option:selected").val().trim();
+        if (Emplist == '') {
+            alert("Please select Empl List");
+        }
+        if (Emplist == 'paid') {
+
+
+            if (lot_no == '' & Empcd == '') {
+                alert("Please select Lot No or Empcd Code");
+            }
+
+            else {
+                // var lot_no = $("#lot_no option:selected").Text().trim();
+                // if (lot_no == 0) {
+                var data = {
+                    "Empcd": Empcd,
+                    "lot_no": lot_no,
+
+                };
+                $.ajax({
+                    url: "/ReitredEmployee/GetEmpByEmpcd",
+                    type: "post",
+                    data: data,
+                    dataType: "json",
+                    success: function (result) {
+                        $("#dtBasicExample tbody").empty();
+                        // $("#yearto").empty();
+                        if (result.length > 0) {
+                            for (var i = 0; i < result.length > 0; i++) {
+                                var row = '<tr><td> ' + result[i].Empcd + ' </td> <td> ' + result[i].Name + ' </td> <td> ' + result[i].yearfrom + '-' + result[i].yearto + ' </td> <td>' + result[i].lot_no + '</td> <td>' + result[i].disp_lot_date + '</td> <td>' + result[i].sanc_amt + '</td> <td>' + result[i].bankname + '</td> <td>' + result[i].accno + '</td> <td>' + result[i].ifsccode + '</td> </tr>'
+                                $("#dtBasicExample tbody").append(row);
+                            }
+
+                        }
+                        else {
+                            //var row = '<tr><td> ' + "No Records found" + ' </td></tr>'
+                            ////var row = '<tr>' + "No Records found" + '</tr>'
+                            //$("#dtBasicExample tbody").append(row);
+                            alert("No Records Found ");
+                        }
+
+
+                    },
+
+                });
+
+            }
+        }
+        else {
+            if (Emplist == '') {
+                alert("Please select Empl List");
+            }
+            else {
+                if (Empcd == '') {
+                    alert("Please Enter Empcd Code");
+                }
+                else {
+                    var data = {
+                        "Empcd": Empcd,
+                    };
+                    $.ajax({
+                        url: "/ReitredEmployee/GetEmplPending",
+                        type: "post",
+                        data: data,
+                        dataType: "json",
+                        success: function (result) {
+                            $("#dtBasicExample tbody").empty();
+                            // $("#yearto").empty();
+                            if (result.length > 0) {
+                                for (var i = 0; i < result.length > 0; i++) {
+                                    var row = '<tr><td> ' + result[i].Empcd + ' </td> <td> ' + result[i].Name + ' </td> <td> ' + result[i].yearfrom + ' </td> <td>' + result[i].lot_no + '</td> <td>' + result[i].disp_lot_date + '</td> <td>' + result[i].sanc_amt + '</td> <td>' + result[i].bankname + '</td> <td>' + result[i].accno + '</td> <td>' + result[i].ifsccode + '</td> </tr>'
+                                    $("#dtBasicExample tbody").append(row);
+                                }
+
+                            }
+                            else {
+                                alert("Emp Code does not Exist");
+                            }
+
+                        },
+
+                    });
+                }
+            }
+        }
+    }
+    function getPDF() {
+        const { jsPDF } = window.jspdf;
+
+        html2canvas(document.querySelector(".PDF")).then(canvas => {
+            var img = canvas.toDataURL("image/png");
+            var pdf = new jsPDF('p', 'pt', 'a4');
+            pdf.addImage(img, 'PNG', 20, 20, 560, 0);
+            pdf.save("Employee_List.pdf");
+        });
+    }
+
+    function BankAdvise() {
+        var lot = $("#lot_no").val();
+        if (lot === "") {
+            alert("Select Lot No");
+            return;
+        }
+        $("#exportData input[name=lot]").val("test");
+        $("#exportData input[name=lotno]").val(lot);
+        $("#exportData").submit();
+    }
+
+    function ViewofficeNote() {
+        var lot = $("#lot_no").val();
+        if (lot === "") {
+            alert("Select Lot No");
+            return;
+        }
+        window.location.href = "/ReitredEmployee/OfficeNote/" + lot;
+    }
+</script>

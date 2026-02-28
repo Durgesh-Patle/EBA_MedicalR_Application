@@ -1,0 +1,239 @@
+﻿@{
+    ViewBag.Title = "MedicalRBatchSummaryReport";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics ></strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Batchwise Summary Report</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <br />
+            <div class="form-row">
+
+                <div class="form-group col-md-3">
+                    <label>Doctor Name</label>
+                    @Html.DropDownList(
+                       "doctor_id",
+                       new SelectList(ViewBag.Doctors, "id", "name"),
+                       "Select",
+                       new { @class = "form-control", id = "doctor_id" })
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>Batch No.</label>
+                    @Html.DropDownList(
+                      "batch_id",
+                      new SelectList(ViewBag.Batches, "id", "name"),
+                      "Select",
+                      new { @class = "form-control", id = "batch_id" })
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>Payment Status</label>
+                    <select id="payment_status" class="form-control">
+                        <option value="">Select</option>
+                        <option value="PAID">PAID</option>
+                        <option value="UNPAID">UNPAID</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="form-group col-sm-1">
+                    <label>.</label>
+                    <button type="button" id="btnSearch" class="btn btn-primary form-control">Search</button>
+                </div>
+
+                <div class="form-group col-sm-1">
+                    <label>.</label>
+                    <a id="btnDownload" class="btn btn-primary form-control" href="#">Download</a>
+                </div>
+            </div>
+
+        </article>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="overflow-auto">
+                <table class="table table-hover table-bordered" id="table_id">
+                    <thead>
+                        <tr class="bg-primary text-white text-center">
+                            <th>SrNo.</th>
+                            <th>Employee Name</th>
+                            <th>Patient Name</th>
+                            <th>Treatment Type</th>
+                            <th>Band</th>
+                            <th>Batch No</th>
+                            <th>Batch Date</th>
+                            <th>Lot No</th>
+                            <th>Lot Date</th>
+                            <th>Sanction Date</th>
+                            <th>Sent To Tmo</th>
+                            <th>Received From Tmo</th>
+                            <th>Doctor Name</th>
+                            <th>Batch Id</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        //loadDoctors();
+        //loadBatches();
+
+        $("#btnSearch").click(function () {
+            getBatchSummaryReport();
+        });
+
+        $("#btnDownload").click(function () {
+            var doctor_id = $("#doctor_id").val() || 0;
+            var batch_id = $("#batch_id").val() || 0;
+            var payment_status = $("#payment_status").val() || "Select";
+
+            var url = "/Report/DownloadBatchSummaryReport/1_" +
+                doctor_id + "/1_" +
+                batch_id + "/1_" +
+                payment_status + "/";
+
+            window.location.href = url;
+        });
+
+    });
+
+
+    //function loadDoctors() {
+    //    $.ajax({
+    //        url: "/Common/GetDoctors",
+    //        type: "GET",
+    //        success: function (response) {
+
+    //            $("#doctor_id").empty();
+    //            $("#doctor_id").append('<option value="">Select</option>');
+
+    //            $.each(response, function (i, item) {
+    //                $("#doctor_id").append(
+    //                    '<option value="' + item.id + '">' + item.name + '</option>'
+    //                );
+    //            });
+    //        }
+    //    });
+    //}
+
+
+    //function loadBatches() {
+    //    $.ajax({
+    //        url: "/Common/GetQMBatches",
+    //        type: "GET",
+    //        success: function (response) {
+
+    //            $("#batch_id").empty();
+    //            $("#batch_id").append('<option value="">Select</option>');
+
+    //            $.each(response, function (i, item) {
+    //                $("#batch_id").append(
+    //                    '<option value="' + item.id + '">' + item.name + '</option>'
+    //                );
+    //            });
+    //        }
+    //    });
+    //}
+
+
+    function getBatchSummaryReport() {
+
+        var doctor_id = $("#doctor_id").val() || 0;
+        var batch_id = $("#batch_id").val() || 0;
+        var payment_status = $("#payment_status").val() || "Select";
+
+        $("#btnSearch").text("Searching...");
+
+        $.ajax({
+            url: "/Report/GetBatchSummaryReport",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                doctor_id: doctor_id,
+                batch_id: batch_id,
+                payment_status: payment_status
+            }),
+            success: function (response) {
+
+                $("#btnSearch").text("Search");
+
+                if ($.fn.DataTable.isDataTable('#table_id')) {
+                    $('#table_id').DataTable().clear().destroy();
+                }
+
+                var tbody = $("#table_id tbody");
+                tbody.empty();
+
+                $.each(response, function (index, item) {
+
+                    tbody.append(`
+                        <tr class="text-center">
+                            <td>${index + 1}</td>
+                            <td>${item.employeename || ''}</td>
+                            <td>${item.patient_name || ''}</td>
+                            <td>${item.treatment_type || ''}</td>
+                            <td>${item.band || ''}</td>
+                            <td>${item.batch_no || ''}</td>
+                            <td>${formatDate(item.batch_date)}</td>
+                            <td>${item.lot_no || ''}</td>
+                            <td>${formatDate(item.lot_date)}</td>
+                            <td>${formatDate(item.sanction_date)}</td>
+                            <td>${formatDate(item.sent_to_tmo)}</td>
+                            <td>${formatDate(item.received_from_tmo)}</td>
+                            <td>${item.doctor_name || ''}</td>
+                            <td>${item.batch_id || ''}</td>
+                        </tr>
+                    `);
+                });
+
+                $('#table_id').DataTable({
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    destroy: true
+                });
+            }
+        });
+    }
+
+
+    function formatDate(dateString) {
+
+        if (!dateString)
+            return "";
+
+        var date = new Date(dateString);
+
+        if (isNaN(date))
+            return "";
+
+        var day = ("0" + date.getDate()).slice(-2);
+        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+
+        return day + "-" + month + "-" + year;
+    }
+
+</script>

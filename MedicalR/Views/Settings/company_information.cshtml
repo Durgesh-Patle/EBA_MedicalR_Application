@@ -1,0 +1,334 @@
+﻿@model MedicalR.Models.CommonSettings.CompanyProfileModel
+@{
+    ViewBag.Title = "Company Information";
+}
+
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Details</h3>
+        </div>
+    </div>
+    <h6 class="pt-3"><strong>Company Details</strong></h6>
+    <hr>
+    <form>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Company Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="CompanyName" placeholder="Company Name" value="@Model.CompanyName" readonly>
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="Email" placeholder="Email" value="@Model.EmailID">
+                <label class="has-error"></label>
+             </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Contact Number</label>
+                <input type="number" class="form-control" id="ContactNumber" placeholder="Contact Number" value="@Model.Contactno">
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Fax Number</label>
+                <input type="number" class="form-control" id="FaxNumber" placeholder="Fax Number" value="@Model.FaxNumber">
+                <label class="has-error"></label>
+             </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">POC</label>
+                <input type="text" class="form-control" id="Poc" placeholder="POC"  value="@Model.Poc">
+                <label class="has-error"></label>
+             </div>
+            <div class="form-group col-md-6">
+                <label for="">Industry Type <span class="text-danger">*</span></label>
+                <select class="form-control" id="IndustryType">
+                    <option value="">Industry Type</option>
+                    @foreach (var item in ViewBag.IndustryList)
+                    {
+                        <option value="@item.IndustryID" @(Model.IndustryID == item.IndustryID ? "selected":"")>@item.IndustryName</option>
+                    }
+                </select>
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">About</label>
+                <input type="text" class="form-control" id="About" placeholder="About"  value="@Model.About">
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Website</label>
+                <input type="text" class="form-control" id="Website" placeholder="Website"  value="@Model.website">
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <h6 class="pt-3"><strong>Address Information</strong></h6>
+        <hr>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Country <span class="text-danger">*</span></label>
+                <select class="form-control" id="Country">
+                    <option value="">Country</option>
+                    @foreach (var item in ViewBag.CountryList)
+                    {
+                        <option value="@item.CountryID" @(Model.CountryID==item.CountryID ? "selected":"")>@item.CountryName</option>
+                    }
+                </select>
+                <label class="has-error"></label>
+             </div>
+            <div class="form-group col-md-6">
+                <label for="">State/Province <span class="text-danger">*</span></label>
+                <select class="form-control" id="State">
+                    <option value="">State/Province</option>
+                    @foreach (var item in ViewBag.StateList)
+                    {
+                        <option value="@item.StateID" @(Model.StateID==item.StateID ? "selected":"")>@item.StateName</option>
+                    }
+
+                </select>
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">City <span class="text-danger">*</span></label>
+                <select class="form-control" id="City">
+                    <option value="">City</option>
+                    @foreach (var item in ViewBag.CityList)
+                    {
+                        <option value="@item.CityID" @(Model.CityID==item.CityID ? "selected":"")>@item.CityName</option>
+                    }
+                </select>
+                <label class="has-error"></label>
+              </div>
+            <div class="form-group col-md-6">
+                <label for="">Zip/Postal Code <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="PostalCode" placeholder="Zip/Postal Code" value="@Model.PostalCode">
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <h6 class="pt-3"><strong>Upload your Logo</strong></h6>
+        <hr>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <div class="form-row pt-3">
+                    <div class="form-group col-md-10">
+                        <label for="">Upload Logo</label>
+                        <div class="custom-file">
+                            <input class="custom-file-input" id="CompanyImg" type="file" accept=".png,.jpg,.jpeg">
+                            <label class="custom-file-label" for="CompanyImg">Logo</label>
+                        </div>
+                    </div>
+                    <div class="form-group pt-3 col-md-2"> <img id="CompanyImgPreview" src="@(!string.IsNullOrEmpty(Model.LogoURL) ? Model.LogoURL : "/Includes/img/logo.png")" width="100%" class="border"> </div>
+                </div>
+
+            </div>
+            </div>
+            <div class="row">
+                <input type="hidden" id="LogoURL" value="@Model.LogoURL" />
+                <input type="hidden" id="LogoURL_GoogleID" value="@Model.LogoURL_GoogleID" />
+                <div class="col-md-12 mt-5">  <a href="javascript:void(0);" class="btn btn-primary" id="UpdateCompanyInfo">Save <span class="spinner"></span></a> <a href="/settings" class="btn btn-primary">Cancel</a> </div>
+            </div>
+</form>
+</article>
+
+
+<script>
+    $(document).ready(function () {
+
+        $("body").on("change", "#Country", function (e) {
+            var CountryID = $(this).val();
+            
+            var data = {
+                "CountryID": CountryID
+            };
+            $.ajax({
+                url: "/Settings/GetStateList",
+                type: "post",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $("#State").empty();
+                    if (result.length > 0) {
+                        $("#State").append("<option value=''>State/Province</option>")
+                        for(var i=0;i<result.length>0;i++)
+                        {
+                            $("#State").append("<option value='" + result[i]["StateID"] + "'>" + result[i]["StateName"] + "</option>");
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+                }
+            });
+        })
+
+        $("body").on("change", "#State", function (e) {
+            var StateID = $(this).val();
+
+            var data = {
+                "StateID": StateID
+            };
+            $.ajax({
+                url: "/Settings/GetCityList",
+                type: "post",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $("#City").empty();
+                    if (result.length > 0) {
+                        $("#City").append("<option value=''>City</option>")
+                        for (var i = 0; i < result.length > 0; i++) {
+                            $("#City").append("<option value='" + result[i]["CityID"] + "'>" + result[i]["CityName"] + "</option>");
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+                }
+            });
+        })
+
+
+        $("#UpdateCompanyInfo").click(function () {
+            var Btn = $(this);
+            var RetStatus = true;
+            $(".has-error").html("");
+
+            var CompanyName = $("#CompanyName").val().trim();
+            var Email = $("#Email").val().trim();
+            var ContactNumber = $("#ContactNumber").val().trim();
+            var FaxNumber = $("#FaxNumber").val().trim();
+            var Poc = $("#Poc").val().trim();
+            var IndustryType = $("#IndustryType").val().trim();
+            var About = $("#About").val().trim();
+            var Website = $("#Website").val().trim();
+            var Country = $("#Country").val().trim();
+            var State = $("#State").val().trim();
+            var City = $("#City").val().trim();
+            var PostalCode = $("#PostalCode").val().trim();
+            var CompanyImg = $("#CompanyImg")[0].files;
+            var LogoURL = $("#LogoURL").val().trim();
+            var LogoURL_GoogleID = $("#LogoURL_GoogleID").val().trim();
+            if (CompanyName == "") {
+                $("#CompanyName").parent().find(".has-error").html("Required*");
+                $("#CompanyName").focus();
+                RetStatus = false;
+            }
+            if (Email == "") {
+                $("#Email").parent().find(".has-error").html("Required*");
+                $("#Email").focus();
+                RetStatus = false;
+            }
+            else
+            {
+                if (isEmail(Email) == false) {
+                    $("#Email").parent().find(".has-error").html("Invalid Email ID");
+                    $("#Email").focus();
+                    RetStatus = false;
+                }
+            }
+            if (IndustryType == "") {
+                $("#IndustryType").parent().find(".has-error").html("Required*");
+                $("#IndustryType").focus();
+                RetStatus = false;
+            }
+            if (Country == "") {
+                $("#Country").parent().find(".has-error").html("Required*");
+                $("#Country").focus();
+                RetStatus = false;
+            }
+            if (State == "") {
+                $("#State").parent().find(".has-error").html("Required*");
+                $("#State").focus();
+                RetStatus = false;
+            }
+            if (City == "") {
+                $("#City").parent().find(".has-error").html("Required*");
+                $("#City").focus();
+                RetStatus = false;
+            }
+            if (PostalCode == "") {
+                $("#PostalCode").parent().find(".has-error").html("Required*");
+                $("#PostalCode").focus();
+                RetStatus = false;
+            }
+
+            if (RetStatus == true) {
+                var formData = new FormData();
+                if (CompanyImg.length > 0) {
+                    for (var i = 0; i < CompanyImg.length; i++) {
+                        formData.append(CompanyImg[i].name, CompanyImg[i]);
+                    }
+                }
+                formData.append("CompanyName", CompanyName);
+                formData.append("EmailID", Email);
+                formData.append("Contactno", ContactNumber);
+                formData.append("website", Website);
+                formData.append("StateID", State);
+                formData.append("CityID", City);
+                formData.append("CountryID", Country);
+                formData.append("PostalCode", PostalCode);
+                formData.append("FaxNumber", FaxNumber);
+                formData.append("Poc", Poc);
+                formData.append("IndustryID", IndustryType);
+                formData.append("About", About);
+                formData.append("LogoURL", LogoURL);
+                formData.append("LogoURL_GoogleID", LogoURL_GoogleID);
+                $(Btn).attr("data-loading", "");
+                $.ajax({
+                    url: "/Settings/UpdateCompanyDetails",
+                    type: "post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result['Status'] == true) {
+                            toastr["success"](result["Message"]);
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(Btn).removeAttr("data-loading");
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                        $(Btn).removeAttr("data-loading");
+                    }
+                });
+            }
+        })
+
+        $("#CompanyImg").change(function () {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#CompanyImgPreview').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+    })
+</script>

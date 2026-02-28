@@ -1,0 +1,175 @@
+﻿@model MedicalR.Models.EmailConfiguration.EmailConfigurationModel
+@using MedicalR.CustomHelper;
+@{
+    ViewBag.Title = "Edit Email Setting";
+}
+
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Email Configurations</h3>
+        </div>
+    </div>
+    <h6 class="pt-3"><strong>Company Details</strong> | @UserManager.User.CompanyName</h6>
+    <hr>
+    <form>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="Name" placeholder="Display Name" value="@Model.Name">
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <div class="form-group">
+                    <label for="">Account Type <span class="text-danger">*</span></label>
+                    <select class="form-control" id="AccountType">
+                        <option value="Exchange" @(Model.AccountType=="Exchange" ? "Selected":"")>Exchange</option>
+                        <option value="SMTP"  @(Model.AccountType== "SMTP" ? "Selected":"")>SMTP</option>
+                    </select>
+                    <label class="has-error"></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Email ID <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="Email" placeholder="Email ID"  value="@Model.Email">
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Email Password <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="EmailPassword" placeholder="Password for Email"  value="@Model.EmailPassword">
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Port Number <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="Port" placeholder="Port Number"  value="@Model.Port">
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Server <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="Server" placeholder="Server details"  value="@Model.Server">
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <div class="row">
+            <input type="hidden" id="UserEmailSettingsID" value="@Model.UserEmailSettingsID" />
+            <input type="hidden" id="UserID" value="@Model.UserID" />
+            <div class="col-md-12 mt-5"> <a href="javascript:void(0)" class="btn btn-primary" id="AddEmailConfiguration">Save Email Settings</a> 
+          @if (UserManager.User.RoleID == 0 || UserManager.User.RoleRightDetails.Settings.FullAccess == true)
+          {
+             <a href="/settings/email-configuaration" class="btn btn-primary">Cancel</a> 
+          }
+            </div>
+        </div>
+    </form>
+</article>
+
+<script>
+    $(document).ready(function () {
+
+        $("#AddEmailConfiguration").click(function () {
+
+            var RetStatus = true;
+            $(".has-error").html("");
+            var UserEmailSettingsID = $("#UserEmailSettingsID").val().trim();
+            var UserID = $("#UserID").val().trim();
+            var Name = $("#Name").val().trim();
+            var AccountType = $("#AccountType").val().trim();
+            var Email = $("#Email").val().trim();
+            var EmailPassword = $("#EmailPassword").val().trim();
+            var Port = $("#Port").val().trim();
+            var Server = $("#Server").val().trim();
+
+            if (Name == "")
+            {
+                $("#Name").parent().find(".has-error").html("Required*");
+                $("#Name").focus();
+                RetStatus = false;
+            }
+            if (AccountType == "") {
+                $("#AccountType").parent().find(".has-error").html("Required*");
+                $("#AccountType").focus();
+                RetStatus = false;
+            }
+            if (Email == "") {
+                $("#Email").parent().find(".has-error").html("Required*");
+                $("#Email").focus();
+                RetStatus = false;
+            }
+            else {
+                if (isEmail(Email) == false) {
+                    $("#Email").parent().find(".has-error").html("Invalid Email ID");
+                    $("#Email").focus();
+                    RetStatus = false;
+                }
+            }
+            if (EmailPassword == "") {
+                $("#EmailPassword").parent().find(".has-error").html("Required*");
+                $("#EmailPassword").focus();
+                RetStatus = false;
+            }
+            if (Port == "") {
+                $("#Port").parent().find(".has-error").html("Required*");
+                $("#Port").focus();
+                RetStatus = false;
+            }
+            if (Server == "") {
+                $("#Server").parent().find(".has-error").html("Required*");
+                $("#Server").focus();
+                RetStatus = false;
+            }
+
+            if(RetStatus==true)
+            {
+                var data = {
+                    "UserID" : UserID,
+                    "Name": Name,
+                    "AccountType": AccountType,
+                    "Email": Email,
+                    "EmailPassword": EmailPassword,
+                    "Port": Port,
+                    "Server": Server,
+                    "UserEmailSettingsID": UserEmailSettingsID
+                };
+                var url = "/Settings/UpdateEmailconfiguaration";
+                if (UserEmailSettingsID == 0)
+                {
+                    url = "/Settings/AddEmailconfiguaration";
+                }
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+                            if (UserEmailSettingsID == 0)
+                            {
+                                window.location.reload();
+                            }
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+    })
+</script>

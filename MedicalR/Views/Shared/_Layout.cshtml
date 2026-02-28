@@ -1,0 +1,239 @@
+﻿@using MedicalR.CustomHelper
+@using MedicalR.Models.UserManagement
+
+@{
+    var menus = Session["user_menus"] as List<MenuHeaderModel>;
+    if (menus == null)
+    {
+        Response.Redirect("~/Home");
+    }
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- jQuery UI -->
+    <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+
+    <!-- Toastr -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="~/Includes/css/style.css" rel="stylesheet" />
+    <link href="~/Includes/css/editor.css" rel="stylesheet" />
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        .navbar {
+            background-image: url('/Includes/img/bg.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 48px;
+        }
+
+        .navbar-brand img {
+            height: 34px;
+        }
+
+        .navbar-nav .nav-link {
+            color: #fff !important;
+            /*            font-weight: 500;*/
+            padding: 14px 12px;
+        }
+
+        .navbar-nav .active > .nav-link {
+            background: rgba(255,255,255,0.18);
+            border-radius: 4px;
+        }
+
+        /* ===== BODY ===== */
+        .container-fluid {
+            min-height: calc(100vh - 110px);
+            background: #fff;
+        }
+
+        /* ===== COMMON ===== */
+        .has-error {
+            color: #c30808;
+            font-weight: 500;
+        }
+
+        .no-data-found {
+            text-align: center;
+            font-weight: bold;
+            padding: 20px;
+        }
+
+        /* ===== FOOTER ===== */
+        footer.footer {
+            border-top: 1px solid #ddd;
+            font-size: 13px;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .navbar::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /*background: rgba(0, 0, 0, 0.35);*/ /* dark overlay */
+            z-index: 0;
+        }
+
+        .navbar > * {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <a class="navbar-brand" href="/Dashboard">
+            <img src="~/Includes/img/logo.png" alt="UTI Logo" />
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarMain">
+
+            <ul class="navbar-nav mr-auto">
+                @foreach (var item in menus)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                            @item.parentmenu_name
+                        </a>
+
+                        <div class="dropdown-menu">
+                            @foreach (var child in item.child_menu_list)
+                            {
+                                <a class="dropdown-item" href="@child.link">
+                                    @child.title
+                                </a>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+
+            <!-- USER MENU -->
+            <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                    @UserManager.User.UserName
+                </button>
+
+                <div class="dropdown-menu dropdown-menu-right">
+                    @if (UserManager.User?.is_full_access == true)
+                    {
+                        <a class="dropdown-item" href="/Settings">
+                            <i class="fa fa-cogs mr-2"></i> Settings
+                        </a>
+                    }
+                    <a class="dropdown-item" onclick="window.location.href = '/Home/Logout?emp_code=@HttpContext.Current.Session["login_user"].ToString()'">
+                        <i class="fa fa-sign-out mr-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- ===== BODY ===== -->
+    @*<div class="container-fluid mt-5 pt-3">*@
+    <div class="container-fluid">
+        <div class="row">
+            @RenderBody()
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer text-center">
+        UTI Mutual Fund © Copyright 2021
+    </footer>
+
+    <!-- ===== JS ===== -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="~/Includes/js/common.js"></script>
+    <script src="~/Includes/js/editor.js"></script>
+
+    <!-- Editor Plugin -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery-editor/1.0.0/jquery.editor.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-editor/1.0.0/jquery.editor.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        $(document).ready(function () {
+
+            toastr.options = {
+                closeButton: true,
+                positionClass: "toast-top-right",
+                timeOut: "4000"
+            };
+
+            var menuName = '@ViewBag.MainMenu';
+            if (menuName) {
+                $('.navbar-nav li:contains("' + menuName + '")').addClass('active');
+            }
+        });
+
+        function blockSpecialCharacters(event) {
+            var charCode = event.which || event.keyCode;
+            if (charCode > 31 &&
+                (charCode < 48 || charCode > 57) &&
+                (charCode < 65 || charCode > 90) &&
+                (charCode < 97 || charCode > 122) &&
+                charCode !== 32) {
+                event.preventDefault();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('input[type="text"]').forEach(function (el) {
+                el.addEventListener('keypress', blockSpecialCharacters);
+            });
+        });
+
+
+        $(window).on('beforeunload', function () {
+            $.ajax({
+                url: '/Home/Logout',
+                method: 'POST',
+                async: false, // This may not work in all scenarios
+            });
+        });
+    </script>
+
+</body>
+</html>

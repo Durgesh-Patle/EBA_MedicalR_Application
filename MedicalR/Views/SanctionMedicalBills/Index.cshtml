@@ -1,0 +1,210 @@
+﻿@model IEnumerable<MedicalR.Models.MedicalR.SanctionMedicalBillsModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="javascript:void(0);">
+                        <strong>Statistics ></strong>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        Sanction Medical Bills
+                    </a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <br />
+
+            <div class="form-row">
+                <div class="form-group col-sm-1">
+                    <a href="/SanctionMedicalBills/download_sanction_med_bills/0"
+                       class="form-control btn btn-primary">
+                        Print
+                    </a>
+                </div>
+            </div>
+
+            <table id="table_id"
+                   class="table table-hover table-bordered"
+                   cellspacing="0"
+                   width="100%">
+                <thead>
+                    <tr>
+                        <th>Employee Code</th>
+                        <th>Name</th>
+                        <th>Appln.No</th>
+                        <th>Date of Request</th>
+                        <th>Batch No</th>
+                        <th>Batch Date</th>
+                        <th>Total Claimed Rs.</th>
+                        <th>Approve Amount</th>
+                        <th>Application Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </article>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        registerCustomSort();
+        loadGridData();
+
+    });
+
+    // CUSTOM SORT FOR APPLICATION NO
+    function registerCustomSort() {
+
+        jQuery.extend(jQuery.fn.dataTable.ext.type.order, {
+
+            "appln-no-pre": function (a) {
+
+                if (!a) return 0;
+
+                var num = a.toString().replace(/[^0-9]/g, '');
+                return parseInt(num, 10) || 0;
+            }
+        });
+    }
+
+
+    // LOAD GRID DATA
+    function loadGridData() {
+
+        $.ajax({
+            url: "/SanctionMedicalBills/GetSanctionMedicalBillsGrid_Data",
+            type: "POST",
+            dataType: "json",
+            success: function (response) {
+
+                initializeDataTable(response);
+
+            },
+            error: function (xhr) {
+
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+
+                toastr["error"]("Something went wrong. Please try again.");
+            }
+        });
+    }
+
+
+    // INITIALIZE DATATABLE
+    function initializeDataTable(data) {
+
+        $("#table_id").DataTable({
+
+            bLengthChange: true,
+            lengthMenu: [[10, 15, 20, -1], [10, 15, 20, "All"]],
+            bFilter: true,
+            bSort: true,
+            bPaginate: true,
+            destroy: true,
+            data: data,
+
+            columns: [
+
+                { data: 'employeecode' },
+
+                { data: 'employeename' },
+
+                {
+                    data: 'appln_no',
+                    type: 'appln-no',
+                    render: function (data, type, row) {
+                        return '<a href="/SanctionMedicalBills/Detail/' +
+                            row.claim_request_id + '">' +
+                            row.appln_no + '</a>';
+                    }
+                },
+
+                {
+                    data: 'date_of_request',
+                    render: function (data) {
+                        return formatDate(data);
+                    }
+                },
+
+                {
+                    data: 'batch_no',
+                    render: function (data, type, row) {
+                        return '<a href="/BatchCreation/BatchItems/' +
+                            row.batch_no + '">' +
+                            row.batch_no + '</a>';
+                    }
+                },
+
+                {
+                    data: 'batch_date',
+                    render: function (data) {
+                        return formatDate(data);
+                    }
+                },
+
+                { data: 'total_claimed_rs' },
+
+                { data: 'total_sanctioned_rs' },
+
+                {
+                    data: 'claim_request_id',
+                    render: function (data, type, row) {
+                        return '<a href="/SanctionMedicalBills/download/' +
+                            row.claim_request_id + '">Download</a>';
+                    }
+                }
+
+            ]
+        });
+    }
+
+
+    // DATE FORMAT FUNCTION
+    function formatDate(data) {
+
+        if (!data) return "";
+
+        var date = new Date(data);
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+
+        return day + "/" +
+            (month.toString().length > 1 ? month : "0" + month) +
+            "/" + date.getFullYear();
+    }
+
+
+    // SIDE NAVIGATION
+    function openNav() {
+        $("#mySidenav").css("width", "250px");
+    }
+
+    function closeNav() {
+        $("#mySidenav").css("width", "0");
+    }
+
+</script>
+

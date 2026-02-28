@@ -1,0 +1,312 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics ></strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">MedicalR Payment Report</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <div class="col-md-12 mt-3">
+            <div class="form-row">
+
+                <div class="form-group col-md-2">
+                    <label>Employee Code</label>
+                    <input type="text" id="employeecode" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>Treatment Type</label>
+                    <select id="treatment_type" class="form-control">
+                        <option value="">--Select--</option>
+                        @foreach (var item in ViewBag.TreatmentTypes)
+                        {
+                            <option value="@item.id">@item.name</option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>Lot No</label>
+                    <select id="lot_no" class="form-control">
+                        <option value="">--Select--</option>
+                        @foreach (var item in ViewBag.LotNos)
+                        {
+                            <option value="@item.name">@item.name</option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>Band</label>
+                    <select id="band" class="form-control">
+                        <option value="">--Select--</option>
+                        @foreach (var item in ViewBag.Bands)
+                        {
+                            <option value="@item.id">@item.name</option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>Batch No</label>
+                    <input type="text" id="batch_no" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>Payment Status</label>
+                    <select id="payment_status" class="form-control">
+                        <option value="">--Select--</option>
+                        <option value="PAID">PAID</option>
+                        <option value="UNPAID">UNPAID</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>Doctor Name</label>
+                    <select id="doctor_id" class="form-control">
+                        <option value="">--Select--</option>
+                        @foreach (var item in ViewBag.Doctors)
+                        {
+                            <option value="@item.id">@item.name</option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>Payment Start Date</label>
+                    <input type="date" id="from_date" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>Payment End Date</label>
+                    <input type="date" id="to_date" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>.</label>
+                    <button id="btnSearch" class="btn btn-primary form-control">
+                        <span id="loader" style="display:none">
+                            <img src="~/images/loader.gif" width="20" />
+                        </span>
+                        <span id="btnText">Search</span>
+                    </button>
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label>.</label>
+                    <button class="btn btn-secondary form-control" onclick="location.reload()">Clear</button>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label>.</label>
+                    <button class="btn btn-success mt-4" id="exportSubmit">Download Excel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="exportData" action="/Report/DownloadPaymentRecord" method="post" style="display:none">
+        <input name="from_date" />
+        <input name="to_date" />
+        <input name="band" />
+        <input name="treatment_type" />
+        <input name="doctor_id" />
+        <input name="batch_no" />
+        <input name="payment_status" />
+        <input name="employeecode" />
+        <input name="lot_no" />
+    </form>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <table class="table table-bordered table-hover" id="table_id">
+                <thead class="bg-primary text-white text-center">
+                    <tr>
+                        <th>SrNo.</th>
+                        <th>Appln_No</th>
+                        <th>Employee Name</th>
+                        <th>Patient Name</th>
+                        <th>Treatment Type</th>
+                        <th>Band</th>
+                        <th>Batch No</th>
+                        <th>Batch Date</th>
+                        <th>Doctor</th>
+                        <th>Sent To Tmo</th>
+                        <th>Received From Tmo</th>
+                        <th>Total Claim</th>
+                        <th>Total Sanction</th>
+                        <th>Sanction Date</th>
+                        <th>Lot No</th>
+                        <th>Lot Date</th>
+                        <th>Status</th>
+                        <th>Download</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        var table;
+
+        function initializeDataTable() {
+            table = $('#table_id').DataTable({
+                scrollX: true,
+                scrollCollapse: true,
+                autoWidth: false,
+                paging: true,
+                ordering: true,
+                searching: true,
+                info: true
+            });
+        }
+
+        // First load
+        initializeDataTable();
+
+        $("#btnSearch").click(function () {
+
+            $("#loader").show();
+            $("#btnText").text("Searching");
+
+            var data = {
+                band: $("#band").val() || "",
+                treatment_id: parseInt($("#treatment_type").val()) || 0,
+                doctor_id: parseInt($("#doctor_id").val()) || 0,
+                lot_no: $("#lot_no").val() || "",
+                batch_no: $("#batch_no").val() || "",
+                employeecode: $("#employeecode").val() || "",
+                payment_status: $("#payment_status").val() || "",
+                from_date: $("#from_date").val() || null,
+                to_date: $("#to_date").val() || null
+            };
+
+
+            $.ajax({
+                url: "/Report/GetPaymentRecordGrid",
+                type: "POST",
+                data: data,
+                dataType: "json",
+                success: function (res) {
+
+
+                    //  Safe destroy
+                    if ($.fn.DataTable.isDataTable('#table_id')) {
+                        table.destroy();
+                    }
+                    var rows = "";
+
+                    $.each(res, function (i, item) {
+                        rows += `<tr class="text-center">
+                        <td>${i + 1}</td>
+                        <td>${item.appln_no || ""}</td>
+                        <td>${item.employeename || ""}</td>
+                        <td>${item.patient_name || ""}</td>
+                        <td>${item.treatment_type || ""}</td>
+                        <td>${item.band || ""}</td>
+                        <td>${item.batch_no || ""}</td>
+                        <td>${formatDate(item.batch_date)}</td>
+                        <td>${item.doctor_name || ""}</td>
+                        <td>${formatDate(item.sent_to_tmo)}</td>
+                        <td>${formatDate(item.received_from_tmo)}</td>
+                        <td>${item.total_claim || 0}</td>
+                        <td>${item.total_sanction || 0}</td>
+                        <td>${formatDate(item.sanction_date)}</td>
+                        <td>${item.lot_no || ""}</td>
+                        <td>${formatDate(item.lot_date)}</td>
+                        <td>${item.payment_status || ""}</td>
+                        <td><a href="/MedicalRequest/download/${item.id}">Download</a></td>
+                    </tr>`;
+                    });
+
+
+                    $("#table_id tbody").html(rows);
+                    //table = $('#table_id').DataTable();
+
+
+
+                    // ✅ Reinitialize WITHOUT var
+
+                    // First load
+                    initializeDataTable();
+
+
+                    $("#loader").hide();
+                    $("#btnText").text("Search");
+                }
+            });
+        });
+
+        $("#exportSubmit").click(function () {
+            $("#exportData input[name=from_date]").val($("#from_date").val());
+            $("#exportData input[name=to_date]").val($("#to_date").val());
+
+            $("#exportData input[name=band]").val($("#band").val());
+            $("#exportData input[name=treatment_type]").val($("#treatment_type").val());
+            $("#exportData input[name=doctor_id]").val($("#doctor_id").val());
+            $("#exportData input[name=batch_no]").val($("#batch_no").val());
+
+            $("#exportData input[name=payment_status]").val($("#payment_status").val());
+            $("#exportData input[name=employeecode]").val($("#employeecode").val());
+
+            $("#exportData input[name=lot_no]").val($("#lot_no").val());
+            //$("#exportData input[name=lot_no]").val($("#lot_no").val());
+
+            $("#exportData").submit();
+        });
+
+        //function loadDropdowns() {
+        //    $.get("/Common/GetBands", res => fill("#band", res));
+        //    $.post("/Common/LoadDropdown", { Category_Code: "#TRTTYPE#" }, res => fill("#treatment_type", res));
+        //    $.get("/Common/GetDoctors", res => fill("#doctor_id", res));
+        //    $.get("/Common/GetQMLotNos", res => fill("#lot_no", res));
+        //}
+
+        //function fill(id, data) {
+        //    $(id).append(`<option value="">--Select--</option>`);
+        //    $.each(data, function (i, v) {
+        //        $(id).append(`<option value="${v.id || v.name}">${v.name}</option>`);
+        //    });
+        //}
+        function formatDate(date) {
+            if (!date) return "";
+
+            // Handle .NET format: /Date(1730831400000)/
+            if (typeof date === "string" && date.indexOf("/Date") === 0) {
+                var timestamp = parseInt(date.replace("/Date(", "").replace(")/", ""));
+                var d = new Date(timestamp);
+            } else {
+                var d = new Date(date);
+            }
+
+            if (isNaN(d)) return "";
+
+            var day = ("0" + d.getDate()).slice(-2);
+            var month = ("0" + (d.getMonth() + 1)).slice(-2);
+            var year = d.getFullYear();
+
+            return day + "-" + month + "-" + year;
+        }
+
+    });
+</script>

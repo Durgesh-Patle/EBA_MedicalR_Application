@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewBag.Title = "Doctor_AddNew";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/settings/Doctor_List">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Hospital name</strong></a> </li>
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Enter Doctor Information</h3>
+        </div>
+    </div>
+    <hr>
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="">Doctor Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="dr_name" placeholder="Doctor Name">
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-row">
+
+                <div class="form-group col-md-6">
+                    <label for="">Mobile No </label>
+                    <input type="text" class="form-control" id="mobile_no" placeholder="Mobile No">
+                </div>
+
+
+
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-row">
+
+                <div class="form-group col-md-6">
+                    <label for="">Designation</label>
+                    <input type="text" class="form-control" id="designation" placeholder="Designation">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row pt-3">
+            <input type="hidden" id="id" />
+            <div class="col-md-12 mt-5">
+                <a href="javascript:void(0)" class="btn btn-primary" id="AddNewDoctor" data-val="1">Save</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            </div>
+        </div>
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#AddNewDoctor").click(function () {
+
+          var buttonValue = $(this).data("val");
+            var RetStatus = true;
+          $(".has-error").html("");
+         // var HospitalID = $("#HospitalID").val().trim();
+          var dr_name = $("#dr_name").val().trim();
+          var mobile_no = $("#mobile_no").val().trim();
+          var designation = $("#designation").val().trim();
+
+
+
+          if (dr_name == "")
+            {
+              $("#dr_name").parent().find(".has-error").html("Required*");
+              $("#dr_name").focus();
+              RetStatus = false;
+            }
+
+
+            if(RetStatus==true)
+            {
+                var data = {
+                    "dr_name": dr_name,
+                    "mobile_no": mobile_no,
+                    "designation": designation
+
+
+                };
+                $.ajax({
+                    url: "/Settings/DoctorNewAdd",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+
+                           window.location.href = "@Url.Action("Doctor_List", "Settings")";
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+    })
+</script>
+

@@ -1,0 +1,172 @@
+﻿
+@{
+    ViewBag.Title = "Contact Us";
+}
+
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Contact Us</h3>
+        </div>
+    </div>
+    <form>
+        <div class="col-md-6">
+            <div class="form-row pt-3">
+                <div class="form-group col-md-12">
+                    <label for="">How can we help you <span class="text-danger">*</span></label>
+                    <textarea class="form-control" rows="3" placeholder="How can we help you" id="Message"></textarea>
+                    <label class="has-error"></label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label for="">Regarding <span class="text-danger">*</span></label>
+                    <select class="form-control" id="Regarding">
+                        <option>Want Demo</option>
+                        <option>Errors</option>
+                        <option>Support</option>
+                    </select>
+                    <label class="has-error"></label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label for="">Attachment</label>
+                    <div class="custom-file">
+                        <input class="custom-file-input" id="CustomFile" type="file">
+                        <label class="custom-file-label" for="CustomFile">Attachment</label>
+                    </div>
+
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group">
+                        <label for="">Mobile NO <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="MobileNo" placeholder="Mobile No">
+                        <label class="has-error"></label>
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group">
+                        <label for="">Email ID <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="EmailID" placeholder="Email ID">
+                        <label class="has-error"></label>
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <label for="">Convenient Date & Time</label>
+                    <div class="input-group date form_datetime" data-date="1979-09-16T05:25:07Z"
+                         data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                        <input class="form-control" value="" placeholder="dd mm yyyy" type="text" id="DateTime">
+                        <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mt-3"> <a href="javascript:void(0)" class="btn btn-primary" id="AddMessage">Submit <span class="spinner"></span></a> </div>
+            </div>
+        </div>
+    </form>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+</article>
+
+<script>
+    $(document).ready(function () {
+        $("#DateTime").datepicker({ dateFormat: 'mm-dd-yy' });
+
+        $("#AddMessage").click(function () {
+            var Btn = $(this);
+            var RetStatus = true;
+            $(".has-error").html("");
+            var Message = $("#Message").val().trim();
+            var Regarding = $("#Regarding").val().trim();
+            var CustomFile = $("#CustomFile")[0].files;
+            var MobileNo = $("#MobileNo").val().trim();
+            var EmailID = $("#EmailID").val().trim();
+            var DateTime = $("#DateTime").val().trim();
+
+            if (Message == "") {
+                $("#Message").parent().find(".has-error").html("Required*");
+                $("#Message").focus();
+                RetStatus = false;
+            }
+            if (Regarding == "")
+            {
+                $("#Regarding").parent().find(".has-error").html("Required*");
+                $("#Regarding").focus();
+                RetStatus = false;
+            }
+            if (MobileNo == "") {
+                $("#MobileNo").parent().find(".has-error").html("Required*");
+                $("#MobileNo").focus();
+                RetStatus = false;
+            }
+            if (EmailID == "") {
+                $("#EmailID").parent().find(".has-error").html("Required*");
+                $("#EmailID").focus();
+                RetStatus = false;
+            }
+            else {
+                if (isEmail(EmailID) == false) {
+                    $("#EmailID").parent().find(".has-error").html("Invalid Email ID");
+                    $("#EmailID").focus();
+                    RetStatus = false;
+                }
+            }
+           
+
+            if(RetStatus==true)
+            {
+                var formData = new FormData();
+    
+                if (CustomFile.length > 0)
+                {
+                    for (var i = 0; i < CustomFile.length; i++)
+                    {
+                        formData.append(CustomFile[i].name, CustomFile[i]);       
+                    }
+                }
+                formData.append("Message", Message);
+                formData.append("Regarding", Regarding);
+                formData.append("MobileNo", MobileNo);
+                formData.append("EmailID", EmailID);
+                formData.append("DateTime", DateTime);
+                $(Btn).attr("data-loading", "");
+                $.ajax({
+                    url: "/Settings/SendMessage",
+                    type: "post",
+                    data: formData,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result ==true)
+                        {
+                            toastr["success"]("Message Sent Successfully.");
+                            clearFields();
+                        }
+                        $(Btn).removeAttr("data-loading");
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                        $(Btn).removeAttr("data-loading");
+                    }
+                });
+            }
+        })
+
+        function clearFields() {
+            $("#Message").val('');
+            $("#Regarding").val('');
+            $("#CustomFile").val('');
+            $("#MobileNo").val('');
+            $("#EmailID").val('');
+            $("#DateTime").val('');
+        }
+    })
+</script>

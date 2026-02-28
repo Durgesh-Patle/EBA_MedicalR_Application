@@ -1,0 +1,98 @@
+﻿@model IEnumerable<MedicalR.Models.MedicalBillsException.HospitilizationDHRD>
+@{
+    ViewBag.Title = "HospitalizationDHRDIndex";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 headerstatics">
+            <ul class="nav">
+                <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+                <li class="nav-item"> <a class="nav-link" href="/MedicalBillsException/HospitalizationCrDetail">Hospitalization DHRD Approved</a> </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+        
+        <article class="col-md-12">
+            <div class="pt-3">
+                <div class="">
+                    <a href="/MedicalBillsException/HospitalizationDHRDDetail/0" class="btn btn-secondary plusbut float-right ml-1">+</a> &nbsp; &nbsp;
+                </div>
+            </div>
+            <br />
+            <div id="UserContent">
+                <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="th-sm">EmplID</th>
+                            <th class="th-sm">Appln.Ref.No.</th>
+                            <th class="th-sm">Date of Request</th>
+                            <th class="th-sm">Total Claimed</th>
+                            <th class="th-sm">Approve Amount</th>
+                            <th class="th-sm">Sanction Amount</th>
+                            <th class="th-sm">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>@item.emplid</td>
+                                <td><span style="cursor:pointer" onclick="openBar()"></span> <a href="/MedicalBillsException/HospitalizationDHRDDetail/@item.emplid">@item.appln_no </a></td>
+                                <td>@Html.Label(item.date_of_request.ToShortDateString())</td>
+                                <td>   </td>
+                                <td> </td>
+                                <td> </td>
+                                <td> </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (Model.Count() == 0)
+                {
+                    <div class="no-data-found">No Data Found</div>
+                }
+            </div>
+
+        </article>
+    </div>
+</div>
+
+<script>
+function openNav() {
+  document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+  document.getElementById("mySidenav").style.width = "0";
+}
+</script>
+<script>
+$(document).ready(function () {
+$('#dtBasicExample').DataTable();
+$('.dataTables_length').addClass('bs-select');
+});
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        $(".select2").select2();
+
+ var table = $('#dtUserList').DataTable();
+$('.dataTables_length').addClass('bs-select');
+$('#tableSearch').on('keyup', function () {
+    table.search(this.value).draw();
+})
+
+
+
+
+});
+</script>
+
+
+
+

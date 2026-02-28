@@ -1,0 +1,152 @@
+﻿@model IEnumerable<MedicalR.Models.CHC.CHCBillProcess>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+                <li class="nav-item"> <a class="nav-link" href="#">Forwarding Cheques</a> </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+        @*<div class="col-md-3">
+                <div id="mySidenav" class="sidenav bg-primary">
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">Search &nbsp;<i class="fa fa-search"></i></a> <a href="#" class="list-group-item list-group-item-action">
+                        <input type="checkbox">
+                        EmplID
+                    </a> <a href="#" class="list-group-item list-group-item-action">
+                        <input type="checkbox">
+                        Name
+                    </a>
+                </div>
+            </div>*@
+        <article class="col-md-12">
+            <div class="col-md-12 p-0">
+                <ul class="nav">
+                    <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Forwarding Cheques</a> </li>
+                </ul>
+                <hr class="m-0">
+            </div>
+            <div class="pt-3">
+                @* <div id="sidemain" class="float-left pl-1"> <span class="btn btn-primary" style="cursor:pointer" onclick="openNav()"><i class="fa fa-search text-light mr-3"></i> FILTER BY</span> </div>*@
+                <div class="">
+                    <select class="custom-select col-sm-2" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                        <option selected>Action</option>
+                        <option value="">Export To Excel</option>
+                        <option value="">Export To Pdf</option>
+                    </select>
+                    @*<a href="/CHCRequestform/Detail" class="btn btn-secondary plusbut float-right ml-1">+</a> &nbsp; &nbsp;*@
+                </div>
+            </div>
+            @* <input type="text" id="tableSearch" class="table-search" placeholder="Search..." />*@
+            <div id="UserContent">
+                @*<div class="form-row">
+                        <div class="form-group col-md-3"></div>
+                        <h6 class="pt-3"><strong>Forwarding of Hospitals Cheques Under C.H.C</strong></h6>
+
+                    </div>*@
+                <hr>
+                @*<div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="">Status <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="" value="" placeholder="">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="">Lot Date: <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="" placeholder="dd-mm-yyyy">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="">Lot No: <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="" placeholder="">
+                        </div>
+                    </div>*@
+                @*@Html.Partial("~/Views/MedicalRequest/_SearchUser.cshtml", Model)*@
+                <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+
+
+
+                            <th class="th-sm">Name of CHC Center</th>
+                            <th class="th-sm">Amount(Rs.)</th>
+                            <th class="th-sm text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+
+                                <td>@item.hosname</td>
+
+                                <td>@item.amount</td>
+
+                                <td id="action">
+                                    <select class="custom-select dropright sel" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                                        <option selected>Select</option>
+                                        @*<option value="/CHCBillProcess/Detail/@item.emplid">On Hold</option>*@
+                                        <option value="/forwardingcheques/Detail/@item.emplid">Put Cheque Details</option>
+                                    </select>
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+                </table>
+                @if (Model.Count() == 0)
+                {
+                    <div class="no-data-found">No Data Found</div>
+                }
+            </div>
+
+        </article>
+    </div>
+</div>
+
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('#dtBasicExample').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+
+
+    });
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        $(".select2").select2();
+
+        var table = $('#dtUserList').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+        $('#tableSearch').on('keyup', function () {
+            table.search(this.value).draw();
+        })
+
+
+
+
+
+    });
+</script>
+
+
+

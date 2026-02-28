@@ -1,0 +1,127 @@
+﻿<div class="container-fluid">
+    <div class="row">
+        <article class="col-md-12">
+
+            <div id="UserContent">
+                <table id="table_id" class="table table-hover table-bordered" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Appln.Ref.No</th>
+                            <th>Date of Request</th>
+                            <th>Name of Patient</th>
+                            <th>Relationship</th>
+                            <th>Total Claimed Rs</th>
+                            <th>Treatment Type</th>
+                            <th>Application Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        loadPastDetails();
+    });
+
+    function loadPastDetails() {
+
+        $.ajax({
+            url: '/MedicalRequest/GetClaimRequestPastDetailsGridData',
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+
+                if (!response || response.length === 0) {
+                    console.log("No past data available.");
+                    return;
+                }
+
+                initializeDataTable(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Status:", status);
+                console.error("Error:", error);
+                console.error("Response:", xhr.responseText);
+                alert("Failed to load past details.");
+            }
+        });
+    }
+
+
+    function initializeDataTable(data) {
+
+        // Destroy if already initialized
+        if ($.fn.DataTable.isDataTable('#table_id')) {
+            $('#table_id').DataTable().clear().destroy();
+        }
+
+        $('#table_id').DataTable({
+            lengthChange: true,
+            lengthMenu: [[10, 15, 20, -1], [10, 15, 20, "All"]],
+            searching: true,
+            ordering: true,
+            paging: true,
+            data: data,
+            columns: [
+                { data: 'employeename' },
+                { data: 'appln_no' },
+                {
+                    data: 'created_date',
+                    render: function (data) {
+                        if (!data) return '';
+
+                        var date = new Date(data);
+                        var day = date.getDate().toString().padStart(2, '0');
+                        var month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        var year = date.getFullYear();
+
+                        return day + '/' + month + '/' + year;
+                    }
+                },
+                { data: 'patient_name' },
+                { data: 'family_relation_code' },
+                {
+                    data: 'total_claimed_rs',
+                    render: function (data) {
+                        return data ? parseFloat(data).toFixed(2) : '0.00';
+                    }
+                },
+                { data: 'treatment_type' },
+                {
+                    data: 'payment_status',
+                    render: function (data) {
+                        if (data === "Approved")
+                            return '<span class="badge badge-success">Approved</span>';
+                        else if (data === "Rejected")
+                            return '<span class="badge badge-danger">Rejected</span>';
+                        else
+                            return '<span class="badge badge-warning">Pending</span>';
+                    }
+                }
+            ]
+        });
+    }
+
+    // Print Requested Form
+    function PrintRquestedForm() {
+
+        var requested_id = $("#request_id").val();
+
+        if (!requested_id) {
+            alert("Please select a request.");
+            return;
+        }
+
+        $("#exportData input[name='request_id']").val(requested_id);
+        $("#exportData").submit();
+    }
+</script>

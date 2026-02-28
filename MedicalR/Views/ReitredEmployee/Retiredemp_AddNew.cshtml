@@ -1,0 +1,243 @@
+﻿@model MedicalR.Models.RetiredEmployee.RetiredEmployeeModel
+
+@{
+    ViewBag.Title = "Retiredemp_AddNew";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/settings/Hospital_list">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Employee name</strong></a> </li>
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item"> <a class="nav-link" href="/settings/Hospital_list">Statistics</a> </li>
+            <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Retired Employee</strong></a> </li>
+
+        </ul>
+        <hr class="m-0">
+    </div>
+    <br />
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="">EmpId <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="EmpId" placeholder="EmpId">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Name<span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Name" placeholder="Enter Name">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Bank Name <span class="text-danger">*</span></label>
+                    <select class="form-control select2" id="bank_id" onchange="getifsccode();">
+
+
+                        @foreach (var item in ViewBag.Banklist)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                    @*<input type="text" class="form-control" id="Bankname" placeholder="Enter Bank Name">*@
+                </div>
+                <div class="form-group col-md-3" id="Ifsc">
+                    <label for="">IFSC Code </label>
+                    <input type="text" class="form-control" id="Ifccode" placeholder="Enter IFSC Code">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="">Account Number <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Accno" placeholder="Enter Account Number">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Other Information</label>
+                    <input type="text" class="form-control" id="Othinfo" placeholder="Enter Other Information">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Last Working Date </label>
+                    @*<input type="text" class="form-control" id="Effdate" placeholder="Hospital Name">*@
+                    <input type="date" class="form-control" id="Effdate" placeholder="dd-mm-yyyy">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Mobile No </label>
+                    <input type="text" class="form-control" id="Mobile" placeholder="Enter Mobile No">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="">Email ID </label>
+                    <input type="email" class="form-control" id="Email" placeholder="xyz@gmai.com">
+                    <label class="has-error"></label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row pt-3">
+            <input type="hidden" id="ID" />
+            <div class="col-md-12 mt-5">
+                <a href="javascript:void(0)" class="btn btn-primary" id="AddNewRemp" data-val="1">Submit</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            </div>
+        </div>
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function getifsccode() {
+        var bank_id = $("#bank_id option:selected").text().trim();
+        if (bank_id == 'AXIS BANK') {
+            $("#Ifsc").hide();
+        }
+        else {
+            $("#Ifsc").show();
+        }
+    }
+    function CheckInTable() {
+        var EmpId = $("#EmpId").val().trim();
+
+        var data = {
+            "EmpId": EmpId,
+
+
+        };
+        $.ajax({
+            url: "/ReitredEmployee/CheckInTable",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: function (result) {
+                if (result["Status"] == true) {
+                    toastr["success"](result["Message"]);
+
+                    window.location.reload();
+                }
+
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                toastr["error"]("Something went wrong. Please try after some time.");
+            }
+        });
+    }
+    $(document).ready(function () {
+
+        $("#AddNewRemp").click(function () {
+
+            var RetStatus = true;
+          $(".has-error").html("");
+              var ID = $("#ID").val().trim();
+              var EmpId = $("#EmpId").val().trim();
+              var Name = $("#Name").val().trim();
+            var bank_id = $("#bank_id").val().trim();
+            var Ifccode = $("#Ifccode").val().trim();
+            var Accno = $("#Accno").val().trim();
+            var Othinfo = $("#Othinfo").val().trim();
+            var Effdate = $("#Effdate").val().trim();
+            var Mobile = $("#Mobile").val().trim();
+            var Email = $("#Email").val().trim();
+
+            if (EmpId == "")
+            {
+                $("#EmpId").parent().find(".has-error").html("Required*");
+                $("#EmpId").focus();
+                RetStatus = false;
+            }
+            if (Name == "") {
+                $("#Name").parent().find(".has-error").html("Required*");
+                $("#Name").focus();
+                RetStatus = false;
+            }
+            if (bank_id == 0) {
+
+                $("#bank_id").parent().find(".has-error").html("Bank Name Required *");
+                $("#bank_id").focus();
+                RetStatus = false;
+
+            }
+            var bankname = $("#bank_id option:selected").text().trim();
+            if (Ifccode == "" && bankname != 'AXIS BANK') {
+                $("#Ifccode").parent().find(".has-error").html("Required*");
+                $("#Ifccode").focus();
+                RetStatus = false;
+            }
+            if (Accno == "") {
+                $("#Accno").parent().find(".has-error").html("Required*");
+                $("#Accno").focus();
+                RetStatus = false;
+            }
+
+            //if (Effdate == "") {
+            //    $("#Effdate").parent().find(".has-error").html("Required*");
+            //    $("#Effdate").focus();
+            //    RetStatus = false;
+            //}
+            //if (Mobile == "") {
+            //    $("#Mobile").parent().find(".has-error").html("Required*");
+            //    $("#Mobile").focus();
+            //    RetStatus = false;
+            //}
+            //if (Email == "") {
+            //    $("#Email").parent().find(".has-error").html("Required*");
+            //    $("#Email").focus();
+            //    RetStatus = false;
+            //}
+            if(RetStatus==true)
+            {
+                var data = {
+                    "ID": ID,
+                    "EmpId": EmpId,
+                    "Name": Name,
+                    "bank_id": bank_id,
+                    "Ifccode": Ifccode,
+                    "Accno": Accno,
+                    "Othinfo": Othinfo,
+                    "Effdate": Effdate,
+                    "Mobile": Mobile,
+                    "Email": Email
+                };
+                $.ajax({
+                    url: "/ReitredEmployee/RetiredNewAdd",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+
+                           window.location.href = "@Url.Action("RetiredEmp", "ReitredEmployee")";
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+    })
+</script>

@@ -1,0 +1,212 @@
+﻿@{
+    ViewBag.Title = "Batch Creation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics ></strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Batch Creation for TMO</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <div class="pt-3">
+                <div class="">
+                    <select class="custom-select col-sm-2" id="action_id">
+                        <option value="0">Select</option>
+                        <option value="1">Create Batch</option>
+                    </select>
+                </div>
+            </div>
+
+            <table id="table_id" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th class="th-sm">
+                            <input type="checkbox" class="clsallCheckedbatch" name="select_all" value="1" id="table_id-select-all">
+                        </th>
+                        <th class="th-sm">Appln.No</th>
+                        <th class="th-sm">Employee_Code</th>
+                        <th class="th-sm">Name of Employee</th>
+                        <th class="th-sm">Name Of Patient</th>
+                        <th class="th-sm">Relationship</th>
+                        <th class="th-sm">Total Claimed Rs.</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(function () {
+
+        var batchcreation_grid_details = [];
+        var is_any_selected = false;
+        var dataTableInstance = null;
+
+        init();
+
+        function init() {
+            getBatchCreationGridData().done(function (data) {
+                batchcreation_grid_details = data;
+                initDataTable(data);
+            }).fail(function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                toastr['error']('Failed to load batch data!');
+            });
+        }
+
+        function getBatchCreationGridData() {
+            return $.ajax({
+                url: '/BatchCreation/GetBatchCreationGridData/',
+                type: 'POST',
+                dataType: 'json'
+            });
+        }
+
+        function batchCreationStart(model) {
+            return $.ajax({
+                url: '/BatchCreation/BatchCreationStart/',
+                type: 'POST',
+                data: { model: model },
+                dataType: 'json'
+            });
+        }
+
+        function initDataTable(data) {
+            dataTableInstance = $("#table_id").dataTable({
+                bLengthChange: true,
+                lengthMenu: [[10, 15, 20, -1], [10, 15, 20, "All"]],
+                bFilter: true,
+                bSort: true,
+                bPaginate: true,
+                data: data,
+                columns: [
+                    {
+                        // Checkbox column - renders checkbox with record id as value
+                        'data': 'id',
+                        "render": function (data, type, full, meta) {
+                            return '<input type="checkbox" class="clsbatch" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                        }
+                    },
+                    { 'data': 'appln_no' },
+                    { 'data': 'employeecode' },
+                    { 'data': 'employeename' },
+                    { 'data': 'patient_name' },
+                    { 'data': 'family_relation_code' },
+                    { 'data': 'total_claimed_rs' }
+                ]
+            });
+        }
+
+        // ===================== SELECT ALL CHECKBOX =====================
+        // Handle "Select All" checkbox click
+        $('#table_id-select-all').on('click', function () {
+            if ($(".clsallCheckedbatch").is(":checked")) {
+                // Check all checkboxes in tbody
+                $("#table_id").find("tbody").find("input[type='checkbox']").prop("checked", true);
+
+                // Update is_batch_created = true for all records in data array
+                for (var k = 0; k < batchcreation_grid_details.length; k++) {
+                    batchcreation_grid_details[k].is_batch_created = true;
+                }
+                is_any_selected = true;
+            } else {
+                // Uncheck all checkboxes in tbody
+                $("#table_id").find("tbody").find("input[type='checkbox']").prop("checked", false);
+
+                // Update is_batch_created = false for all records in data array
+                for (var k = 0; k < batchcreation_grid_details.length; k++) {
+                    batchcreation_grid_details[k].is_batch_created = false;
+                }
+                is_any_selected = false;
+            }
+        });
+
+        // ===================== ROW CHECKBOX CHANGE =====================
+        // Handle individual checkbox click — toggle is_batch_created in data array by matching id
+        $('#table_id tbody').on('change', 'input[type="checkbox"]', function () {
+            var claim_request_id = parseInt($(this).parents("tr").find(".clsbatch").val());
+
+            for (var k = 0; k < batchcreation_grid_details.length; k++) {
+                if (claim_request_id === batchcreation_grid_details[k].id) {
+                    if (batchcreation_grid_details[k].is_batch_created) {
+                        // Was selected → deselect
+                        batchcreation_grid_details[k].is_batch_created = false;
+                        is_any_selected = false;
+                    } else {
+                        // Was not selected → select
+                        batchcreation_grid_details[k].is_batch_created = true;
+                        is_any_selected = true;
+                    }
+                    break;
+                }
+            }
+
+            // Re-evaluate is_any_selected based on full array
+            is_any_selected = batchcreation_grid_details.some(function (item) {
+                return item.is_batch_created === true;
+            });
+        });
+
+        // ===================== ACTION DROPDOWN CHANGE =====================
+        // Replaces ng-click="BatchCreationStart(action_id)"
+        $('#action_id').on('change', function () {
+            var action_id = parseInt($(this).val()) || 0;
+            BatchCreationStart(action_id);
+        });
+
+        // ===================== BATCH CREATION LOGIC =====================
+        function BatchCreationStart(action_id) {
+            // If no record is selected and action is "Create Batch"
+            if (!is_any_selected && action_id === 1) {
+                toastr['error']('Please select at least 1 record!');
+                $('#action_id').val(0); // Reset dropdown to "Select"
+                return;
+            }
+
+            if (action_id === 1) {
+                // Count selected records
+                var selectedCount = batchcreation_grid_details.filter(function (item) {
+                    return item.is_batch_created === true;
+                }).length;
+
+                // Show confirmation with count
+                var message = "You have selected " + selectedCount + " record(s) to create Batch.\nDo you want to continue?";
+                if (!confirm(message)) {
+                    $('#action_id').val(0); // Reset dropdown on cancel
+                    return;
+                }
+
+                // Call API to create batch
+                batchCreationStart(batchcreation_grid_details).done(function (data) {
+                    alert(data);
+                    window.location.href = window.location.origin + '/BatchCreation';
+                }).fail(function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr['error']('Batch creation failed!');
+                    $('#action_id').val(0);
+                });
+            }
+        }
+
+    }); // end document.ready
+</script>

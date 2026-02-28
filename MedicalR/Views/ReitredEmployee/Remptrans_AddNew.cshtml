@@ -1,0 +1,276 @@
+﻿@model MedicalR.Models.RetiredEmployee.RetiredempTransModel
+
+@{
+    ViewBag.Title = "Remptrans_AddNew";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/Trans_RetiredEmp">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Employee name</strong></a> </li>
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item"> <a class="nav-link text-dark" href="/ReitredEmployee/Trans_RetiredEmp"><strong>Statistics</strong></a> </li>
+            <li class="nav-item"> <a class="nav-link" href="javascript:void(0);">Transaction For Retired Employees</a> </li>
+        </ul>
+        <hr class="m-0">
+    </div>
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Transaction For Retired Employees</h3>
+        </div>
+    </div>
+    <hr>
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="">Empl Code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Empcd" onchange="GetYear(this);" placeholder="EmpId">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="">Name<span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Name" readonly>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="">Claim From Year </label>
+                    <select class="form-control select2" id="yearfrom" onchange="getyearto();">
+                        @*@foreach (var item in ViewBag.Yearlist)
+                            {
+                                <option value="@item.Name">@item.Id</option>
+                            }*@
+                    </select>
+                    <label class="has-error"></label>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="">Claim To Year</label>
+                    <input type="text" class="form-control" id="yearto" readonly>
+
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="">Total Claimed <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Totalclaim" readonly>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="">Sanc Amount <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="sanc_amt" readonly>
+                </div>
+                @*<div class="form-group col-md-6">
+                        <label for="">Balance <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="Balance" placeholder="Enter Balance">
+                    </div>*@
+                @*<div class="form-group col-md-6">
+                        <label for="">Remar/Office Note<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="Remark" placeholder="Enter Other Information">
+                    </div>*@
+
+            </div>
+        </div>
+
+        <div class="row pt-3">
+            <input type="hidden" id="ID" />
+            <div class="col-md-12 mt-5">
+                <a href="javascript:void(0)" class="btn btn-primary" id="AddNewRemptran" data-val="1">Submit</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            </div>
+        </div>
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function getyearto() {
+
+        var yearfrom = $("#yearfrom option:selected").text().trim();
+        var year = (yearfrom);
+        year++;
+        $("#yearto").val(year);
+        var data = {
+            "yearfrom": yearfrom,
+
+
+        };
+        $.ajax({
+            url: "/ReitredEmployee/GetAmount",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: function (result) {
+
+                $("#Totalclaim").empty();
+                $("#sanc_amt").empty();
+                $("#Totalclaim").val(result.sanc_amt);
+                $("#sanc_amt").val(result.sanc_amt);
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                toastr["error"]("Something went wrong. Please try after some time.");
+            }
+        });
+
+    }
+    function GetName() {
+        var Empcd = $("#Empcd").val().trim();
+        var data = {
+            "Empcd": Empcd,
+
+
+        };
+        $.ajax({
+            url: "/ReitredEmployee/GetName",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: function (result) {
+
+                $("#Name").val(result.Name);
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                toastr["error"]("Something went wrong. Please try after some time.");
+            }
+        });
+    }
+    function GetYear(Empcd) {
+
+        var Empcd = $("#Empcd").val().trim();
+
+
+        var data = {
+            "Empcd": Empcd,
+
+
+        };
+        $.ajax({
+            url: "/ReitredEmployee/GetYears",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: function (result) {
+                $("#yearfrom").empty();
+               // $("#yearto").empty();
+                if (result.length > 0) {
+                      for (var i = 0; i < result.length > 0; i++) {
+                          $("#yearfrom").append("<option value='" + result[i]["Id"] + "'>" + result[i]["Name"] + "</option>");
+                          //$("#yearto").append("<option value='" + result[i]["Id"] + "'>" + result[i]["Name"] + "</option>");
+                    }
+
+                }
+                GetName();
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                toastr["error"]("Something went wrong. Please try after some time.");
+            }
+        });
+
+    }
+    $(document).ready(function () {
+
+        $("#AddNewRemptran").click(function () {
+
+            var RetStatus = true;
+          $(".has-error").html("");
+              var ID = $("#ID").val().trim();
+              var Empcd = $("#Empcd").val().trim();
+            var Name = $("#Name").val().trim();
+            var yearfrom = $("#yearfrom option:selected").text().trim();
+            var yearto = $("#yearto").val().trim();
+            var Totalclaim = $("#Totalclaim").val().trim();
+            var sanc_amt = $("#sanc_amt").val().trim();
+
+
+            if (yearfrom == "") {
+
+                    $("#yearfrom").parent().find(".has-error").html("Current Year Required *");
+                    $("#yearfrom").focus();
+                    RetStatus = false;
+
+            }
+
+            if (Empcd == "")
+            {
+                $("#Empcd").parent().find(".has-error").html("Required*");
+                $("#Empcd").focus();
+                RetStatus = false;
+            }
+            if (Name == "") {
+                $("#Name").parent().find(".has-error").html("Required*");
+                $("#Name").focus();
+                RetStatus = false;
+            }
+            if (Totalclaim == "") {
+                $("#Totalclaim").parent().find(".has-error").html("Required*");
+                $("#Totalclaim").focus();
+                RetStatus = false;
+            }
+            if (sanc_amt == "") {
+                $("#sanc_amt").parent().find(".has-error").html("Required*");
+                $("#sanc_amt").focus();
+                RetStatus = false;
+            }
+
+
+
+            if(RetStatus==true)
+            {
+                var data = {
+                    "ID": ID,
+                    "Empcd": Empcd,
+                    "Name": Name,
+                    "yearfrom": yearfrom,
+                    "yearto": yearto,
+                    "Totalclaim": Totalclaim,
+                    "sanc_amt": sanc_amt
+
+
+                };
+                $.ajax({
+                    url: "/ReitredEmployee/RemptransNewAdd",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+
+                           window.location.href = "@Url.Action("Trans_RetiredEmp", "ReitredEmployee")";
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+    })
+</script>

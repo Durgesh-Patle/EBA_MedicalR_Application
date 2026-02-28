@@ -1,0 +1,139 @@
+﻿@model MedicalR.Models.UserManagement.UserDetailModel
+@{
+    ViewBag.Title = "Edit User";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/settings/users">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>User Management</strong></a> </li>
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Enter Hpspital Information</h3>
+        </div>
+    </div>
+    <h6 class="pt-3"><strong>Add Users</strong></h6>
+    <hr>
+    <form>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for=""> Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="UserName" placeholder="Name" value="@Model.UserName">
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Mobile No</label>
+                <input type="number" class="form-control" id="MobileNo" placeholder="Mobile No" value="@Model.MobileNo">
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Role Type <span class="text-danger">*</span></label>
+                <select class="form-control" id="RoleID">
+                    <option value="">Role Type</option>
+                    @foreach (var item in ViewBag.RoleType)
+                    {
+                        <option value="@item.RoleID" @(Model.RoleID == item.RoleID ? "selected" : "")>@item.RoleName</option>
+                    }
+                </select>
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Email ID <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="EmailID" placeholder="Email ID" value="@Model.EmailID">
+                <label class="has-error"></label>
+            </div>
+
+        </div>
+        <div class="row">
+            <input type="hidden" id="UserID" value="@Model.UserID" />
+            <input type="hidden" id="PhotoURL_GoogleID" value="@Model.PhotoURL_GoogleID" />
+            <div class="col-md-12 mt-5"> <a href="javascript:void(0)" class="btn btn-primary" id="AddUser" data-val="1">Update</a> <a href="/settings/users" class="btn btn-primary">Cancel</a> </div>
+        </div>
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+
+        $("#AddUser").click(function () {
+
+            var RetStatus = true;
+            $(".has-error").html("");
+            var UserID = $("#UserID").val().trim();
+            var UserName = $("#UserName").val().trim();
+            var MobileNo = $("#MobileNo").val().trim();
+            var RoleID = $("#RoleID").val().trim();
+            var EmailID = $("#EmailID").val().trim();
+            var PhotoURL_GoogleID = $("#PhotoURL_GoogleID").val().trim();
+
+            if (UserName == "") {
+                $("#UserName").parent().find(".has-error").html("Required*");
+                $("#UserName").focus();
+                RetStatus = false;
+            }
+            if (RoleID == "") {
+                $("#RoleID").parent().find(".has-error").html("Required*");
+                $("#RoleID").focus();
+                RetStatus = false;
+            }
+            if (EmailID == "") {
+                $("#EmailID").parent().find(".has-error").html("Required*");
+                $("#EmailID").focus();
+                RetStatus = false;
+            }
+            else {
+                if (isEmail(EmailID) == false) {
+                    $("#EmailID").parent().find(".has-error").html("Invalid Email ID");
+                    $("#EmailID").focus();
+                    RetStatus = false;
+                }
+            }
+
+
+            if (RetStatus == true) {
+                var data = {
+                    "UserID": UserID,
+                    "UserName": UserName,
+                    "EmailID": EmailID,
+                    "MobileNo": MobileNo,
+                    "RoleID": RoleID,
+                    "PhotoURL_GoogleID": PhotoURL_GoogleID
+                };
+                $.ajax({
+                    url: "/Settings/UpdateUser",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+    })
+</script>

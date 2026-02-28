@@ -1,0 +1,249 @@
+﻿<div class="container-fluid headtop">
+
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link text-dark"><strong>Statistics</strong></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/MedicalRequest/ApplicationHistory">
+                    Application Details
+                </a>
+            </li>
+        </ul>
+        <hr class="m-0">
+        <br />
+    </div>
+
+    <div id="applicationContent"></div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        var model = null;
+        var objectionCodes = [];
+
+        var id = getIdFromUrl();
+
+        loadData(id);
+
+        function loadData(id) {
+
+            $.when(
+                $.post('/SanctionMedicalBills/GetItem', { id: id }),
+                $.get('/Common/GetObjectionCodes/')
+            ).done(function (itemRes, objectionRes) {
+
+                model = itemRes[0];   // ✅ NOT .data
+                objectionCodes = objectionRes[0]; // adjust if needed
+
+                renderApplication();
+            });
+
+        }
+
+        // RENDER COMPLETE APPLICATION
+        function renderApplication() {
+
+            if (!model || !Array.isArray(model.expense_type_detalis)) {
+                console.error("expense_type_detalis missing:", model);
+                return;
+            }
+
+            let html = '';
+
+            // BASIC DETAILS
+            html += `
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label>Appln.No:</label>
+                            <input class="form-control" value="${model.appln_no || ''}" readonly />
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label>Name of Patient:</label>
+                            <input class="form-control" value="${model.patient_name || ''}" readonly />
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label>Relationship:</label>
+                            <input class="form-control" value="${model.family_relation_code || ''}" readonly />
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label>Nature of Illness:</label>
+                            <input class="form-control" value="${model.nature_of_illness || ''}" readonly />
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label>Treatment Type:</label>
+                            <input class="form-control" value="${model.treatment_type || ''}" readonly />
+                        </div>
+                    </div>
+
+                    <h6 class="pt-3"><strong>Details of Claim (For the Treatment Taken)</strong></h6>
+                    <hr/>
+                    `;
+
+            // EXPENSE TYPES LOOP
+            model.expense_type_detalis.forEach(function (expense) {
+
+                html += `
+                        <div class="form-group col-md-4">
+                            <label><strong>Expense Type:</strong></label>
+                            <input class="form-control mb-2"
+                                   value="${expense.expense_type_name || ''}"
+                                   readonly />
+                        </div>
+                        `;
+
+                html += `
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Bill.No</th>
+                                    <th>Amt Claimed Rs</th>
+                                    <th>Sanctn Rs</th>
+                                    <th>Reason</th>
+                                    <th>Remark(Empl)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        `;
+
+                if (Array.isArray(expense.request_claim_expense_items)) {
+
+                    expense.request_claim_expense_items.forEach(function (item) {
+
+                        html += `
+                <tr>
+                    <td>${formatDate(item.only_date)}</td>
+                    <td>${item.bill_no || ''}</td>
+                    <td>${item.amt_claimed_rs || 0}</td>
+                    <td>${item.amt_sanctioned_rs || 0}</td>
+                    <td>${getObjectionName(item.objection_code_id)}</td>
+                    <td>${item.remark || ''}</td>
+                </tr>
+                `;
+                    });
+                }
+
+                html += `
+                        </tbody>
+                        </table>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 text-right">
+                                <strong>Total Claimed Rs: ${expense.total_claimed_rs || 0}</strong>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <strong>Sanc. Rs: ${expense.total_sanctioned_rs || 0}</strong>
+                            </div>
+                        </div>
+
+                        <hr/>
+                        `;
+            });
+
+            // GRAND TOTAL
+            html += `
+                    <div class="row mt-4">
+                        <div class="col-md-6 text-right">
+                            <strong>Total Claimed Rs: ${model.total_claimed_rs || 0}</strong>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <strong>Sanc. Rs: ${model.total_sanctioned_rs || 0}</strong>
+                        </div>
+                    </div>
+                    `;
+
+            $("#applicationContent").html(html);
+        }
+
+        // SANCTION CALCULATION
+        $(document).on('input', '.sanc-input', function () {
+
+            var expIndex = $(this).data("exp");
+            var itemIndex = $(this).data("item");
+
+            model.expense_type_detalis[expIndex]
+                .request_claim_expense_items[itemIndex]
+                .amt_sanctioned_rs = parseFloat($(this).val() || 0);
+
+            calculateTotals();
+        });
+
+        function calculateTotals() {
+
+            model.total_sanctioned_rs = 0;
+
+            model.expense_type_detalis.forEach(function (expense, index) {
+
+                expense.total_sanctioned_rs = 0;
+
+                expense.request_claim_expense_items.forEach(function (item) {
+                    expense.total_sanctioned_rs +=
+                        parseFloat(item.amt_sanctioned_rs || 0);
+                });
+
+                $("#total_sanc_" + index)
+                    .text(expense.total_sanctioned_rs);
+
+                model.total_sanctioned_rs += expense.total_sanctioned_rs;
+            });
+
+            $("#grandTotal").text(model.total_sanctioned_rs);
+        }
+
+        // SAVE
+        $(document).on("click", "#btnSave", function () {
+
+            $.post('/SanctionMedicalBills/Save', { model: model },
+                function (res) {
+
+                    if (res.Status) {
+                        toastr.success(res.Message);
+                        window.location.href = '/MedicalRequest/ApplicationHistory';
+                    } else {
+                        toastr.error(res.Message);
+                    }
+                });
+        });
+
+        // UTILITIES
+        function formatDate(data) {
+
+            if (!data) return '';
+
+            if (data.indexOf("/Date(") === 0) {
+                var timestamp = parseInt(data.replace("/Date(", "").replace(")/", ""));
+                var date = new Date(timestamp);
+            } else {
+                var date = new Date(data);
+            }
+
+            if (isNaN(date)) return '';
+
+            return date.getDate() + "/" +
+                (date.getMonth() + 1) + "/" +
+                date.getFullYear();
+        }
+
+        function getObjectionName(id) {
+
+            var obj = objectionCodes.find(o => o.id === id);
+            return obj ? obj.name : '';
+        }
+
+        function getIdFromUrl() {
+            var parts = window.location.pathname.split('/');
+            return parseInt(parts[parts.length - 1]) || 0;
+        }
+
+    });
+</script>

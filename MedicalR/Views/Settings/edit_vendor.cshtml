@@ -1,0 +1,154 @@
+﻿@model MedicalR.Models.VendorManagement.VendorDetailModel
+@{
+    ViewBag.Title = "Edit Vendor";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/settings/vendors">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Vendor Management</strong></a> </li>
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Vendor Management</h3>
+        </div>
+    </div>
+    <h6 class="pt-3">Contact Information</h6>
+    <hr>
+    <form>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Source</label>
+                <select class="form-control" id="Source">
+                    <option value="">Select</option>
+                    @foreach (var item in ViewBag.VendorSource)
+                    {
+                        <option value="@item.SourceID" @(Model.SourceID==item.SourceID ? "selected" : "")>@item.SourceName</option>
+                    }
+                </select>
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">UserID</label>
+                <input type="text" class="form-control" id="UserID" placeholder="UserID" value="@Model.UserID">
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Date of Activation</label>
+                <div class="input-group date form_datetime" data-date="1979-09-16T05:25:07Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                    <input class="form-control" type="text"  value="@Model.DateofActivation.Value.ToString("MM/dd/yyyy")" id="DateofActivation" >
+                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span> <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                </div>
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Expiry Date</label>
+                <div class="input-group date form_datetime" data-date="1979-09-16T05:25:07Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                    <input class="form-control" type="text"  value="@Model.ExpiryDate.Value.ToString("MM/dd/yyyy")" id="ExpiryDate">
+                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span> <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                </div>
+                <label class="has-error"></label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="">Package Cost</label>
+                <input type="email" class="form-control only_decimal" id="PackageCost" placeholder="Package Cost" value="@Model.PackageCost">
+                <label class="has-error"></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="">Exhaust</label>
+                <input type="checkbox" id="Exhaust" @(Model.Exhaust==true ? "checked":"")>
+            </div>
+        </div>
+        <div class="row">
+            <input type="hidden" id="VendorID" value="@Model.VendorID"/>
+            <div class="col-md-12 mt-5"><a href="javascript:void(0)" class="btn btn-primary" id="AddSource" data-val="1">Update</a> <a href="/settings/vendors" class="btn btn-primary">Cancel</a></div>
+        </div>
+    </form>
+</article>
+
+<script>
+    $(document).ready(function () {
+        $("#DateofActivation,#ExpiryDate").datepicker({ dateFormat: 'mm-dd-yy' });
+
+
+        $("#AddSource").click(function () {
+
+            var RetStatus = true;
+            $(".has-error").html("");
+            var VendorID = $("#VendorID").val().trim();
+            var Source = $("#Source").val().trim();
+            var UserID = $("#UserID").val().trim();
+            var DateofActivation = $("#DateofActivation").val().trim();
+            var ExpiryDate = $("#ExpiryDate").val().trim();
+            var PackageCost = $("#PackageCost").val().trim();
+            var Exhaust = $("#Exhaust").is(":checked");
+
+            if (Source == "") {
+                $("#Source").parent().find(".has-error").html("Required*");
+                $("#Source").focus();
+                RetStatus = false;
+            }
+            if (UserID == "") {
+                $("#UserID").parent().find(".has-error").html("Required*");
+                $("#UserID").focus();
+                RetStatus = false;
+            }
+            if (DateofActivation == "") {
+                $("#DateofActivation").parents(".form-group").eq(0).find(".has-error").html("Required*");
+                RetStatus = false;
+            }
+            if (ExpiryDate == "") {
+                $("#ExpiryDate").parents(".form-group").eq(0).find(".has-error").html("Required*");
+                RetStatus = false;
+            }
+            if (PackageCost == "") {
+                $("#PackageCost").parent().find(".has-error").html("Required*");
+                $("#PackageCost").focus();
+                RetStatus = false;
+            }
+
+            if (RetStatus == true) {
+                var data = {
+                    "SourceID": Source,
+                    "UserID": UserID,
+                    "DateofActivation": DateofActivation,
+                    "ExpiryDate": ExpiryDate,
+                    "PackageCost": PackageCost,
+                    "Exhaust": Exhaust,
+                    "VendorID": VendorID
+                };
+                $.ajax({
+                    url: "/Settings/UpdateVendor",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+    })
+</script>

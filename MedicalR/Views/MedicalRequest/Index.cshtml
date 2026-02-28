@@ -1,0 +1,199 @@
+﻿@{
+    ViewBag.Title = "Claim Request List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-12 headerstatics">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/MedicalRequest/Item/0">
+                        <strong>Claim Request List</strong>
+                    </a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+
+            <div class="pt-3">
+                <a href="/MedicalRequest/ApplicationHistory/0"
+                   class="btn btn-primary float-left ml-1">
+                    Click here to See past details
+                </a>
+
+                <a href="/MedicalRequest/Item/0"
+                   class="btn btn-secondary float-right ml-1">
+                    +
+                </a>
+            </div>
+
+            <div id="UserContent" class="mt-5">
+
+                <table id="table_id"
+                       class="table table-hover table-bordered"
+                       width="100%">
+
+                    <thead>
+                        <tr>
+                            <th>Appln.Ref.No</th>
+                            <th>Date of Request</th>
+                            <th>Name of Patient</th>
+                            <th>Relationship</th>
+                            <th>Total Claimed Rs</th>
+                            <th>Total Sanc Rs</th>
+                            <th>Treatment Type</th>
+                            <th>Application Status</th>
+                            <th>Form</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+        </article>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        loadClaimRequestGrid();
+
+        function loadClaimRequestGrid() {
+
+            $.ajax({
+                url: '/MedicalRequest/GetClaimRequestGridData/',
+                type: 'POST',
+                dataType: 'json',
+
+                success: function (response) {
+
+                    console.log("Claim Grid Response:", response);
+
+                    // If your controller returns { data: [...] }
+                    // then use: var data = response.data;
+                    var data = response;
+
+                    if ($.fn.DataTable.isDataTable('#table_id')) {
+                        $('#table_id').DataTable().clear().destroy();
+                    }
+
+                    $('#table_id').DataTable({
+
+                        bLengthChange: true,
+                        lengthMenu: [[10, 15, 20, -1], [10, 15, 20, "All"]],
+                        bFilter: true,
+                        bSort: true,
+                        bPaginate: true,
+                        data: data,
+
+                        columns: [
+
+                            // Application Ref No
+                            {
+                                data: 'appln_no',
+                                render: function (data, type, row) {
+
+                                    if (row.is_saveforletter) {
+                                        return '<a href="/MedicalRequest/Item/' +
+                                            row.id + '">' + data + '</a>';
+                                    }
+
+                                    return data;
+                                }
+                            },
+
+                            // Created Date
+                            {
+                                data: 'created_date',
+                                render: function (data) {
+
+                                    if (!data) return '';
+
+                                    var date;
+
+                                    // Handle MVC /Date(...)/
+                                    if (typeof data === "string" &&
+                                        data.indexOf("/Date(") === 0) {
+
+                                        var timestamp = parseInt(
+                                            data.replace("/Date(", "")
+                                                .replace(")/", "")
+                                        );
+
+                                        date = new Date(timestamp);
+
+                                    } else {
+                                        date = new Date(data);
+                                    }
+
+                                    if (isNaN(date.getTime())) return '';
+
+                                    var day = String(date.getDate()).padStart(2, '0');
+                                    var month = String(date.getMonth() + 1).padStart(2, '0');
+                                    var year = date.getFullYear();
+
+                                    return day + "/" + month + "/" + year;
+                                }
+                            },
+
+                            { data: 'patient_name', defaultContent: '' },
+                            { data: 'family_relation_code', defaultContent: '' },
+                            { data: 'total_claimed_rs', defaultContent: '' },
+                            { data: 'total_sanctioned_rs', defaultContent: '' },
+                            { data: 'treatment_type', defaultContent: '' },
+                            { data: 'payment_status', defaultContent: '' },
+
+                            // Download Column
+                            {
+                                data: 'appln_no',
+                                render: function (data, type, row) {
+
+                                    if (row.is_saveforletter) {
+                                        return '';
+                                    }
+
+                                    return '<a href="/MedicalRequest/download/' +
+                                        row.id + '">Download</a>';
+                                }
+                            }
+
+                        ]
+                    });
+                },
+
+                error: function (xhr) {
+                    console.error("Error loading grid:", xhr.responseText);
+                    toastr.error("Failed to load claim request list.");
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    function PrintRquestedForm() {
+
+        var requested_id = $("#request_id").val();
+
+        if (!requested_id) {
+            alert("Please select");
+            return;
+        }
+
+        $("#exportData input[name=request_id]").val(requested_id);
+        $("#exportData").submit();
+    }
+</script>

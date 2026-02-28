@@ -1,0 +1,215 @@
+﻿@model IEnumerable<MedicalR.Models.RetiredEmployee.RempDemiseModel>
+
+@{
+    ViewBag.Title = "RetiredempDemise_AddNew";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/ReitredEmployee/RetiredEmpDemise">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Employee name</strong></a> </li>
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 pb-2 bg-light">
+        <div class="col-md-12">
+            <h3>Enter Retired Employee Information</h3>
+        </div>
+    </div>
+    <hr>
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="">EmpId <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="EmpId" placeholder="EmpId">
+                </div>
+                @*<div class="form-group col-md-3">
+                        <label for="">Demise Empl name<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="Dempname" placeholder="Enter Name">
+                    </div>*@
+                <div class="form-group col-md-3">
+                    <label for="">Date Of Demise<span class="text-danger">*</span> </label>
+                    <input type="date" class="form-control" id="Ddate" placeholder="dd-mm-yyyy">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Date Certificate Received<span class="text-danger">*</span></label>
+                    <select class="form-control" id="Dcertificate">
+                        <option value="S">Select</option>
+                        <option value="Y">Yes</option>
+                        <option value="N">No</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Letter Received from Spouse<span class="text-danger">*</span></label>
+                    <select class="form-control" id="Lreceived">
+                        <option value="S">Select</option>
+                        <option value="Y">Yes</option>
+                        <option value="N">No</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+
+                <div class="form-group col-md-3">
+                    <label for="">Spouse Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Sname" placeholder="Enter Name">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for=""> Spouse Bank Name <span class="text-danger">*</span></label>
+                    <select class="form-control select2" id="Sbankname" onchange="getifsccode();">
+                        @foreach (var item in ViewBag.Banklist)
+                        {
+                            <option value="@item.Name">@item.Name</option>
+                        }
+                    </select>
+                    @*<label for="">Bank Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="Sbankname" placeholder="Enter bank Name">*@
+                </div>
+                <div class="form-group col-md-3" id="Ifsc">
+                    <label for="">IFSC Code</label>
+                    <input type="text" class="form-control" id="Sifsccode" placeholder="Enter IFSC Code">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Account Number <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Saccno" placeholder="Enter Account No">
+                </div>
+            </div>
+            <div class="form-row">
+
+                <div class="form-group col-md-3">
+                    <label for="">Mobile No</label>
+                    <input type="text" class="form-control" id="Smobile" placeholder="Enter Mobile No">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="">Personal Email ID </label>
+                    <input type="email" class="form-control" id="Semail" placeholder="xyz@gmai.com">
+                    <label class="has-error"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row pt-3">
+            <input type="hidden" id="ID" />
+            <div class="col-md-12 mt-5">
+                <a href="javascript:void(0)" class="btn btn-primary" id="AddNewRempD" data-val="1">Submit</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            </div>
+        </div>
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function getifsccode() {
+        var bankname = $("#Sbankname option:selected").text().trim();
+        if (bankname == 'AXIS BANK') {
+            $("#Ifsc").hide();
+        }
+        else {
+            $("#Ifsc").show();
+        }
+    }
+
+    $(document).ready(function () {
+
+        $("#AddNewRempD").click(function () {
+
+            var RetStatus = true;
+          $(".has-error").html("");
+              var ID = $("#ID").val().trim();
+              var EmpId = $("#EmpId").val().trim();
+            //var Dempname = $("#Dempname").val().trim();
+            var Ddate = $("#Ddate").val().trim();
+            var Dcertificate = $("#Dcertificate").val().trim();
+            var Lreceived = $("#Lreceived").val().trim();
+            var Sname = $("#Sname").val().trim();
+            var Sbankname = $("#Sbankname").val().trim();
+            var Sifsccode = $("#Sifsccode").val().trim();
+            var Saccno = $("#Saccno").val().trim();
+            var Smobile = $("#Smobile").val().trim();
+            var Semail = $("#Semail").val().trim();
+
+            if (EmpId == "")
+            {
+                $("#EmpId").parent().find(".has-error").html("Required*");
+                $("#EmpId").focus();
+                RetStatus = false;
+            }
+
+            if (Lreceived == "") {
+                $("#Lreceived").parent().find(".has-error").html("Required*");
+                $("#Lreceived").focus();
+                RetStatus = false;
+            }
+            if (Sname == "") {
+                $("#Sname").parent().find(".has-error").html("Required*");
+                $("#Sname").focus();
+                RetStatus = false;
+            }
+            if (Sbankname == "") {
+                $("#Sbankname").parent().find(".has-error").html("Required*");
+                $("#Sbankname").focus();
+                RetStatus = false;
+            }
+
+            if (Saccno == "") {
+                $("#Saccno").parent().find(".has-error").html("Required*");
+                $("#Saccno").focus();
+                RetStatus = false;
+            }
+
+
+            if(RetStatus==true)
+            {
+                var data = {
+                    "ID": ID,
+                    "EmpId": EmpId,
+                  //  "Dempname": Dempname,
+                    "Ddate": Ddate,
+                    "Dcertificate": Dcertificate,
+                    "Lreceived": Lreceived,
+                    "Sname": Sname,
+                    "Sbankname": Sbankname,
+                    "Sifsccode": Sifsccode,
+                    "Saccno": Saccno,
+                    "Smobile": Smobile,
+                    "Semail": Semail
+
+                };
+                $.ajax({
+                    url: "/ReitredEmployee/RetiredempDemiseAddNew",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+
+                           window.location.href = "@Url.Action("RetiredEmpDemise", "ReitredEmployee")";
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+
+    })
+</script>

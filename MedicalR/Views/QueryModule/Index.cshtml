@@ -1,0 +1,408 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .linkbutton {
+        display: block;
+        width: 115px;
+        height: 25px;
+        background: #4E9CAF;
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        line-height: 25px;
+    }
+</style>
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics ></strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Query Module</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <br />
+
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label>Batch No.</label>
+                    <select id="batch_no" class="form-control"></select>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>Application No.</label>
+                    <input type="text" id="appl_no" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>Empl ID</label>
+                    <input type="text" id="empl_code" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>Lot No</label>
+                    <select id="lot_no" class="form-control"></select>
+                </div>
+
+                <div class="form-group col-sm-1">
+                    <label>.</label>
+                    <button id="btnSearch" class="btn btn-primary form-control">Search</button>
+                </div>
+
+                <div class="form-group col-sm-1">
+                    <label>.</label>
+                    <button id="btnReset" class="btn btn-primary form-control">Reset</button>
+                </div>
+            </div>
+
+            <div id="downloadSection" style="display:none;">
+                <div class="form-row">
+
+                    <div class="form-group col-md-3">
+                        <label>Download Type</label>
+                        <select id="download_type" class="form-control">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-3" id="fromDateDiv" style="display:none;">
+                        <label>From Date</label>
+                        <input type="date" id="from_date" class="form-control" disabled />
+                    </div>
+
+                    <div class="form-group col-md-3" id="toDateDiv" style="display:none;">
+                        <label>To Date</label>
+                        <input type="date" id="to_date" class="form-control" />
+                    </div>
+
+                    <div class="form-group col-sm-1">
+                        <label>.</label>
+                        <a id="downloadLink" class="btn btn-primary form-control" >Download</a>
+                    </div>
+
+                </div>
+            </div>
+
+            <table id="table_id" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Employee_Code</th>
+                        <th>Name</th>
+                        <th>Appln.No</th>
+                        <th>Date of Request</th>
+                        <th>Batch_No</th>
+                        <th>Batch Date</th>
+                        <th>Lot_No</th>
+                        <th>Payment_date</th>
+                        <th>Total Claimed Rs.</th>
+                        <th>Approve Amount</th>
+                        <th>Status</th>
+                        <th>Download</th>
+                    </tr>
+                </thead>
+            </table>
+
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    var table;
+
+    $(document).ready(function () {
+
+        loadDropdowns();
+
+        var temp_from_date = "_";
+        var temp_to_date = "_";
+
+        $('#download_type, #batch_no, #lot_no, #to_date').on('change', function () {
+            updateDownloadLink();
+        });
+
+        function updateDownloadLink() {
+
+            var batch_no = $('#batch_no').val() || "_";
+            var lot_no = $('#lot_no').val() || "_";
+            var download_type = $('#download_type').val() || "_";
+
+            // Hewitt special logic
+            if (download_type === "Payment Details For Hewitt") {
+
+                var fromDate = $('#from_date').val();
+                var toDate = $('#to_date').val();
+
+                if (fromDate)
+                    temp_from_date = fromDate;
+                else
+                    temp_from_date = "_";
+
+                if (toDate)
+                    temp_to_date = toDate;
+                else
+                    temp_to_date = "_";
+            }
+            else {
+                temp_from_date = "_";
+                temp_to_date = "_";
+            }
+
+            var finalUrl = "/QueryModule/download/"
+                + "1_" + batch_no + "/"
+                + "1_" + lot_no + "/"
+                + "1_" + download_type + "/"
+                + temp_from_date + "/"
+                + temp_to_date;
+
+            $('#downloadLink').attr('href', finalUrl);
+        }
+
+
+        $("#batch_no").change(function () {
+            $("#lot_no").val('');
+            setDownloadTypes(["Batch Print"]);
+            hideTable();
+        });
+
+        $("#lot_no").change(function () {
+            $("#batch_no").val('');
+            setDownloadTypes([
+                "Office Notes",
+                "Bank Advise",
+                "Bank Advise Excel",
+                "Payment Details For SAP",
+                "Payment Details For Hewitt"
+            ]);
+            hideTable();
+        });
+
+        $("#btnReset").click(function () {
+            $("#batch_no, #lot_no").val('');
+            $("#appl_no, #empl_code").val('');
+            $("#downloadSection").hide();
+            hideTable();
+        });
+
+        $("#btnSearch").click(function () {
+
+            var batch_no = $("#batch_no").val();
+            var appl_no = $("#appl_no").val();
+            var empl_code = $("#empl_code").val();
+            var lot_no = $("#lot_no").val();
+            var query_type = $("#download_type").val();
+
+            if (!batch_no && !appl_no && !empl_code && !lot_no) {
+                toastr["error"]("Please select at least one parameter !");
+                return;
+            }
+
+            $.ajax({
+                url: "/QueryModule/GetQMGridData",
+                type: "POST",
+                data: {
+                    batch_no: batch_no,
+                    appl_no: appl_no,
+                    empl_code: empl_code,
+                    lot_no: lot_no,
+                    query_type: query_type
+                },
+                success: function (data) {
+
+                    if (data.length === 0) {
+                        toastr["error"]("No Record Found !");
+                        hideTable();
+                        return;
+                    }
+
+                    $("#downloadSection").show();
+
+                    bindTable(data);
+
+                }
+            });
+
+        });
+
+    });
+
+    function bindTable(data) {
+
+        if ($.fn.DataTable.isDataTable("#table_id")) {
+            table.destroy();
+        }
+
+        table = $("#table_id").DataTable({
+            scrollX: true,
+            destroy: true,
+            data: data,
+            columns: [
+                { data: "employeecode" },
+                { data: "employeename" },
+                {
+                    data: "appln_no",
+                    render: function (data, type, row) {
+                        return '<a href="/SanctionMedicalBills/Detail/' + row.claim_request_id + '">' + data + '</a>';
+                    }
+                },
+                {
+                    data: "date_of_request",
+                    render: function (data) {
+                        return formatDate(data);
+                    }
+                },
+
+                {
+                    data: "batch_no",
+                    render: function (data, type, row) {
+                        return '<a href="/BatchCreation/BatchItems/' + data + '">' + data + '</a>';
+                    }
+                },
+                {
+                    data: "batch_date",
+                    render: function (data) {
+                        return formatDate(data);
+                    }
+                },
+
+                //{ data: "batch_date", render: formatDate },
+                { data: "lot_no" },
+                //{ data: "payment_date" },
+                {
+                    data: "payment_date",
+                    render: function (data) {
+                        return formatDate(data);
+                    }
+                },
+
+                { data: "total_claimed_rs" },
+                { data: "total_sanctioned_rs" },
+                { data: "trans_status" },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        if (row.trans_status === "Rejected") {
+                            return '<a href="/SanctionMedicalBills/download/' + row.claim_request_id + '">Objection Letter</a>';
+                        }
+                        return "";
+                    }
+                }
+            ]
+        });
+
+        $("#table_id").show();
+    }
+
+    function formatDate(data) {
+
+        if (!data) return "";
+
+        var date;
+
+        // Handle MVC format /Date(1651180800000)/
+        if (typeof data === "string" && data.indexOf("/Date(") === 0) {
+            var timestamp = parseInt(data.substr(6));
+            date = new Date(timestamp);
+        } else {
+            date = new Date(data);
+        }
+
+        if (isNaN(date.getTime())) return "";
+
+        var day = ("0" + date.getDate()).slice(-2);
+        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+
+        return day + "/" + month + "/" + year;
+    }
+
+    function loadDropdowns() {
+
+        $.get("/Common/GetQMBatches", function (data) {
+
+            var ddlBatch = $("#batch_no");
+            ddlBatch.empty();
+
+            ddlBatch.append('<option value="">-- Select Batch --</option>');
+
+            $.each(data, function (i, item) {
+                ddlBatch.append('<option value="' + item.name + '">' + item.name + '</option>');
+            });
+
+            ddlBatch.val(""); // ensure default selected
+        });
+
+
+        // Lot Dropdown
+        $.get("/Common/GetQMLotNos", function (data) {
+
+            var ddlLot = $("#lot_no");
+            ddlLot.empty();
+
+            // Default option
+            ddlLot.append('<option value="">-- Select Lot --</option>');
+
+            $.each(data, function (i, item) {
+                ddlLot.append('<option value="' + item.name + '">' + item.name + '</option>');
+            });
+
+            ddlLot.val("");
+        });
+    }
+
+
+    function setDownloadTypes(types) {
+
+        var ddl = $("#download_type");
+
+        ddl.empty();
+
+        // Always add default option
+        ddl.append('<option value="">-- Select --</option>');
+
+        if (!types || types.length === 0)
+            return;
+
+        $.each(types, function (i, val) {
+
+            if (val !== null && val !== undefined && val !== "") {
+                ddl.append(
+                    $("<option></option>")
+                        .val(val)
+                        .text(val)
+                );
+            }
+        });
+    }
+
+
+    //function hideTable() {
+    //    $("#table_id").hide();
+    //    $("#downloadSection").hide();
+    //}
+
+    function hideTable() {
+        if ($.fn.DataTable.isDataTable("#table_id")) {
+            $("#table_id").DataTable().clear().draw();
+            $("#table_id_wrapper").hide();
+        }
+
+        $("#downloadSection").hide();
+    }
+
+</script>
+
+
+

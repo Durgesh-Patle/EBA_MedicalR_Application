@@ -1,0 +1,187 @@
+﻿@model IEnumerable<MedicalR.Models.RetiredEmployee.RetiredempTransModel>
+
+@{
+    ViewBag.Title = "EditChecking";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<style>
+    .dataTables_processing,
+    .dataTables_empty {
+        display: none !important;
+    }
+</style>*@
+
+
+<div class="container-fluid headtop">
+    <div class="row">
+
+        <!-- ================= HEADER ================= -->
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="javascript:void(0);">
+                        <strong>Statistics ></strong>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Edit Checking Transaction</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <!-- ================= ACTION BAR ================= -->
+        <article class="col-md-12">
+            <div class="pt-3 d-flex align-items-center">
+                <select class="custom-select col-sm-2 mr-3" id="actionSelect">
+                    <option value="0">Select</option>
+                    <option value="1">Checked & Verified</option>
+                </select>
+
+                <button type="button" class="btn btn-primary" id="exportSubmit">
+                    Print
+                </button>
+            </div>
+
+            <!-- ================= EXPORT FORM ================= -->
+            <form id="exportData" action="/ReitredEmployee/GetExportToExcel" method="post" style="display:none">
+                <input type="text" name="lot" id="lot" value="test" />
+            </form>
+
+            <!-- ================= TABLE ================= -->
+            <table id="table_id" class="table table-hover table-bordered mt-3" width="100%">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll" />
+                        </th>
+                        <th>Emp Code</th>
+                        <th>Name</th>
+                        <th>Claim Year</th>
+                        <th>Sanc. Amt</th>
+                        <th>Bank Name</th>
+                        <th>Account No</th>
+                        <th>IFSC Code</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+
+        </article>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script>
+        var table;
+        var selectedRows = [];
+
+        $(document).ready(function () {
+
+            // ================= LOAD DATATABLE =================
+            table = $('#table_id').DataTable({
+                processing: false,
+                paging: true,
+                searching: true,
+                ordering: true,
+
+                language: {
+                    loadingRecords: "",
+                    processing: "",
+                    zeroRecords: "No data available in table",
+                    emptyTable: "No data available in table"
+                },
+
+                ajax: {
+                    url: '/ReitredEmployee/EditCheckingGridData',
+                    type: 'GET'
+                },
+
+                columns: [
+                    {
+                        data: 'Id',
+                        orderable: false,
+                        render: function (data) {
+                            return '<input type="checkbox" class="rowChk" value="' + data + '">';
+                        }
+                    },
+                    { data: 'Empcd' },
+                    { data: 'Name' },
+                    {
+                        data: null,
+                        render: function (row) {
+                            return row.yearfrom + ' - ' + row.yearto;
+                        }
+                    },
+                    { data: 'sanc_amt' },
+                    { data: 'bankname' },
+                    { data: 'accno' },
+                    { data: 'ifsccode' },
+                    {
+                        data: 'Empcd',
+                        render: function (data) {
+                            return '<a href="/ReitredEmployee/CheckingVerify/' + data + '">View Details</a>';
+                        }
+                    }
+                ]
+            });
+
+            // ================= SELECT ALL =================
+            $('#selectAll').on('change', function () {
+                $('.rowChk').prop('checked', this.checked).trigger('change');
+            });
+
+            // ================= SINGLE ROW SELECT =================
+            $('#table_id').on('change', '.rowChk', function () {
+                var id = $(this).val();
+
+                if (this.checked) {
+                    if (!selectedRows.includes(id))
+                        selectedRows.push(id);
+                } else {
+                    selectedRows = selectedRows.filter(x => x !== id);
+                }
+            });
+
+            // ================= ACTION DROPDOWN =================
+            $('#actionSelect').on('change', function () {
+                var action = $(this).val();
+
+                if (action == "1") {
+
+                    if (selectedRows.length === 0) {
+                        toastr.error("Please select at least 1 record!");
+                        $(this).val("0");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '/ReitredEmployee/EditCheckingStart2',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(selectedRows),
+                        success: function (res) {
+                            toastr.success("Records verified successfully");
+                            table.ajax.reload(null, false);
+                            selectedRows = [];
+                            $('#selectAll').prop('checked', false);
+                            $('#actionSelect').val("0");
+                        },
+                        error: function () {
+                            toastr.error("Something went wrong");
+                        }
+                    });
+                }
+            });
+
+            // ================= EXPORT =================
+            $('#exportSubmit').on('click', function () {
+                $('#exportData').submit();
+            });
+
+        });
+    </script>
+}

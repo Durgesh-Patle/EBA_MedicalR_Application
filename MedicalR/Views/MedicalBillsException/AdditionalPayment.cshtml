@@ -1,0 +1,99 @@
+﻿@model MedicalR.Models.MedicalBillsException.AdditionalSanction
+<form>
+    <div class="form-row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+                <li class="nav-item"> <a class="nav-link" href="/MedicalBillsException/Index">Additional Sanction</a> </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+    </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="">Appln.No:</label>
+                <input type="text" class="form-control" id="appln_no" value="@Model.appln_no" disabled>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="">Date of Request:</label>
+                @*<input type="date" class="form-control" id="date_of_request" value="@Model.date_of_request">*@
+                @Html.TextBoxFor(m => @Model.date_of_request, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+            </div>
+            <div class="form-group col-md-3">
+                <label for="">Department:</label>
+                <input type="text" class="form-control" id="department" value="@Model.department" disabled>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="">Band Group:</label>
+                <input type="text" class="form-control" id="band_group" value="@Model.band_group" disabled>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="">Name of Patient:</label>
+                <input type="text" class="form-control" id="name_of_patient" value="@Model.name_of_patient" disabled>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="">Relationship:</label>
+                <input type="text" class="form-control" id="relationship" value="@Model.relationship" disabled>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="">Nature of Illness:</label>
+                <input type="text" class="form-control" id="nature_of_illness" value="@Model.nature_of_illness" disabled>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="">Treatment Type:</label>
+                <input type="text" class="form-control" id="treatment_type" value="@Model.treatment_type" disabled>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="">Total Claimed Rs.:</label>
+                <input type="text" class="form-control" id="total_claimed_rs" value="@Model.total_claimed_rs" disabled>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="">Sanction & Paid Rs.:</label>
+                <input type="text" class="form-control" id="sanction_and_paid_rs" value="@Model.sanction_and_paid_rs" disabled>
+            </div>
+        </div>
+
+        <hr />
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label for="">Addl.Sanction Rs.:</label>
+            </div>
+            <div class="form-group col-md-4">
+                <input type="text" class="form-control" id="addl_sanction_rs" onchange="check()" placeholder="Enter Amount">
+            </div>
+
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label for="">Payment Remarks:</label>
+            </div>
+            <div class="form-group col-md-4">
+                <input type="text" class="form-control" id="payment_remark">
+            </div>
+
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6"></div>
+            <div class="form-group col-md-2">
+                <label for="">No.Of Enclosure.:</label>
+            </div>
+            <div class="form-group col-md-3">
+                <input type="text" class="form-control" id="no_of_enclosure">
+            </div>
+
+        </div>
+
+
+        <div class="row">
+            <div class="form-group col-md-4"></div>
+            @*<div class="form-group col-md-4"> <a href="" class="btn btn-primary">Approved-Additional Sanctioned</a>  </div>*@
+            <a href="javascript:void(0)" class="btn btn-primary" id="Approved" data-val="1">Approved-Additional Sanctioned <span class="spinner"></span></a>
+
+        </div>
+
+</form>

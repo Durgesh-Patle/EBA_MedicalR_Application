@@ -1,0 +1,76 @@
+﻿@model IEnumerable<MedicalR.Models.CHC.CHCBillProcess>
+@{
+    ViewBag.Title = "EnclosureEmplSummary";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                @*<li class="nav-item"> <a class="nav-link text-dark" href=""><strong>CHC Bill Process / Office Note / Bank Advise Note – CHC Bill Process</strong></a> </li>*@
+                <!--<li class="nav-item"> <a class="nav-link" href="update-batch-details.html">Update Batch</a> </li>-->
+            </ul>
+            <hr class="m-0">
+
+        </div>
+
+        <article class="col-md-12">
+            <div class="pt-3">
+            </div>
+            <div class="pt-3">
+            </div>
+            <div class="pt-3">
+            </div>
+            <div class="col-md-12">
+                <h3>Employee Wise Summary</h3>
+            </div>
+            <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+
+
+                        <th class="th-sm">EmplID</th>
+                        <th class="th-sm">Name of Employee</th>
+                        <th class="th-sm">A/C.No</th>
+                        <th class="th-sm">Amount(Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+
+
+                            <td>@item.emplid</td>
+                            <td>@item.employee_name</td>
+                            <td></td>
+                            <td>@item.amount</td>
+
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+            @if (Model.Count() == 0)
+            {
+                <div class="no-data-found">No Data Found</div>
+            }
+            @* </div> *@
+
+        </article>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#dtBasicExample').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+
+
+    });
+
+
+</script>

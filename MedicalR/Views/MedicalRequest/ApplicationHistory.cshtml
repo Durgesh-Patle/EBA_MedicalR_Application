@@ -1,0 +1,181 @@
+﻿@{
+    ViewBag.Title = "ApplicationHistory";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="javascript:void(0);">
+                        <strong>Statistics ></strong>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Past Details</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12 mt-3">
+
+            <table id="table_id"
+                   class="table table-hover table-bordered"
+                   width="100%">
+                <thead>
+                    <tr>
+                        <th>Appln.Ref.No</th>
+                        <th>Date of Request</th>
+                        <th>Name of Patient</th>
+                        <th>Relationship</th>
+                        <th>Total Claimed Rs</th>
+                        <th>Total Sanc Rs</th>
+                        <th>Treatment Type</th>
+                        <th>Payment Status</th>
+                        <th>Payment Date</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        loadApplicationHistory();
+
+        function loadApplicationHistory() {
+
+            $.ajax({
+                url: '/SanctionMedicalBills/GetEmployeePastDetails',
+                type: 'POST',
+                dataType: 'json',
+
+                success: function (response) {
+
+                    console.log("Application History:", response);
+
+                    // change to: var data = response.data;
+                    var data = response;
+
+                    // Custom Sorting Definitions
+
+                    // Alphanumeric Sorting (Appln No)
+                    $.fn.dataTable.ext.type.order['alpha-numeric-pre'] = function (data) {
+                        if (!data) return 0;
+                        return data.replace(/[^0-9]/g, '') * 1;
+                    };
+
+                    // Date Sorting (dd/mm/yyyy)
+                    $.fn.dataTable.ext.type.order['date-dd-mm-yyyy-pre'] = function (data) {
+                        if (!data) return 0;
+                        var parts = data.split('/');
+                        return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+                    };
+
+                    if ($.fn.DataTable.isDataTable('#table_id')) {
+                        $('#table_id').DataTable().clear().destroy();
+                    }
+
+                    $('#table_id').DataTable({
+
+                        bLengthChange: true,
+                        lengthMenu: [[10, 15, 20, -1], [10, 15, 20, "All"]],
+                        bFilter: true,
+                        bSort: true,
+                        bPaginate: true,
+                        data: data,
+
+                        columns: [
+
+                            // Application Ref No
+                            {
+                                data: 'appln_no',
+                                render: function (data, type, row) {
+                                    return '<a href="/MedicalRequest/ApplicationItem/' +
+                                        row.id + '">' + data + '</a>';
+                                }
+                            },
+
+                            // Created Date
+                            {
+                                data: 'created_date',
+                                render: function (data) {
+                                    return formatDate(data);
+                                }
+                            },
+
+                            { data: 'patient_name', defaultContent: '' },
+                            { data: 'family_relation_code', defaultContent: '' },
+                            { data: 'total_claimed_rs', defaultContent: '' },
+                            { data: 'total_sanctioned_rs', defaultContent: '' },
+                            { data: 'treatment_type', defaultContent: '' },
+                            { data: 'payment_status', defaultContent: '' },
+
+                            // Payment Date
+                            {
+                                data: 'payment_date',
+                                render: function (data) {
+                                    return formatDate(data);
+                                }
+                            }
+                        ],
+
+                        columnDefs: [
+                            { targets: 0, type: 'alpha-numeric' },
+                            { targets: 1, type: 'date-dd-mm-yyyy' },
+                            { targets: 8, type: 'date-dd-mm-yyyy' }
+                        ]
+                    });
+
+                },
+
+                error: function (xhr) {
+                    console.error("Error loading history:", xhr.responseText);
+                    toastr.error("Failed to load past details.");
+                }
+            });
+        }
+
+        // Safe Date Formatter (MVC Compatible)
+        function formatDate(data) {
+
+            if (!data) return '';
+
+            var date;
+
+            // Handle MVC /Date(...)/
+            if (typeof data === "string" &&
+                data.indexOf("/Date(") === 0) {
+
+                var timestamp = parseInt(
+                    data.replace("/Date(", "")
+                        .replace(")/", "")
+                );
+
+                date = new Date(timestamp);
+            }
+            else {
+                date = new Date(data);
+            }
+
+            if (isNaN(date.getTime()) || date.getFullYear() <= 1900)
+                return '';
+
+            var day = String(date.getDate()).padStart(2, '0');
+            var month = String(date.getMonth() + 1).padStart(2, '0');
+            var year = date.getFullYear();
+
+            return day + "/" + month + "/" + year;
+        }
+
+    });
+</script>

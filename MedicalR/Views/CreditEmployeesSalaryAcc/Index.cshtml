@@ -1,0 +1,295 @@
+﻿@model IEnumerable<MedicalR.Models.CHC.CHCBillProcess>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 p-0">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark"><strong>Statistics</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">Credit Employee Salary AC</a>
+                    </li>
+                </ul>
+                <hr class="m-0">
+            </div>
+
+            <article class="col-md-12">
+                <table id="table_id" class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th> </th>
+                            <th>EmplID</th>
+                            <th>Name of Employee</th>
+                            <th>Date Of Checkup</th>
+                            <th>Name of CHC Center</th>
+                            <th>Amount</th>
+                            <th>Name of Spouse</th>
+                            <th>Date Of Checkup</th>
+                            <th>Name of CHC Center</th>
+                            <th>Amount(Spouse)</th>
+                            <th>Total Amount(Rs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chcTableBody"></tbody>
+                </table>
+
+                <div id="footerSection" style="display:none;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Date of Credit to Employee Sal A/C :</label>
+                        </div>
+                        <div class="col-md-2">
+                            <input id="CR_DATE" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-1">
+                            <label>SUM Rs:</label>
+                        </div>
+                        <div class="col-md-2">
+                            <input id="SUM_AMOUNT" type="text" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <hr />
+                </div>
+
+                <div class="row mt-3" id="buttonSection" style="display:none;">
+                    <div class="col-md-2">
+                        <button type="button" id="btnSaveLater" class="btn btn-primary">
+                            Save For Later
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="btnSave" class="btn btn-success">
+                            Submit
+                        </button>
+                    </div>
+                </div>
+
+            </article>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    var CHC_DATA = [];
+    var is_any_selected = false;
+
+    $(document).ready(function () {
+
+        loadData();
+
+        // SELECT ALL
+        $(document).on("change", "#selectAll", function () {
+
+            var checked = $(this).prop("checked");
+
+            CHC_DATA.forEach(function (item) {
+                item.Status2 = checked;
+                item.CrsalAcc_status = checked;
+                item.saveforlater_status = checked;
+            });
+
+            $(".rowCheckbox").prop("checked", checked);
+
+            is_any_selected = checked;
+
+            calculateTotal();
+        });
+
+        // ROW CHECKBOX
+        $(document).on("change", ".rowCheckbox", function () {
+
+            var id = $(this).data("id");
+            var checked = $(this).prop("checked");
+
+            var item = CHC_DATA.find(x => x.id == id);
+
+            if (item) {
+                item.Status2 = checked;
+                item.CrsalAcc_status = checked;
+                item.saveforlater_status = checked;
+            }
+
+            is_any_selected = CHC_DATA.some(x => x.Status2 === true);
+
+            calculateTotal();
+        });
+
+        // AMOUNT CHANGE
+        $(document).on("input", ".amountInput, .spouseAmountInput", function () {
+
+            var id = $(this).data("id");
+            var item = CHC_DATA.find(x => x.id == id);
+
+            if (item) {
+                item.amount = parseFloat($("#amount_" + id).val()) || 0;
+                item.spouse_amount = parseFloat($("#spouse_" + id).val()) || 0;
+            }
+
+            updateRowTotal(id);
+            calculateTotal();
+        });
+
+        // SAVE
+        $("#btnSave").click(function () {
+
+            var CR_DATE = $("#CR_DATE").val();
+
+            if (!CR_DATE) {
+                toastr["error"]("Credit Date can't be blank !");
+                return;
+            }
+
+            $.ajax({
+                url: '/CreditEmployeesSalaryAcc/Save/',
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    model: CHC_DATA,
+                    CR_DATE: new Date(CR_DATE).toISOString()
+                }),
+                success: function (response) {
+                    toastr["success"](response);
+                    location.reload();
+                }
+            });
+        });
+
+        // SAVE FOR LATER
+        $("#btnSaveLater").click(function () {
+
+            var CR_DATE = $("#CR_DATE").val();
+
+            if (!CR_DATE) {
+                toastr["error"]("Credit Date can't be blank !");
+                return;
+            }
+
+            $.ajax({
+                url: '/CreditEmployeesSalaryAcc/Saveforlater/',
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    model: CHC_DATA,
+                    CR_DATE: new Date(CR_DATE).toISOString()
+                }),
+                success: function (response) {
+                    toastr["success"](response);
+                    location.reload();
+                }
+            });
+        });
+
+    });
+
+    // LOAD DATA
+    function loadData() {
+
+        $.ajax({
+            url: '/CreditEmployeesSalaryAcc/Get_CHC_CRemptoacc_data/',
+            type: 'POST',
+            success: function (response) {
+
+                CHC_DATA = response;
+
+                if (CHC_DATA.length > 0) {
+                    $("#footerSection").show();
+                    $("#buttonSection").show();
+                }
+
+                renderTable();
+                calculateTotal();
+            }
+        });
+    }
+
+    // RENDER TABLE
+    function renderTable() {
+
+        var tbody = $("#chcTableBody");
+        tbody.empty();
+
+        CHC_DATA.forEach(function (item) {
+
+            console.log(item, "item");
+
+            var spouseDisabled = item.relationship === "self" ? "disabled" : "";
+
+            //var total = (parseFloat(item.amount || 0) + parseFloat(item.spouse_amount || 0)).toFixed(2);
+
+            var row = `
+                <tr>
+                    <td>
+                        <input type="checkbox"
+                               class="rowCheckbox"
+                               data-id="${item.id}"
+                               ${item.Status2 ? "checked" : ""}>
+                    </td>
+                    <td>${item.srno}</td>
+                    <td>${item.emplid}</td>
+                    <td>${item.employee_name}</td>
+                    <td>${item.date_of_checkup}</td>
+                    <td>${item.hosname}</td>
+                    <td>
+                        <input type="text"
+                               id="amount_${item.id}"
+                               class="form-control amountInput"
+                               data-id="${item.id}"
+                               value="${item.amount || 0}">
+                    </td>
+                    <td>${item.name_of_spouse}</td>
+                    <td>${item.spouse_dt_of_checkup}</td>
+                    <td>${item.spouse_hosname}</td>
+                    <td>
+                        <input type="text"
+                               id="spouse_${item.id}"
+                               class="form-control spouseAmountInput"
+                               data-id="${item.id}"
+                               value="${item.spouse_amount || 0}"
+                               ${spouseDisabled}>
+                    </td>
+                    <td id="rowTotal_${item.id}">${item.total}</td>
+                </tr>
+            `;
+
+            tbody.append(row);
+        });
+    }
+
+    // UPDATE ROW TOTAL
+    function updateRowTotal(id) {
+
+        var item = CHC_DATA.find(x => x.id == id);
+
+        if (item) {
+            var total = (parseFloat(item.amount || 0) + parseFloat(item.spouse_amount || 0)).toFixed(2);
+            $("#rowTotal_" + id).text(total);
+        }
+    }
+
+    // CALCULATE GRAND TOTAL
+    function calculateTotal() {
+
+        var total = 0;
+
+        CHC_DATA.forEach(function (item) {
+
+            var amount = parseFloat(item.amount) || 0;
+            var spouse = parseFloat(item.spouse_amount) || 0;
+
+            total += amount + spouse;
+        });
+
+        $("#SUM_AMOUNT").val(total.toFixed(2));
+    }
+
+</script>

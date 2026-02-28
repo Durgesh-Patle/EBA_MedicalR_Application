@@ -1,0 +1,130 @@
+﻿@model MedicalR.Models.RetiredEmployee.RetiredempTransModel
+@{
+    ViewBag.Title = "YearWisePaymentDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Year Wise Payment Details </strong></a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Year Wise Payment Details</strong></a> </li>
+        </ul>
+        <hr class="m-0">
+    </div>
+    <br>
+    <br />
+    <form>
+        <div class="col-md-12">
+            <div class="form-row">
+
+                <div class="form-group col-md-1">
+                    <label for="">Select Year:</label>
+                </div>
+                <div class="form-group col-md-2">
+                    <select class="form-control select2" id="year">
+
+                        @foreach (var item in ViewBag.Yearlist)
+                        {
+                            <option value="@item.Name">@item.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <button type="button" class="btn btn-primary" onclick="ViewAnnexure()">Search</button>
+                </div>
+                <div class="form-group col-md-2">
+                    <button type="button" class="btn btn-primary" id="exportSubmit">ExportToExcel</button>
+                </div>
+            </div>
+        </div>
+
+        <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th class="th-sm">Empl Code</th>
+                    <th class="th-sm">Name</th>
+                    <th class="th-sm">Financial Year</th>
+                    <th class="th-sm">Lot No</th>
+                    <th class="th-sm">Paid Date</th>
+                    <th class="th-sm">Amount</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </form>
+    <form id="exportData" action="/ReitredEmployee/ReportExportToExcel" style="display:none">
+        <input type="text" value="" name="year" />
+
+    </form>
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#exportSubmit").click(function () {
+
+
+            var year = $("#year").val();
+            if (year == 'Select') {
+                alert("Please select Year");
+            }
+            else {
+                $("#exportData input[name=year]").val(year);
+
+                $("#exportData").submit();
+            }
+        })
+    });
+    function ViewAnnexure() {
+
+        var year = $("#year").val().trim();
+        if (year == 'Select') {
+            alert("Please select Year");
+        }
+        else {
+            var data = {
+                "year": year,
+
+
+            };
+            $.ajax({
+                url: "/ReitredEmployee/GetyearwiseReport",
+                type: "post",
+                data: data,
+                dataType: "json",
+                success: function (result) {
+                    $("#dtBasicExample tbody").empty();
+                    // $("#yearto").empty();
+                    if (result.length > 0) {
+                        for (var i = 0; i < result.length > 0; i++) {
+                            var row = '<tr><td> ' + result[i].Empcd + ' </td> <td> ' + result[i].Name + ' </td> <td> ' + result[i].yearfrom + '-' + result[i].yearto + ' </td> <td>' + result[i].lot_no + '</td> <td>' + result[i].paid_date + '</td> <td>' + result[i].sanc_amt + '</td> </tr>'
+                            $("#dtBasicExample tbody").append(row);
+                        }
+
+                    }
+                    else {
+                        //var row = '<tr><td> ' + "No Records found" + ' </td></tr>'
+                        ////var row = '<tr>' + "No Records found" + '</tr>'
+                        //$("#dtBasicExample tbody").append(row);
+                        alert("No Records Found ");
+                    }
+
+
+                },
+
+            });
+        }
+    }
+
+
+</script>

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<MedicalR.Models.VendorManagement.VendorDetailModel>
+@{
+    ViewBag.Title = "Vendors";
+}
+
+<article class="col-md-12">
+    <div class="p-2">
+        <div class=""> <a href="/settings/vendors/add" class="btn btn-secondary float-right ml-1">+</a> &nbsp;<a href="#" class="btn btn-secondary float-right">Import</a> </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"><input type="checkbox"></th>
+                <th scope="col">VendorName</th>
+                <th scope="col">UserID</th>
+                <th scope="col">DateofActivation</th>
+                <th scope="col">ExpiryDate</th>
+                <th scope="col">ProfileSenttoclient</th>
+                <th scope="col">Selected</th>
+                <th scope="col">Rejected</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <th scope="row"><input type="checkbox"></th>
+                    <td>@item.SourceName</td>
+                    <td><a href="/settings/vendors/@item.VendorID/edit">@item.UserID</a></td>
+                    <td>@item.DateofActivation</td>
+                    <td>@item.ExpiryDate</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    @if (Model.Count() == 0)
+    {
+        <div class="no-data-found">No Data Found</div>
+    }
+</article>
+

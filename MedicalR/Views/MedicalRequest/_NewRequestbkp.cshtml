@@ -1,0 +1,593 @@
+﻿
+<style>
+    .border-section {
+        border: 1px solid #dee2e6;
+        margin: 8px 0;
+        padding: 12px;
+        border-radius: 4px;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+
+    .btn-circle { 
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        line-height: 18px;
+        font-size: 16px;
+        padding: 0;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <h4>New Medical Claim Request</h4>
+
+    <form id="claimForm">
+
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label>Name of Patient <span class="text-danger">*</span></label>
+                <select id="patientSelect" class="form-control" required>
+                    <option value="">-- Select Patient --</option>
+                    <!-- filled by JS -->
+                </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label>Treatment Type <span class="text-danger">*</span></label>
+                <select id="treatmentSelect" class="form-control" required>
+                    <option value="">-- Select Treatment --</option>
+                    <!-- filled dynamically -->
+                </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label>Nature of Illness <span class="text-danger">*</span></label>
+                <input type="text" id="natureOfIllness" class="form-control" required>
+            </div>
+        </div>
+
+        <h6 class="pt-3"><strong>Details of Claim (For the Treatment Taken)</strong></h6>
+
+        <div id="expenseBlocksContainer"></div>
+
+        <div class="row mt-3">
+            <div class="col-md-2"></div>
+            <div class="col-md-3">
+                <label>Grand Total Claimed Rs.</label>
+            </div>
+            <div class="col-md-4">
+                <input type="text" id="grandTotal" class="form-control font-weight-bold" readonly value="0.00">
+            </div>
+            <div class="col-md-3">
+                <button type="button" id="addExpenseTypeBtn" class="btn btn-primary float-right">
+                    + Expense Type
+                </button>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="form-group col-md-4">
+                <label>Enclosure <span class="text-danger">*</span></label>
+                <input type="text" id="enclosure" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-4"></div>
+            <div class="col-md-2">
+                <button type="button" id="saveDraftBtn" class="btn btn-primary btn-block">Save For Later</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" id="submitBtn" class="btn btn-primary btn-block">Submit</button>
+            </div>
+            <div class="col-md-2" id="deleteSection" style="display:none;">
+                <button type="button" id="deleteBtn" class="btn btn-danger btn-block">Delete</button>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    // Global data structures (simulate what Angular had)
+
+    $(document).ready(function () {
+        loadPatients();
+    });
+
+    async function loadPatients() {
+        try {
+            const patients = await getPatientsFromServer();
+
+            const $select = $("#patientSelect");
+            $select.empty(); // Clear old options
+
+            // Default option
+            $select.append('<option value="">-- Select Patient --</option>');
+
+            // Fill dropdown
+            patients.forEach(p => {
+                $select.append(
+                    `<option value="${p.id}">
+                        ${p.name}
+                    </option>`
+                );
+            });
+
+        } catch (error) {
+            console.error("Error loading patients:", error);
+            alert("Failed to load patients.");
+        }
+    }
+
+    function getPatientsFromServer() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Common/GetPatients/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    resolve(response);
+                },
+                error: function (xhr, status, error) {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    let treatmentTypes = [];        
+    let currentTreatmentCode = "";
+
+    let expenseBlocks = [];         
+
+    let expenseTypesMaster = [];     
+    let headOfExpensesMaster = {};   
+
+    // UI state helpers
+    let hideFromToDates = [];
+    let hideOnlyDate = [];
+    let hideDays = [];
+    let hideHeadOfExp = [];
+
+
+    function fakeGetTreatmentTypes() {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve([
+                    { id: 1, name: "Hospitalization", code: "#HOSPIL#" },
+                    { id: 2, name: "Maternity", code: "#MATERNITY#" },
+                    { id: 3, name: "Domiciliary", code: "#DOMCIL#" },
+                    { id: 19, name: "OPD", code: "OPD" },
+                    // ... add more
+                ]);
+            }, 300);
+        });
+    }
+
+    function fakeGetExpenseTypes(treatmentId) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve([
+                    { id: 101, name: "Room Rent", code: "#HOSPIL#" },
+                    { id: 102, name: "Doctor Fee", code: "#HOSPIL#" },
+                    { id: 201, name: "Hearing Aid", code: "#HEARAID#" },
+                    { id: 301, name: "Physiotherapy", code: "#PHYC#" },
+                    { id: 401, name: "Dental Treatment", code: "#CFDT#" },
+                    // ...
+                ]);
+            }, 400);
+        });
+    }
+
+    function fakeGetHeadOfExpenses(expenseTypeId) {
+        return new Promise(resolve => {
+            let heads = [];
+            if (expenseTypeId === 401) {
+                heads = [
+                    { id: 5001, name: "Root Canal", code: "#RC#" },
+                    { id: 5002, name: "Crown", code: "#CBC#" },
+                ];
+            } else if (expenseTypeId === 301) {
+                heads = [
+                    { id: 6001, name: "Session", code: "SESS" },
+                ];
+            }
+            setTimeout(() => resolve(heads), 300);
+        });
+    }
+
+    function fakeSaveClaim(data) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve({ Status: true, Message: "Claim saved successfully" });
+                // or {Status:false, Message:"Error..."}
+            }, 800);
+        });
+    }
+
+    // Utility functions
+
+    function calculateDays(from, to) {
+        if (!from || !to) return 0;
+        const f = new Date(from);
+        const t = new Date(to);
+        const diff = t - f;
+        return Math.round(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function isFutureDate(dateStr) {
+        if (!dateStr) return false;
+        const d = new Date(dateStr);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return d > today;
+    }
+
+    function recalculateTotals() {
+        let grand = 0;
+        $(".expense-block").each(function () {
+            let sub = 0;
+            $(this).find(".amt-claimed").each(function () {
+                let v = parseFloat($(this).val()) || 0;
+                sub += v;
+            });
+            $(this).find(".sub-total").text(sub.toFixed(2));
+            grand += sub;
+        });
+        $("#grandTotal").val(grand.toFixed(2));
+    }
+
+    function checkDuplicateExpenseTypes() {
+        const selected = [];
+        let dup = false;
+        $(".expense-type-select").each(function () {
+            let v = $(this).val();
+            if (v && selected.includes(v)) dup = true;
+            if (v) selected.push(v);
+        });
+        return dup;
+    }
+
+    function showHideFieldsPerExpenseType(expenseTypeId, blockIndex) {
+        const code = expenseTypesMaster.find(e => e.id == expenseTypeId)?.code || "";
+
+        hideFromToDates[blockIndex] = !(code === "#PHYC#" || code === "#HAT#");
+        hideOnlyDate[blockIndex] = (code === "#PHYC#");
+        hideDays[blockIndex] = (code !== "#HAT#");
+        hideHeadOfExp[blockIndex] = !(code === "#CFDT#" || code === "#MRE#" || code === "#HECHRG#");
+
+        const $block = $(`.expense-block[data-index="${blockIndex}"]`);
+
+        $block.find(".from-date-group, .to-date-group").toggle(!hideFromToDates[blockIndex]);
+        $block.find(".only-date-group").toggle(!hideOnlyDate[blockIndex]);
+        $block.find(".days-col").toggle(!hideDays[blockIndex]);
+        $block.find(".head-exp-col").toggle(!hideHeadOfExp[blockIndex]);
+    }
+
+    // Render one expense block (main repeatable part)
+
+    function renderExpenseBlock(index, data = {}) {
+        const fromDate = data.from_date || "";
+        const toDate = data.to_date || "";
+        const hospital = data.hospital_name || "";
+        const itCert = data.it_cert || "No";
+
+        const blockHtml = `
+        <div class="border-section expense-block" data-index="${index}">
+          <div class="d-flex justify-content-between mb-2">
+            <div class="form-group col-md-5">
+              <label><strong>Expense Type:</strong> <span class="text-danger">*</span></label>
+              <select class="form-control expense-type-select" required>
+                <option value="">-- Select --</option>
+                ${expenseTypesMaster.map(t => `<option value="${t.id}" ${t.id == data.expense_type_id ? 'selected' : ''}>${t.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <button type="button" class="btn btn-danger btn-circle remove-expense-block">X</button>
+            </div>
+          </div>
+
+          <!-- Hospital / Maternity / Special fields -->
+          <div class="hospital-fields form-row" style="display:none;">
+            <div class="form-group col-md-3 from-date-group">
+              <label>From Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control from-date" value="${fromDate}" required>
+            </div>
+            <div class="form-group col-md-3 to-date-group">
+              <label>To Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control to-date" value="${toDate}" required>
+            </div>
+            <div class="form-group col-md-3">
+              <label>Name of Hospital <span class="text-danger">*</span></label>
+              <input type="text" class="form-control hospital-name" value="${hospital}" required>
+            </div>
+            <div class="form-group col-md-3">
+              <label>Hospital Awarded I.T R Cert.? <span class="text-danger">*</span></label>
+              <select class="form-control it-cert">
+                <option value="Yes" ${itCert === 'Yes' ? 'selected' : ''}>Yes</option>
+                <option value="No"  ${itCert === 'No' ? 'selected' : ''}>No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive mt-3">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Bill No</th>
+                  <th>Amt. Claimed Rs. ()</th>
+                  <th>Remarks</th>
+                  <th style="width:50px"></th>
+                  <th style="width:50px"></th>
+                </tr>
+              </thead>
+              <tbody class="items-body">
+                <!-- items will be added here -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      `;
+          //<button type="button" class="btn btn-sm btn-success add-item-btn">+ Add Item</button>
+
+        return blockHtml;
+    }
+
+    // Add new item row inside one expense block
+    function addItemRow($tbody, item = {}) {
+        const idx = $tbody.find("tr").length;
+        const billNo = item.bill_no || "";
+        const amt = item.amt_claimed_rs || "";
+        const remark = item.remark || "";
+        const onlyDate = item.only_date || "";
+        const fromD = item.from_date || "";
+        const toD = item.to_date || "";
+        const days = item.days || "";
+        const headId = item.head_of_expense_id || "";
+        const qty = item.no_of_teeth || "";
+
+        let headsOptions = "";
+        const expenseTypeId = $tbody.closest(".expense-block").find(".expense-type-select").val();
+        const heads = headOfExpensesMaster[expenseTypeId] || [];
+
+        heads.forEach(h => {
+            headsOptions += `<option value="${h.id}" ${h.id == headId ? 'selected' : ''}>${h.name}</option>`;
+        });
+
+        const row = `
+        <tr data-item-idx="${idx}">
+          <td><input type="text" class="form-control bill-no" value="${billNo}" required></td>
+          <td><input type="number" step="0.01" class="form-control amt-claimed" value="${amt}" required></td>
+          <td><input type="text" class="form-control remark" value="${remark}"></td>
+          <td><button type="button" class="btn btn-sm btn-success add-same">+</button></td>
+          <td><button type="button" class="btn btn-sm btn-danger remove-item">−</button></td>
+        </tr>
+      `;
+
+        $tbody.append(row);
+    }
+
+    // Main Initialization
+
+    $(async function () {
+
+        toastr.options = { positionClass: "toast-top-right", timeOut: 4000 };
+
+        // Load initial data
+        treatmentTypes = await fakeGetTreatmentTypes();
+
+        // Fill treatment types (will be filtered later)
+        treatmentTypes.forEach(t => {
+            $("#treatmentSelect").append(`<option value="${t.id}" data-code="${t.code}">${t.name}</option>`);
+        });
+
+        // ── Patient change ──
+        $("#patientSelect").change(function () {
+            const pid = $(this).val();
+            if (!pid) return;
+
+            const patient = patients.find(p => p.id == pid);
+            if (!patient) return;
+
+            // Filter maternity for male spouse / female self
+            $("#treatmentSelect").html('<option value="">-- Select Treatment --</option>');
+            treatmentTypes.forEach(t => {
+                if (t.code === "#MATERNITY#") {
+                    if ((patient.code === "Spouse" && patient.gender === "Male") ||
+                        (patient.code === "Self" && patient.gender === "Female")) {
+                        $("#treatmentSelect").append(`<option value="${t.id}" data-code="${t.code}">${t.name}</option>`);
+                    }
+                } else {
+                    $("#treatmentSelect").append(`<option value="${t.id}" data-code="${t.code}">${t.name}</option>`);
+                }
+            });
+        });
+
+        // ── Treatment type change ──
+        $("#treatmentSelect").change(async function () {
+            const tid = $(this).val();
+            if (!tid) return;
+
+            currentTreatmentCode = $(this).find("option:selected").data("code") || "";
+
+            expenseTypesMaster = await fakeGetExpenseTypes(tid);
+
+            // Clear existing blocks
+            $("#expenseBlocksContainer").empty();
+            expenseBlocks = [];
+            addNewExpenseBlock();   // at least one
+        });
+
+        // ── Add new expense type block ──
+        $("#addExpenseTypeBtn").click(addNewExpenseBlock);
+
+        function addNewExpenseBlock() {
+            const index = expenseBlocks.length;
+            expenseBlocks.push({ items: [] });
+
+            hideFromToDates[index] = true;
+            hideOnlyDate[index] = true;
+            hideDays[index] = true;
+            hideHeadOfExp[index] = true;
+
+            const html = renderExpenseBlock(index);
+            $("#expenseBlocksContainer").append(html);
+
+            const $block = $(`.expense-block[data-index="${index}"]`);
+            const $tbody = $block.find(".items-body");
+
+            // add first empty item
+            addItemRow($tbody);
+
+            recalculateTotals();
+        }
+
+        // ── Event delegation ───────────────────────────────────────
+
+        // Remove whole expense block
+        $(document).on("click", ".remove-expense-block", function () {
+            $(this).closest(".expense-block").remove();
+            recalculateTotals();
+        });
+
+        // Change expense type → load heads + show/hide fields
+        $(document).on("change", ".expense-type-select", async function () {
+            const $block = $(this).closest(".expense-block");
+            const idx = parseInt($block.data("index"));
+            const etid = $(this).val();
+
+            if (!etid) return;
+
+            // Load heads
+            headOfExpensesMaster[etid] = await fakeGetHeadOfExpenses(etid);
+
+            // show/hide logic
+            showHideFieldsPerExpenseType(etid, idx);
+
+            // refresh items visibility
+            $block.find(".only-date-col").toggle(!hideOnlyDate[idx]);
+            $block.find(".from-date-col, .to-date-col").toggle(!hideFromToDates[idx]);
+            $block.find(".days-col").toggle(!hideDays[idx]);
+            $block.find(".head-exp-col").toggle(!hideHeadOfExp[idx]);
+
+            // Re-render items if needed (simple way → clear & re-add)
+            const $tbody = $block.find(".items-body");
+            $tbody.empty();
+            addItemRow($tbody);
+        });
+
+        // Add item inside block
+        $(document).on("click", ".add-item-btn, .add-same", function () {
+            const $tbody = $(this).closest(".expense-block").find(".items-body");
+            addItemRow($tbody);
+        });
+
+        // Remove item
+        $(document).on("click", ".remove-item", function () {
+            $(this).closest("tr").remove();
+            recalculateTotals();
+        });
+
+        // Recalculate on amount / date change
+        $(document).on("input change", ".amt-claimed, .from-date-item, .to-date-item", function () {
+            const $row = $(this).closest("tr");
+            const from = $row.find(".from-date-item").val();
+            const to = $row.find(".to-date-item").val();
+
+            if (from && to) {
+                const days = calculateDays(from, to);
+                $row.find(".days-display").text(days);
+            }
+
+            // future date check
+            if (isFutureDate(from) || isFutureDate(to)) {
+                toastr.error("Bill date can't be future date!");
+            }
+
+            recalculateTotals();
+        });
+
+        // ── Save / Submit ───────────────────────────────────────
+
+        $("#saveDraftBtn, #submitBtn").click(async function () {
+            if (checkDuplicateExpenseTypes()) {
+                toastr.error("Expense type cannot be duplicate!");
+                return;
+            }
+
+            // Very basic validation
+            if (!$("#patientSelect").val() || !$("#treatmentSelect").val() || !$("#natureOfIllness").val()) {
+                toastr.error("Please fill required patient / treatment / illness fields");
+                return;
+            }
+
+            // collect data (simplified)
+            let payload = {
+                patient_id: $("#patientSelect").val(),
+                treatment_type_id: $("#treatmentSelect").val(),
+                nature_of_illness: $("#natureOfIllness").val(),
+                enclosure: $("#enclosure").val(),
+                expense_type_details: []
+            };
+
+            $(".expense-block").each(function () {
+                const etid = $(this).find(".expense-type-select").val();
+                if (!etid) return;
+
+                let blockData = {
+                    expense_type_id: etid,
+                    from_date: $(this).find(".from-date").val() || null,
+                    to_date: $(this).find(".to-date").val() || null,
+                    hospital_name: $(this).find(".hospital-name").val() || "",
+                    it_cert: $(this).find(".it-cert").val(),
+                    request_claim_expense_items: []
+                };
+
+                $(this).find("tr").each(function () {
+                    blockData.request_claim_expense_items.push({
+                        bill_no: $(this).find(".bill-no").val(),
+                        only_date: $(this).find(".only-date").val() || null,
+                        from_date: $(this).find(".from-date-item").val() || null,
+                        to_date: $(this).find(".to-date-item").val() || null,
+                        amt_claimed_rs: $(this).find(".amt-claimed").val(),
+                        remark: $(this).find(".remark").val(),
+                        head_of_expense_id: $(this).find(".head-of-expense").val() || 0,
+                        no_of_teeth: $(this).find(".qty-field").val() || ""
+                    });
+                });
+
+                payload.expense_type_details.push(blockData);
+            });
+
+            try {
+                const resp = await fakeSaveClaim(payload);
+                if (resp.Status) {
+                    toastr.success(resp.Message);
+                    // window.location = "/MedicalRequest";
+                } else {
+                    toastr.error(resp.Message || "Save failed");
+                }
+            } catch (e) {
+                toastr.error("Server error");
+            }
+        });
+
+        // First block auto-create
+        addNewExpenseBlock();
+
+    });
+</script>

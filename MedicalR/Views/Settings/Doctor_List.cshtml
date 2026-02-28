@@ -1,0 +1,71 @@
+﻿@model IEnumerable<MedicalR.Models.CommonSettings.DoctorList>
+@{
+    ViewBag.Title = "Doctor_List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link text-dark" href="#"><strong>Statistics</strong></a> </li>
+        <li class="nav-item"> <a class="nav-link" href="/settings/Doctor_List/0/add">Doctor Name</a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="pt-3">
+        <div id="sidemain" class="float-left pl-1"> <span class="btn btn-primary" style="cursor:pointer" onclick="openNav()"><i class="fa fa-search text-light mr-3"></i> FILTER BY</span> </div>
+        <div class="">
+            <select class="custom-select col-sm-2" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                <option selected>Action</option>
+                <option value="">Print</option>
+                <option value="">Export To Excel</option>
+                <option value="">Export To Pdf</option>
+            </select>
+            <a href="/settings/Doctor_List/0/add" class="btn btn-secondary plusbut float-right ml-1">+</a>
+        </div>
+    </div>
+    <input type="text" id="tableSearch" class="table-search form-control col-md-2 float-right" placeholder="Search..." />
+    <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th class="th-sm">Doctor ID</th>
+                <th class="th-sm">Name</th>
+                <th class="th-sm">Mobile No</th>
+                <th class="th-sm">Designation</th>
+                <th class="th-sm text-right">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>@item.id</td>
+                    <td>@item.dr_name</td>
+                    <td>@item.mobile_no</td>
+                    <td>@item.designation</td>
+                    <td>
+                        <select class="custom-select dropright sel" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                            <option selected>Select </option>
+                            <option value="/settings/Doctor_List/@item.id/edit">Edit</option>
+                            <option value="/settings/Doctor_List/@item.id/edit">Delete</option>
+
+                        </select>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.Count() == 0)
+    {
+        <div class="no-data-found">No Data Found</div>
+    }
+</article>
+
+<script>
+    $(document).ready(function () {
+        $('#dtBasicExample').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+    });
+</script>
+

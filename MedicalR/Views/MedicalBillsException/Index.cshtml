@@ -1,0 +1,122 @@
+﻿@model IEnumerable<MedicalR.Models.MedicalBillsException.AdditionalSanction>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row ">
+        <div class="col-md-12 headerstatics">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/MedicalBillsException/Detail">Additional Sanction</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label>Employee Code.</label>
+                    <input type="text" id="empl_code" class="form-control" />
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Application No.</label>
+                    <input type="text" id="appl_no" class="form-control" />
+                </div>
+                <div class="form-group col-md-2">
+                    <label>.</label>
+                    <button type="button" id="btnSearch" class="btn btn-primary form-control">
+                        Search
+                    </button>
+                </div>
+            </div>
+
+            <table id="table_id" class="table table-hover table-bordered" width="100%">
+                <thead>
+                    <tr>
+                        <th>Appln_No</th>
+                        <th>EmplID</th>
+                        <th>Name</th>
+                        <th>Treatment Type</th>
+                        <th>Date of Request</th>
+                        <th>Relationship</th>
+                        <th>Total Claimed Rs.</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#btnSearch").click(function () {
+
+            var empl_code = $("#empl_code").val().trim();
+            var appl_no = $("#appl_no").val().trim();
+
+            $.ajax({
+                url: '/MedicalBillsException/AddionalPaymentGrid_data',
+                type: 'POST',
+                data: {
+                    empl_code: empl_code,
+                    appln_no: appl_no
+                },
+                success: function (response) {
+
+                    var tableBody = $("#tableBody");
+                    tableBody.empty();
+
+                    if (response && response.length > 0) {
+
+                        $.each(response, function (index, item) {
+
+                            var row = "<tr>" +
+                                "<td><a href='/MedicalBillsException/Item/" + item.id + "'>" + item.appln_no + "</a></td>" +
+                                "<td>" + item.EmpCode + "</td>" +
+                                "<td>" + item.name_of_patient + "</td>" +
+                                "<td>" + item.treatment_type + "</td>" +
+                                "<td>" + formatDotNetDate(item.date_of_request) + "</td>"+
+                                "<td>" + item.relationship + "</td>" +
+                                "<td>" + item.total_claimed_rs + "</td>" +
+                                "</tr>";
+
+                            tableBody.append(row);
+                        });
+
+                    } else {
+                        tableBody.append("<tr><td colspan='7' class='text-center'>No Data Found</td></tr>");
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error while fetching data.");
+                    console.log(xhr.responseText);
+                }
+            });
+
+        });
+
+        function formatDotNetDate(dotNetDate) {
+            if (!dotNetDate) return "";
+
+            var timestamp = parseInt(dotNetDate.replace(/\/Date\((\d+)\)\//, "$1"));
+            var date = new Date(timestamp);
+
+            return date.getDate().toString().padStart(2, '0') + "-" +
+                (date.getMonth() + 1).toString().padStart(2, '0') + "-" +
+                date.getFullYear();
+        }
+
+
+    });
+</script>

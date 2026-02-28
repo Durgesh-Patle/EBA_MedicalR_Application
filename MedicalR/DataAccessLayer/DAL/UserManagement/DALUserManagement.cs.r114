@@ -1,0 +1,499 @@
+﻿using MedicalR.CustomHelper;
+using MedicalR.DataAccessLayer.DAL.EmailConfiguration;
+using MedicalR.DataAccessLayer.IDAL.EmailConfiguration;
+using MedicalR.DataAccessLayer.IDAL.UserManagement;
+using MedicalR.Models;
+using MedicalR.Models.RoleManagement;
+using MedicalR.Models.UserManagement;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+
+namespace MedicalR.DataAccessLayer.DAL.UserManagement
+{
+    public class DALUserManagement: IDALUserManagement
+    {
+        IDALEmailConfiguration objDALEmailConfiguration = new DALEmailConfiguration();
+        #region validate user for login
+        public LoginDetailModel ValidateUser(LoginViewModel objModel)
+        {
+            LoginDetailModel UserDetail = new LoginDetailModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                var EncryptedPassword = AesGenerator.Encrypt(objModel.Password);
+                SqlCommand cmd = new SqlCommand("sproc_GetLoginDetail", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@EmailID", objModel.EmailID);
+                cmd.Parameters.AddWithValue("@Password", EncryptedPassword);  
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter();
+                da.SelectCommand = cmd;
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+                    UserDetail = null;
+                }
+                else
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        UserDetail.UserID = Convert.ToInt32(ds.Tables[0].Rows[i]["CompanyUserID"].ToString());
+                        UserDetail.CompanyID = Convert.ToInt32(ds.Tables[0].Rows[i]["CompanyID"].ToString());
+                        UserDetail.CompanyName = ds.Tables[0].Rows[i]["CompanyName"].ToString();
+                        UserDetail.EmailID = ds.Tables[0].Rows[i]["EmailID"].ToString();
+                        UserDetail.UserName = ds.Tables[0].Rows[i]["UserName"].ToString();
+                        UserDetail.RoleID = Convert.ToInt32(ds.Tables[0].Rows[i]["Role"].ToString());
+                        UserDetail.RoleRights = ds.Tables[0].Rows[i]["RoleRights"].ToString();
+                        UserDetail.PhotoURL = ds.Tables[0].Rows[i]["PhotoURL"].ToString();
+                       
+                    }
+
+                    if (UserDetail.RoleID > 0)
+                    {
+                        if (!string.IsNullOrEmpty(UserDetail.RoleRights))
+                        {
+                            UserDetail.RoleRightDetails = JsonConvert.DeserializeObject<RoleRightDetailModel>(UserDetail.RoleRights);
+                        }
+                        else
+                        {
+                            UserDetail = null;
+                        }
+                    }
+     
+                }
+            }
+            catch(Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                UserDetail = null;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return UserDetail;
+        }
+        #endregion
+
+
+        #region get company user list
+        public List<UserDetailModel> GetUserList()
+        {
+            List<UserDetailModel> UserList = new List<UserDetailModel>();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                var CompanyID = UserManager.User.CompanyID;
+                SqlCommand cmd = new SqlCommand("sproc_GettblCompanyUserList", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CompanyID", CompanyID);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter();
+                da.SelectCommand = cmd;
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    UserDetailModel User = new UserDetailModel();
+                    User.UserID = Convert.ToInt32(ds.Tables[0].Rows[i]["CompanyUserID"].ToString());
+                    User.UserName = ds.Tables[0].Rows[i]["UserName"].ToString();
+                    User.EmailID = ds.Tables[0].Rows[i]["EmailID"].ToString();
+                    User.MobileNo = ds.Tables[0].Rows[i]["MobileNo"]!=DBNull.Value ? ds.Tables[0].Rows[i]["MobileNo"].ToString() : "";
+                    User.IsActive = Convert.ToBoolean(ds.Tables[0].Rows[i]["IsActive"].ToString());
+                    User.RoleID = Convert.ToInt32(ds.Tables[0].Rows[i]["Role"].ToString());
+                    User.RoleName = ds.Tables[0].Rows[i]["RoleName"].ToString();
+                    UserList.Add(User);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                UserList = new List<UserDetailModel>();
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return UserList;
+        }
+
+        #endregion region
+
+
+        #region get company single user data
+        public UserDetailModel GetSingleUserDetails(UserDetailModel objModel)
+        {
+            UserDetailModel UserDetails = new UserDetailModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                var CompanyID = UserManager.User.CompanyID;
+                SqlCommand cmd = new SqlCommand("sproc_GetSingleUser", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CompanyID", CompanyID);
+                cmd.Parameters.AddWithValue("@CompanyUserID", objModel.UserID);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter();
+                da.SelectCommand = cmd;
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                if (ds.Tables[0].Rows.Count == 0)
+                {
+                    UserDetails = null;
+                }
+                else
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        UserDetails.UserID = Convert.ToInt32(ds.Tables[0].Rows[i]["CompanyUserID"].ToString());
+                        UserDetails.UserName = ds.Tables[0].Rows[i]["UserName"].ToString();
+                        UserDetails.EmailID = ds.Tables[0].Rows[i]["EmailID"].ToString();
+                        UserDetails.MobileNo = ds.Tables[0].Rows[i]["MobileNo"] != DBNull.Value ? ds.Tables[0].Rows[i]["MobileNo"].ToString() : "";
+                        UserDetails.IsActive = Convert.ToBoolean(ds.Tables[0].Rows[i]["IsActive"].ToString());
+                        UserDetails.RoleID = Convert.ToInt32(ds.Tables[0].Rows[i]["Role"].ToString());
+                        UserDetails.PhotoURL_GoogleID = ds.Tables[0].Rows[i]["PhotoURL_GoogleID"]!=DBNull.Value ? Convert.ToInt32(ds.Tables[0].Rows[i]["PhotoURL_GoogleID"].ToString()) : 0;
+                        UserDetails.PhotoURL = ds.Tables[0].Rows[i]["PhotoURL"].ToString();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                UserDetails = null;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return UserDetails;
+        }
+
+        #endregion region
+
+
+
+        #region add new user to company
+        public ResponseModel AddUser(UserDetailModel objModel)
+        {
+            ResponseModel Response = new ResponseModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                var EncryptedPassword = AesGenerator.Encrypt(objModel.Password);
+                var CurrentUtcDate = CommonHelper.GetDate;
+                var CompanyUserID = UserManager.User.UserID;
+                var CompanyID = UserManager.User.CompanyID;
+                SqlCommand cmd = new SqlCommand("sproc_InsertCompanyUser", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@UserName", objModel.UserName);
+                cmd.Parameters.AddWithValue("@EmailID", objModel.EmailID);
+                cmd.Parameters.AddWithValue("@Password", EncryptedPassword);
+                cmd.Parameters.AddWithValue("@Role", objModel.RoleID);
+                cmd.Parameters.AddWithValue("@CompanyID", CompanyID);
+                cmd.Parameters.AddWithValue("@MobileNo", objModel.MobileNo);
+                cmd.Parameters.AddWithValue("@CreatedDate", CurrentUtcDate);
+                cmd.Parameters.AddWithValue("@Createdby", CompanyUserID);
+                cmd.Parameters.AddWithValue("@IsActive", true);
+                cmd.Parameters.AddWithValue("@CompanyUserID", SqlDbType.Int).Direction = ParameterDirection.Output;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                var UserID = Convert.ToInt32(cmd.Parameters["@CompanyUserID"].Value.ToString());
+                if(UserID==0)
+                {
+                    Response.Status = false;
+                    Response.Message = MessageHelper.UserEmailExists;
+                }
+                else
+                {
+                    Response.Status = true;
+                    Response.Message = MessageHelper.UserAdded;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                Response.Status = false;
+                Response.Message = MessageHelper.ExceptionMessage;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return Response;
+        }
+
+        #endregion
+
+
+
+        #region update existing company user
+        public ResponseModel UpdateUser(UserDetailModel objModel)
+        {
+            ResponseModel Response = new ResponseModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                var CompanyUserID = UserManager.User.UserID;
+                var CompanyID = UserManager.User.CompanyID;
+                SqlCommand cmd = new SqlCommand("sproc_UpdateCompanyUser", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@UserName", objModel.UserName);
+                cmd.Parameters.AddWithValue("@EmailID", objModel.EmailID);
+                cmd.Parameters.AddWithValue("@Role", objModel.RoleID);
+                cmd.Parameters.AddWithValue("@CompanyID", CompanyID);
+                cmd.Parameters.AddWithValue("@MobileNo", objModel.MobileNo);
+                cmd.Parameters.AddWithValue("@CompanyUserID", objModel.UserID);
+                cmd.Parameters.AddWithValue("@PhotoURL_GoogleID", objModel.PhotoURL_GoogleID);
+                cmd.Parameters.AddWithValue("@PhotoURL", objModel.PhotoURL);
+                cmd.Parameters.AddWithValue("@UpdateRes", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                var Res = Convert.ToInt32(cmd.Parameters["@UpdateRes"].Value.ToString());
+                if (Res == 0)
+                {
+                    Response.Status = false;
+                    Response.Message = MessageHelper.UserEmailExists;
+                }
+                else
+                {
+                    Response.Status = true;
+                    Response.Message = MessageHelper.UserUpdated;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                Response.Status = false;
+                Response.Message = MessageHelper.ExceptionMessage;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return Response;
+        }
+
+        #endregion
+
+
+        #region update existing company user status
+
+        public ResponseModel UpdateUserStatus(UserDetailModel objModel)
+        {
+            ResponseModel Response = new ResponseModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                var CompanyUserID = UserManager.User.UserID;
+                var CompanyID = UserManager.User.CompanyID;
+                SqlCommand cmd = new SqlCommand("sproc_UpdateCompanyUserStatus", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IsActive", objModel.IsActive);
+                cmd.Parameters.AddWithValue("@CompanyID", CompanyID);
+                cmd.Parameters.AddWithValue("@CompanyUserID", objModel.UserID);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                Response.Status = true;
+                Response.Message = MessageHelper.UserStatusUpdated;
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                Response.Status = false;
+                Response.Message = MessageHelper.ExceptionMessage;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return Response;
+        }
+        #endregion
+
+        #region save reset password code
+        public ResponseModel SaveResetPasswordCode(string emailID, string resetCode)
+        {
+            ResponseModel Response = new ResponseModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                SqlCommand cmd = new SqlCommand("sproc_UpdateResetCode", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@EmailID", emailID);
+                cmd.Parameters.AddWithValue("@ResetPasswordCode", resetCode);
+                cmd.Parameters.AddWithValue("@UpdateRes", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                var Res = Convert.ToInt32(cmd.Parameters["@UpdateRes"].Value.ToString());
+                if (Res == 0)
+                {
+                    Response.Status = false;
+                    Response.Message = MessageHelper.EmailNotRegistered;
+                }
+                else
+                {
+                    Response.Status = true;
+                    Response.Message = MessageHelper.ResetLinkSent;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                Response.Status = false;
+                Response.Message = MessageHelper.ExceptionMessage;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return Response;
+        }
+        #endregion
+
+        #region verify reset password link
+        public ResponseModel VerifyResetPasswordLink(string resetCode)
+        {
+            ResponseModel Response = new ResponseModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                SqlCommand cmd = new SqlCommand("sproc_VerifyResetCode", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@ResetPasswordCode", resetCode);
+                cmd.Parameters.AddWithValue("@UpdateRes", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                var Res = Convert.ToInt32(cmd.Parameters["@UpdateRes"].Value.ToString());
+                if (Res == 0)
+                {
+                    Response.Status = false;
+                }
+                else
+                {
+                    Response.Status = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                Response.Status = false;
+                Response.Message = MessageHelper.ExceptionMessage;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return Response;
+        }
+        #endregion
+
+        #region  reset password 
+        public ResponseModel ResetPassword(string resetCode,string newPassword)
+        {
+            ResponseModel Response = new ResponseModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                var EncryptedPassword = AesGenerator.Encrypt(newPassword);
+                SqlCommand cmd = new SqlCommand("sproc_ResetPassword", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@ResetPasswordCode", resetCode);
+                cmd.Parameters.AddWithValue("@Password", EncryptedPassword);
+                cmd.Parameters.AddWithValue("@UpdateRes", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                var Res = Convert.ToInt32(cmd.Parameters["@UpdateRes"].Value.ToString());
+                if (Res == 0)
+                {
+                    Response.Status = false;
+                    Response.Message = MessageHelper.ExceptionMessage;
+                }
+                else
+                {
+                    Response.Status = true;
+                    Response.Message = MessageHelper.PasswordUpdated;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                Response.Status = false;
+                Response.Message = MessageHelper.ExceptionMessage;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return Response;
+        }
+        #endregion
+
+        #region registration
+        public ResponseModel RegisterUser(RegisterModel objModel)
+        {
+            ResponseModel Response = new ResponseModel();
+            SqlConnection con = new SqlConnection(CommonHelper.GetConnectionString);
+            try
+            {
+                var EncryptedPassword = AesGenerator.Encrypt(objModel.Password);
+                var CurrentUtcDate = CommonHelper.GetDate;
+           
+                SqlCommand cmd = new SqlCommand("sproc_Register", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CompanyName", objModel.CompanyName);
+                cmd.Parameters.AddWithValue("@UserName", objModel.UserName);
+                cmd.Parameters.AddWithValue("@EmailID", objModel.EmailID);
+                cmd.Parameters.AddWithValue("@Password", EncryptedPassword);
+                cmd.Parameters.AddWithValue("@IndustryID", objModel.IndustryID);
+                cmd.Parameters.AddWithValue("@CreatedDate", CurrentUtcDate);
+                cmd.Parameters.AddWithValue("@Result", SqlDbType.Int).Direction = ParameterDirection.Output;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                var Result = Convert.ToInt32(cmd.Parameters["@Result"].Value.ToString());
+                if (Result == 0)
+                {
+                    Response.Status = false;
+                    Response.Message = MessageHelper.UserEmailExists;
+                }
+                else
+                {
+                    Response.Status = true;
+                    Response.Message = MessageHelper.UserRegister;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.LogException(ex);
+                Response.Status = false;
+                Response.Message = MessageHelper.ExceptionMessage;
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return Response;
+        }
+
+        #endregion
+    }
+}

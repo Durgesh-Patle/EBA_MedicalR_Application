@@ -1,0 +1,169 @@
+﻿@model IEnumerable<MedicalR.Models.CHC.CHCRequest>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 headerstatics">
+            <ul class="nav">
+                <li class="nav-item"> <a class="nav-link" href="Request Form.html">Statistics</a> </li>
+                <li class="nav-item"> <a class="nav-link text-dark" href="#"><strong>Approve/Reject Request form</strong></a> </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+        @*<div class="col-md-3">
+                <div id="mySidenav" class="sidenav bg-primary">
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">Search &nbsp;<i class="fa fa-search"></i></a> <a href="#" class="list-group-item list-group-item-action">
+                        <input type="checkbox">
+                        EmplID
+                    </a> <a href="#" class="list-group-item list-group-item-action">
+                        <input type="checkbox">
+                        Name
+                    </a>
+                </div>
+            </div>*@
+        <article class="col-md-12">
+            <div class="pt-3">
+                @*<div id="sidemain" class="float-left pl-1"> <span class="btn btn-primary" style="cursor:pointer" onclick="openNav()"><i class="fa fa-search text-light mr-3"></i> FILTER BY</span> </div>*@
+                <div class="">
+                    @*<select class="custom-select col-sm-2" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                            <option selected>Action</option>
+                            <option value="Request Form.html">Export To Excel</option>
+                            <option value="email.html">Export To Pdf</option>
+                        </select>*@
+                    @*<a href="/CHCRequestform/Detail" class="btn btn-secondary plusbut float-right ml-1">+</a> &nbsp; &nbsp;*@
+                </div>
+            </div>
+            @*<input type="text" id="tableSearch" class="table-search" placeholder="Search..." />*@
+            <div id="UserContent">
+                @*@Html.Partial("~/Views/MedicalRequest/_SearchUser.cshtml", Model)*@
+                <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+
+                            @*<th class="th-sm"><input type="checkbox"></th>*@
+                            <th class="th-sm">EmplCD</th>
+                            <th class="th-sm">Date of Request</th>
+                            <th class="th-sm">Name of Employee</th>
+                            <th class="th-sm">Name of Patient</th>
+                            <th class="th-sm">RelationShip</th>
+                            <th class="th-sm">Name of CHC Center</th>
+                            <th class="th-sm">Name of CHC Center(Spouse)</th>
+                            <th class="th-sm">Application Status</th>
+                            <th class="th-sm text-right">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+
+                                @*<th scope="row"><input type="checkbox"></th>*@
+                                <td>@item.employeecode</td>
+                                @if (item.relationship == "spouse")
+                                {
+                                    <td>@Html.Label(item.spouse_dt_of_checkup.ToShortDateString())</td>
+                                }
+                                else
+                                {
+                                    <td>@Html.Label(item.date_of_checkup.ToShortDateString())</td>
+                                }
+
+                                <td><span style="cursor:pointer" onclick="openBar()"></span> <a href="/CHCApproveRequestform/Detail/@item.id">@item.employeename</a></td>
+                                @if (item.relationship == "spouse")
+                                {
+                                    <td>@item.name_of_spouse</td>
+                                }
+                                else
+                                {
+                                    <td>@item.employeename</td>
+                                }
+
+                                <td>@item.relationship</td>
+                                <td>@item.hosname</td>
+                                <td>@item.phosname</td>
+                                <td>@item.status</td>
+                                <td>@item.emp_location</td>
+                                @*<td id="action">
+                                        <select class="custom-select dropright sel" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                                            <option selected>Select</option>
+                                            <option value="/CHCApproveRequestform/Detail/@item.id">Fill Details</option>
+                                            <option value="/CHCApproveRequestform/Detail/@item.emplid">Reject</option>
+
+                                        </select>
+                                    </td>*@
+                            </tr>
+                        }
+
+
+                    </tbody>
+                </table>
+                @*@if (Model.Count() == 0)
+                    {
+                        <div class="no-data-found">No Data Found</div>
+                    }*@
+            </div>
+
+        </article>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+@section Scripts {
+    <script>
+        $(function () {
+
+            if ($.fn.DataTable.isDataTable('#dtBasicExample')) {
+                $('#dtBasicExample').DataTable().destroy();
+            }
+
+            $('#dtBasicExample').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                lengthChange: true
+            });
+
+        });
+    </script>
+}
+
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+</script>
+@*<script>
+        $(document).ready(function () {
+            $('#dtBasicExample').DataTable();
+            $('.dataTables_length').addClass('bs-select');
+        });
+    </script>*@
+<script>
+    $(document).ready(function () {
+        $(".select2").select2();
+
+        var table = $('#dtUserList').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+        $('#tableSearch').on('keyup', function () {
+            table.search(this.value).draw();
+        })
+
+
+
+
+    });
+</script>
+
+
+

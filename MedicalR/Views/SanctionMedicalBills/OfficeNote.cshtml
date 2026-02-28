@@ -1,0 +1,229 @@
+﻿@model IEnumerable<MedicalR.Models.MedicalR.SanctionMedicalBillsModel>
+    ViewBag.Title = "OfficeNote";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+<style>
+    /* Style the body */
+    body {
+        font-family: Arial;
+        margin: 0;
+    }
+
+    ex1 {
+        border: 1px solid red;
+        padding: 35px;
+    }
+    /* Header/Logo Title */
+    .header {
+        margin: auto;
+        width: 60%;
+        border: 1px solid black;
+        padding: 20px;
+        color: black;
+        font-size: 12px;
+        border-color: black;
+        /* border: 1px solid red;
+        padding: 20px;
+        color: black;
+        font-size: 10px;
+        border-color:black;*/
+    }
+
+    .contents {
+        margin: auto;
+        width: 60%;
+        padding: 5px;
+        color: black;
+        font-size: 16px;
+    }
+
+    /* Page Content */
+    .content {
+        padding: 20px;
+    }
+</style>
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            @*<ul class="nav">
+                    <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a> </li>
+                    <li class="nav-item"> <a class="nav-link" href="#">Bill Process</a> </li>
+                </ul>*@
+            <hr class="m-0">
+        </div>
+        <article class="col-md-12">
+            <div class="pt-3">
+            </div>
+            <div class="pt-3">
+            </div>
+            <div class="pt-3">
+            </div>
+            <div class="pt-3">
+
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6"></div>
+                <div class="form-group col-md-4"></div>
+                <button type="button" class="btn-primary" onclick="getPDF()">Print</button>
+            </div>
+            <div class="PDF">
+                <div class="row" id="contnet">
+                    <div class="header">
+                        <h3 style="text-align: center"><strong>Assest Management Company Ltd.</strong></h3>
+                        <p style="text-align: center"><strong>UTI Tower , Gn Block</strong></p>
+                        <p style="text-align: center"><strong>Bandra Kurla Complex</strong></p>
+                        <p style="text-align: center"><strong>Bandra(East), Mumbai - 400051</strong></p>
+                        <p style="text-align: center"><span>Phone </span><span style="word-spacing:1px ">:66786542</span><span style="word-spacing: 100px">. Fax</span><span style="word-spacing:1px "> : 26528991</span> </p>
+                        @*<%--  <p style="text-align:center"><span style=""> </span><br /><span style="word-spacing:60px"> </span></p>--%>*@
+                    </div>
+                    <div class="contents">
+                        <p>Ref : UT/DOAA/___________________/2020-2021</p>
+                        <h2 style="text-align:center; color:cornflowerblue">Office Note</h2>
+
+                        <p>We are reimbursing the Medical Bills for the employees who have already applied for availing their claim.</p>
+                        <p>We enclose the list of batches which are already processed for payment,the details are as below.</p>
+
+                        <table id="dtBasicExample" class="table table-hover table-bordered" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+
+
+                                    <th class="th-sm">Batch ID</th>
+                                    <th class="th-sm">Status</th>
+                                    <th class="th-sm">Record Counts</th>
+                                    <th class="th-sm">Claimed Rs.</th>
+                                    <th class="th-sm">Sanctioned Rs.</th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+
+
+                                        <td>@item.batch_no</td>
+                                        <td>@item.status</td>
+                                        <td>@item.application_count</td>
+                                        <td>@item.total_claimed_rs</td>
+                                        <td>@item.total_claimed_rs</td>
+
+
+
+                                    </tr>
+                                }
+
+
+                            </tbody>
+                        </table>
+                        @if (Model.Count() == 0)
+                        {
+                            <div class="no-data-found">No Data Found</div>
+                        }
+                        <div class="row">
+
+                            <div class="form-group col-md-4">
+                                <label for="">Sum Total Claimed Rs. <span id="val">.</span></label>
+                            </div>
+                            <div class="form-group col-md-2"></div>
+                            <div class="form-group col-md-4">
+                                <label for="">Application Received. <span id="appcount">.</span></label>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="form-group col-md-4">
+                                <label for="">Sum Total Sanctioned Rs. <span id="val">.</span></label>
+                            </div>
+                            <div class="form-group col-md-2"></div>
+                            <div class="form-group col-md-4">
+                                <label for="">Application Sanction. <span id="appsanc">.</span></label>
+                            </div>
+                        </div>
+                        <p>The Medical Bills Which are sanctioned.are found in order if approved we may pay Rs.<span id="value">.</span></p>
+                        <p>to the employees for the above sanctioned cases as mentioned in annexure(enclosed).</p>
+                        <p>Submitted for Approval Please.</p>
+                        <p>A.M(SK)</p>
+                        <p>SVP(SS)</p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-3"></div>
+                <div class="form-group col-md-3">
+                    <button type="button" class="btn-primary" onclick="ViewAnnexure()">View-Annexure</button>
+                </div>
+                <div class="form-group col-md-3">
+                    <button type="button" class="btn-primary">Done and Proceed for Next..</button>
+                </div>
+
+            </div>
+            <div id="elementH"></div>
+            @* </div> *@
+
+        </article>
+    </div>
+</div>
+
+<script src="https://www.freakyjolly.com/multipage-canvas-pdf-using-jspdf/"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script>
+    $(document).ready(function () {
+        var table = document.getElementById("dtBasicExample"), sumVal = 0; apcount = 0;
+        for (i = 1; i < table.rows.length; i++) {
+            apcount = apcount + parseInt(table.rows[i].cells[2].innerHTML);
+            sumVal = sumVal + parseInt(table.rows[i].cells[3].innerHTML);
+
+        }
+        document.getElementById("val").innerHTML = ":" + sumVal;
+        document.getElementById("value").innerHTML = ":" + sumVal;
+
+        document.getElementById("appcount").innerHTML = ":" + apcount;
+        document.getElementById("appsanc").innerHTML = ":" + apcount;
+    });
+
+    function getPDF() {
+
+        var HTML_Width = $(".PDF").width();
+        var HTML_Height = $(".PDF").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($(".PDF")[0], { allowTaint: true }).then(function (canvas) {
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+
+            var imgData = canvas.toDataURL("image/jpeg", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+
+            pdf.save("HTML-Document.pdf");
+        });
+    };
+    function ViewAnnexure() {
+
+        window.location.href = "/SanctionMedicalBills/Annexure";
+    };
+
+</script>
+

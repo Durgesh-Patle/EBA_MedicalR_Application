@@ -1,0 +1,178 @@
+﻿@model MedicalR.Models.RetiredEmployee.ReimburseAmtModel
+
+@{
+    ViewBag.Title = "Reimburse_Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/settings/Objection">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Reimbursement Amount</strong></a> </li>
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item"> <a class="nav-link" href="/settings/Objection">Statistics</a> </li>
+            <li class="nav-item"> <a class="nav-link text-dark" href="#"><strong>Reimbursement Amount Master</strong></a> </li>
+        </ul>
+        <hr class="m-0">
+    </div>
+    <br />
+    <form>
+        <div class="col-md-12">
+            <div class="col-md-6">
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="">Financial year <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="Finyear" placeholder="Enter Year" value="@Model.Finyear">
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="">Amount<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="Amount" placeholder="Enter Amount" value="@Model.Amount">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row pt-3">
+                <input type="hidden" id="ID" value="@Model.Id" />
+                <div class="col-md-12 mt-5">
+                    <a href="javascript:void(0)" class="btn btn-primary" id="AddReimburseamt" data-val="1">Submit</a>
+                    <a href="javascript:void(0)" class="btn btn-primary" id="DelReimburseamt" data-val="1">Delete</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</article>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#AddReimburseamt").click(function () {
+
+          var buttonValue = $(this).data("val");
+            var RetStatus = true;
+          $(".has-error").html("");
+            var ID = $("#ID").val().trim();
+            var Finyear = $("#Finyear").val().trim();
+            var Amount = $("#Amount").val().trim();
+
+
+
+            if (Finyear == "")
+            {
+                $("#Finyear").parent().find(".has-error").html("Required*");
+                $("#Finyear").focus();
+                 RetStatus = false;
+            }
+            if (Amount == "")
+            {
+                $("#Amount").parent().find(".has-error").html("Required*");
+                $("#Amount").focus();
+                RetStatus = false;
+            }
+
+            if(RetStatus==true)
+            {
+                var data = {
+                    "ID": ID,
+                    "Finyear": Finyear,
+                    "Amount": Amount
+                };
+                $.ajax({
+                    url: "/ReitredEmployee/UpdateReimburse",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+
+                           window.location.href = "@Url.Action("Reimburse_Amt", "ReitredEmployee")";
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+        $("#DelReimburseamt").click(function () {
+
+          var buttonValue = $(this).data("val");
+            var RetStatus = true;
+          $(".has-error").html("");
+            var ID = $("#ID").val().trim();
+            var Finyear = $("#Finyear").val().trim();
+            var Amount = $("#Amount").val().trim();
+
+
+
+            if (Finyear == "")
+            {
+                $("#Finyear").parent().find(".has-error").html("Required*");
+                $("#Finyear").focus();
+                 RetStatus = false;
+            }
+            if (Amount == "")
+            {
+                $("#Amount").parent().find(".has-error").html("Required*");
+                $("#Amount").focus();
+                RetStatus = false;
+            }
+
+            if(RetStatus==true)
+            {
+                var data = {
+                    "ID": ID,
+                    "Finyear": Finyear,
+                    "Amount": Amount
+                };
+                $.ajax({
+                    url: "/ReitredEmployee/ReimburseamtStatus",
+                    type: "post",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result["Status"] ==true)
+                        {
+                            toastr["success"](result["Message"]);
+
+                           window.location.href = "@Url.Action("Reimburse_Amt", "ReitredEmployee")";
+                        }
+                        else
+                        {
+                            toastr["error"](result["Message"]);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+        })
+
+    })
+</script>

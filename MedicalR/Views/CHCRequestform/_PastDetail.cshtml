@@ -1,0 +1,56 @@
+﻿@model IEnumerable<MedicalR.Models.CHC.CHCRequest>
+<table id="dtInterview" class="table table-hover table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+
+            @*<th class="th-sm"><input type="checkbox"></th>*@
+            <th class="th-sm">Name of Employee</th>
+            <th class="th-sm">Date of Checkup</th>
+            <th class="th-sm">Name of CHC Center</th>
+            <th class="th-sm">Name of the Spouse</th>
+            <th class="th-sm">Date of Checkup(Spouse)</th>
+            <th class="th-sm">Name of CHC Center (Spouse)</th>
+            <th class="th-sm">Status</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+
+                @*<th scope="row"><input type="checkbox"></th>*@
+                <td>@item.employeename</td>
+                @if (item.relationship == "spouse")
+                {
+                    <td></td>
+                }
+                else
+                {
+                    <td>@Html.Label(item.date_of_checkup.ToShortDateString())</td>
+                }
+                <td>@item.hosname</td>
+                <td>@item.name_of_spouse</td>
+                @if (item.relationship == "spouse")
+                {
+                    <td>@Html.Label(item.spouse_dt_of_checkup.ToShortDateString())</td>
+
+                }
+                else if (item.relationship == "Self and Spouse")
+                {
+                    <td>@Html.Label(item.spouse_dt_of_checkup.ToShortDateString())</td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>@item.phosname</td>
+                <td>@item.status</td>
+
+            </tr>
+        }
+
+
+    </tbody>
+</table>

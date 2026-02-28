@@ -1,0 +1,753 @@
+﻿@model IEnumerable<MedicalR.Models.MedicalR.EditCheckingBillsModel>
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop" id="editCheckingDetailsContainer">
+    <div class="col-md-12 p-0">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics</strong></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="BatchItemsView-add.html">Edit checking medical bills(Checking verified)</a>
+            </li>
+        </ul>
+        <hr class="m-0">
+        <br />
+    </div>
+
+    <!-- ===== Top Form Fields ===== -->
+    <div class="form-row">
+        <div class="form-group col-md-2">
+            <label>Appln.No:</label>
+            <input type="text" class="form-control" id="appln_no" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>status:</label>
+            <input type="text" class="form-control" id="edit_status" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Email Address:</label>
+            <input type="text" class="form-control" id="email" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Name:</label>
+            <input type="text" class="form-control" id="employeename" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Department:</label>
+            <input type="text" class="form-control" id="department_name" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Location:</label>
+            <input type="text" class="form-control" id="national_location" readonly>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-2">
+            <label>Band:</label>
+            <input type="text" class="form-control" id="band_level" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Name of Patient:</label>
+            <input type="text" class="form-control" id="patient_name" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Relationship:</label>
+            <input type="text" class="form-control" id="family_relation_code" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Nature of Illness:</label>
+            <input type="text" class="form-control" id="nature_of_illness" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Treatment Type:</label>
+            <input type="text" class="form-control" id="treatment_type" readonly>
+        </div>
+        <div class="form-group col-md-2">
+            <label>Is treatement taken out of Head Quaters?</label>
+            <input type="checkbox" id="is_treatment_taken_out_of_head_quaters" disabled>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ===== Dynamic Expense Types Section ===== -->
+    <div id="expense-types-container"></div>
+
+    <hr>
+
+    <!-- ===== Grand Total Row ===== -->
+    <div class="row">
+        <div class="form-group col-md-4"></div>
+        <div class="form-group col-md-4">
+            <label>Total Claimed Rs.: <span id="grand_total_claimed_rs">0</span></label>
+        </div>
+        <div class="form-group col-md-4">
+            <label>Sanc. Rs.: <span id="grand_total_sanctioned_rs">0</span></label>
+        </div>
+    </div>
+
+    <!-- ===== Save Button ===== -->
+    <div class="row">
+        <div class="form-group col-md-4"></div>
+        <div class="form-group col-md-2">
+            <a href="javascript:void(0);" class="btn btn-primary" id="btnSave">Checked and Verified</a>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    var model = null;
+    var objection_codes = [];
+
+    var ishidefrmtodates = [];  
+    var ishideOnlydates = [];   
+    var isHideHeadofExpenses = [];    
+    var is_head_of_expenses = [];
+    var is_qty = [];
+    var is_qty_disable = [];
+
+    function getIdFromUrl() {
+        var parts = window.location.pathname.split('/');
+        var id = parseInt(parts[parts.length - 1]);
+        return isNaN(id) ? 0 : id;
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        var d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return ('0' + d.getDate()).slice(-2) + '-' + months[d.getMonth()] + '-' + d.getFullYear();
+    }
+
+    function showhidefields(expense_type_code, index) {
+
+        // From/To date columns: only show for #PHYC#
+        ishidefrmtodates[index] = (expense_type_code !== '#PHYC#');
+
+        // Only-date column: show for these specific codes
+        var onlyDateCodes = ['#PRC#', '#CEFV#', '#COMD#', '#HEARAID#', '#HAT#', '#SPECT#', '#INJVAC#'];
+        ishideOnlydates[index] = (onlyDateCodes.indexOf(expense_type_code) === -1);
+
+        // Head-of-expense column: show for these specific codes
+        var headCodes = ['#CFDT#', '#MRE#', '#HECHRG#'];
+        isHideHeadofExpenses[index] = (headCodes.indexOf(expense_type_code) === -1);
+    }
+
+    function validateHeadOfExpenses(head_of_expense_id, parent_index, child_index) {
+        is_head_of_expenses[parent_index] = false;
+        is_qty_disable[child_index] = false;
+
+        if (is_qty[parent_index] === undefined) {
+            is_qty[parent_index] = false;
+        }
+
+        if (head_of_expense_id === 2) {   // if head of expense is Dental > cap
+            is_head_of_expenses[parent_index] = true;
+            is_qty[parent_index] = true;
+            is_qty_disable[child_index] = true;
+        } else {
+            is_head_of_expenses[parent_index] = false;
+        }
+    }
+
+    function calculateSactionAmt() {
+        model.total_sanctioned_rs = 0;
+
+        for (var k = 0; k < model.expense_type_detalis.length; k++) {
+            model.expense_type_detalis[k].total_sanctioned_rs = 0;
+
+            for (var k2 = 0; k2 < model.expense_type_detalis[k].request_claim_expense_items.length; k2++) {
+                var sanctAmt = model.expense_type_detalis[k].request_claim_expense_items[k2].amt_sanctioned_rs;
+
+                // Preserve original skip logic for undefined/empty
+                if (sanctAmt === undefined || sanctAmt === '') {
+                    // skip (same as original — no assignment made)
+                } else {
+                    model.expense_type_detalis[k].total_sanctioned_rs += (parseFloat(sanctAmt) || 0);
+                }
+            }
+
+            model.expense_type_detalis[k].total_sanctioned_rs =
+                parseFloat(model.expense_type_detalis[k].total_sanctioned_rs);
+
+            model.total_sanctioned_rs +=
+                parseFloat(model.expense_type_detalis[k].total_sanctioned_rs);
+        }
+
+        // Update grand total on screen
+        $('#grand_total_sanctioned_rs').text(model.total_sanctioned_rs);
+
+        // Update per-expense-type sanction total labels
+        for (var k = 0; k < model.expense_type_detalis.length; k++) {
+            $('#expense-sanc-' + k).text(model.expense_type_detalis[k].total_sanctioned_rs);
+        }
+    }
+
+    function populateTopForm() {
+        $('#appln_no').val(model.appln_no || '');
+        $('#edit_status').val(model.edit_status || '');
+        $('#email').val(model.email || '');
+        $('#employeename').val(model.employeename || '');
+        $('#department_name').val(model.department_name || '');
+        $('#national_location').val(model.national_location || '');
+        $('#band_level').val(model.band_level || '');
+        $('#patient_name').val(model.patient_name || '');
+        $('#family_relation_code').val(model.family_relation_code || '');
+        $('#nature_of_illness').val(model.nature_of_illness || '');
+        $('#treatment_type').val(model.treatment_type || '');
+        $('#is_treatment_taken_out_of_head_quaters')
+            .prop('checked', model.is_treatment_taken_out_of_head_quaters || false);
+        $('#grand_total_claimed_rs').text(model.total_claimed_rs || 0);
+        $('#grand_total_sanctioned_rs').text(model.total_sanctioned_rs || 0);
+    }
+
+    function buildExpenseTypesUI() {
+
+        var container = $('#expense-types-container');
+        container.empty();
+
+        // GLOBAL SAFETY CHECK
+        if (!model || !Array.isArray(model.expense_type_detalis)) {
+            console.warn("Model or expense_type_detalis is invalid.");
+            return;
+        }
+
+        var treatment_type_code = model.treatment_type_code || '';
+
+        var showHospitalSection =
+            treatment_type_code === '#HOSPIL#' ||
+            treatment_type_code === '#MATERNITY#';
+
+        // LOOP THROUGH EXPENSE TYPES (SAFE WAY)
+        model.expense_type_detalis.forEach(function (item, k) {
+
+            if (!item) return;
+
+            // Safe flags
+            var hideFromTo = ishidefrmtodates?.[k] ?? false;
+            var hideOnlyDate = ishideOnlydates?.[k] ?? false;
+            var hideHead = isHideHeadofExpenses?.[k] ?? false;
+            var showQtyFlag = is_qty?.[k] ?? false;
+            var headExpenseFlag = is_head_of_expenses?.[k] ?? false;
+
+            // HOSPITAL SECTION
+            var hospitalSectionHtml = '';
+
+            if (showHospitalSection) {
+
+                var fromDateStyle = !hideFromTo ? '' : 'display:none;';
+                var hospitalNameStyle = !hideHead ? '' : 'display:none;';
+
+                hospitalSectionHtml = `
+            <div class="form-row">
+                <div class="form-group col-md-2" style="${fromDateStyle}">
+                    <label>From Date:</label>
+                    <input type="date" class="form-control expense-from-date"
+                        value="${item.from_date || ''}"
+                        data-parent-index="${k}">
+                </div>
+
+                <div class="form-group col-md-2" style="${fromDateStyle}">
+                    <label>To Date:</label>
+                    <input type="date" class="form-control expense-to-date"
+                        value="${item.to_date || ''}"
+                        data-parent-index="${k}">
+                </div>
+
+                <div class="form-group col-md-2" style="${hospitalNameStyle}">
+                    <label>Name of Hospital:</label>
+                    <input type="text" class="form-control expense-hospital-name"
+                        value="${item.hospital_name || ''}"
+                        data-parent-index="${k}">
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>Whether Hospital Awarded I.T Rebate Certificate:</label>
+                    <input type="text" class="form-control">
+                </div>
+            </div>`;
+            }
+
+            // TABLE HEADER
+            var headerHtml = '';
+
+            if (!hideFromTo)
+                headerHtml += '<th>From Date</th><th>To Date</th>';
+
+            if (!hideOnlyDate)
+                headerHtml += '<th>Date</th>';
+
+            if (!hideHead)
+                headerHtml += '<th>Heads of Expense</th>';
+
+            if (showQtyFlag || (headExpenseFlag && !hideHead))
+                headerHtml += '<th>Qty</th>';
+
+            headerHtml += `
+            <th>Bill No</th>
+            <th>Amt Claimed</th>
+            <th>Sanction Amt</th>
+            <th>Remark(Empl)</th>
+            <th>Obj Code</th>
+            <th>Description</th>
+            <th>Remark(MA)</th>`;
+
+            // TABLE ROWS
+            var tableRowsHtml = '';
+
+            var claimItems = Array.isArray(item.request_claim_expense_items)
+                ? item.request_claim_expense_items
+                : [];
+
+            claimItems.forEach(function (item2, k2) {
+
+                if (!item2) return;
+
+                var claimed = parseFloat(item2.amt_claimed_rs) || 0;
+                var sanctioned = parseFloat(item2.amt_sanctioned_rs) || 0;
+                var isSame = claimed === sanctioned;
+
+                var objOptionsHtml = '<option value="0">-- Select --</option>';
+
+                if (Array.isArray(objection_codes)) {
+                    objection_codes.forEach(function (obj) {
+                        var selected =
+                            item2.objection_code_id === obj.id ? 'selected' : '';
+                        objOptionsHtml +=
+                            `<option value="${obj.id}" ${selected}>${obj.name}</option>`;
+                    });
+                }
+
+                var rowCells = '';
+
+                if (!hideFromTo)
+                    rowCells += `<td>${formatDate(item2.from_date)}</td>
+                             <td>${formatDate(item2.to_date)}</td>`;
+
+                if (!hideOnlyDate)
+                    rowCells += `<td>${formatDate(item2.only_date)}</td>`;
+
+                if (!hideHead)
+                    rowCells += `<td>${item2.head_of_expense_name || ''}</td>`;
+
+                if (showQtyFlag || (headExpenseFlag && !hideHead))
+                    rowCells += `<td>${item2.no_of_teeth || ''}</td>`;
+
+                rowCells += `
+                <td>${item2.bill_no || ''}</td>
+                <td>${claimed}</td>
+
+                <td>
+                    <input type="text"
+                        class="form-control sanc-amt-input"
+                        value="${sanctioned}"
+                        data-parent-index="${k}"
+                        data-child-index="${k2}"
+                        data-claimed="${claimed}">
+                </td>
+
+                <td>${item2.remark || ''}</td>
+
+                <td>
+                    <select class="form-control objection-code-select"
+                        data-parent-index="${k}"
+                        data-child-index="${k2}"
+                        ${isSame ? 'disabled' : ''}>
+                        ${objOptionsHtml}
+                    </select>
+                </td>
+
+                <td>
+                    <input type="text"
+                        class="form-control"
+                        value="${item2.description || ''}"
+                        readonly>
+                </td>
+
+                <td>
+                    <input type="text"
+                        class="form-control ma-remark-input"
+                        value="${item2.ma_remark || ''}"
+                        data-parent-index="${k}"
+                        data-child-index="${k2}"
+                        ${isSame ? 'disabled' : ''}>
+                </td>`;
+
+                tableRowsHtml += `<tr>${rowCells}</tr>`;
+            });
+
+            // FULL BLOCK HTML
+            var blockHtml = `
+        <div class="expense-type-block" data-index="${k}">
+
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label>Expense Type:</label>
+                    <input type="text" class="form-control"
+                        value="${item.expense_type_name || ''}" readonly>
+                </div>
+            </div>
+
+            ${hospitalSectionHtml}
+
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>${headerHtml}</tr>
+                    </thead>
+                    <tbody>
+                        ${tableRowsHtml}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <label>Total Claimed: ${item.total_claimed_rs || 0}</label>
+                </div>
+                <div class="col-md-4">
+                    <label>Sanction: 
+                        <span id="expense-sanc-${k}">
+                            ${item.total_sanctioned_rs || 0}
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+        </div>`;
+
+            container.append(blockHtml);
+
+        });
+
+        bindEvents();
+    }
+
+    //function buildExpenseTypesUI() {
+    //    var container = $('#expense-types-container');
+    //    container.empty();
+
+    //    // treatment_type_code from model (used in ng-show on hospital section)
+    //    var treatment_type_code = model.treatment_type_code || '';
+    //    var showHospitalSection = (
+    //        treatment_type_code === '#HOSPIL#' ||
+    //        treatment_type_code === '#MATERNITY#'
+    //    );
+
+    //    for (var k = 0; k < model.expense_type_detalis.length; k++) {
+    //        var item = model.expense_type_detalis[k];
+
+    //        // ---- Build hospital/maternity section (ng-show condition) ----
+    //        var hospitalSectionHtml = '';
+    //        if (showHospitalSection) {
+    //            var fromDateStyle = !ishidefrmtodates[k] ? '' : 'display:none;';
+    //            var hospitalNameStyle = !isHideHeadofExpenses[k] ? '' : 'display:none;';
+
+    //            hospitalSectionHtml = `
+    //            <div class="form-row">
+    //                <div class="form-group col-md-2" style="${fromDateStyle}">
+    //                    <label>From Date:</label>
+    //                    <input type="date" class="form-control expense-from-date"
+    //                        value="${item.from_date || ''}"
+    //                        data-parent-index="${k}">
+    //                </div>
+    //                <div class="form-group col-md-2" style="${fromDateStyle}">
+    //                    <label>To Date:</label>
+    //                    <input type="date" class="form-control expense-to-date"
+    //                        value="${item.to_date || ''}"
+    //                        data-parent-index="${k}">
+    //                </div>
+    //                <div class="form-group col-md-2" style="${hospitalNameStyle}">
+    //                    <label>Name of Hospital:</label>
+    //                    <input type="text" class="form-control expense-hospital-name"
+    //                        value="${item.hospital_name || ''}"
+    //                        data-parent-index="${k}">
+    //                </div>
+    //                <div class="form-group col-md-3">
+    //                    <label>Wheather Hospital Awarded I.T Rebate Certificate:</label>
+    //                    <input type="text" class="form-control">
+    //                </div>
+    //            </div>`;
+    //        }
+
+    //        // ---- Build table header columns (mirrors ng-show on <td>/<th>) ----
+    //        var headerHtml = '';
+    //        if (!ishidefrmtodates[k]) headerHtml += '<td class="th-sm">from date</td><td class="th-sm">To Date</td>';
+    //        if (!ishideOnlydates[k]) headerHtml += '<td class="th-sm">Date</td>';
+    //        if (!isHideHeadofExpenses[k]) headerHtml += '<th class="th-sm">Heads of Expense</th>';
+
+    //        var showQtyHeader = is_qty[k] || (is_head_of_expenses[k] && !isHideHeadofExpenses[k]);
+    //        if (showQtyHeader) headerHtml += '<th class="th-sm">Qty</th>';
+
+    //        headerHtml += `
+    //            <th class="th-sm">Bill.No</th>
+    //            <th class="th-sm">Amt Claimed Rs</th>
+    //            <th class="th-sm">Sanctn Rs</th>
+    //            <th class="th-sm">Remark(Empl)</th>
+    //            <th class="th-sm">Obj Code</th>
+    //            <th class="th-sm">Description</th>
+    //            <th class="th-sm">Remarks(MA)</th>`;
+
+    //        // ---- Build table rows (ng-repeat: item2 in item.request_claim_expense_items) ----
+    //        var tableRowsHtml = '';
+    //        var claimItems = item.request_claim_expense_items || [];
+
+    //        for (var k2 = 0; k2 < claimItems.length; k2++) {
+    //            var item2 = claimItems[k2];
+
+    //            // Replaces ng-disabled="item2.amt_claimed_rs==item2.amt_sanctioned_rs"
+    //            var isSame = (parseFloat(item2.amt_claimed_rs) === parseFloat(item2.amt_sanctioned_rs));
+
+    //            // Build objection code <select> options  (replaces ng-options)
+    //            var objOptionsHtml = '<option value="0">-- Select --</option>';
+    //            for (var oi = 0; oi < objection_codes.length; oi++) {
+    //                var isSelected = (item2.objection_code_id === objection_codes[oi].id) ? 'selected' : '';
+    //                objOptionsHtml += `<option value="${objection_codes[oi].id}" ${isSelected}>
+    //                                        ${objection_codes[oi].name}
+    //                                    </option>`;
+    //            }
+
+    //            // Column cells — mirror ng-show conditions exactly
+    //            var rowCells = '';
+    //            if (!ishidefrmtodates[k]) rowCells += `<td>${formatDate(item2.from_date)}</td>`;
+    //            if (!ishidefrmtodates[k]) rowCells += `<td>${formatDate(item2.to_date)}</td>`;
+    //            if (!ishideOnlydates[k]) rowCells += `<td>${formatDate(item2.only_date)}</td>`;
+    //            if (!isHideHeadofExpenses[k]) rowCells += `<td>${item2.head_of_expense_name || ''}</td>`;
+
+    //            var showQtyCell = is_qty[k] || (is_head_of_expenses[k] && !isHideHeadofExpenses[k]);
+    //            if (showQtyCell) rowCells += `<td>${item2.no_of_teeth || ''}</td>`;
+
+    //            rowCells += `
+    //                <td>${item2.bill_no || ''}</td>
+    //                <td>${item2.amt_claimed_rs || ''}</td>
+
+    //                <!-- Sanction Amount input (ng-change="calculateSactionAmt(...)") -->
+    //                <td>
+    //                    <input type="text" class="form-control sanc-amt-input"
+    //                        value="${item2.amt_sanctioned_rs || ''}"
+    //                        data-parent-index="${k}"
+    //                        data-child-index="${k2}"
+    //                        data-claimed="${item2.amt_claimed_rs}">
+    //                </td>
+
+    //                <td>${item2.remark || ''}</td>
+
+    //                <!-- Objection Code select (ng-disabled when claimed==sanctioned) -->
+    //                <td>
+    //                    <select class="form-control objection-code-select"
+    //                        data-parent-index="${k}"
+    //                        data-child-index="${k2}"
+    //                        ${isSame ? 'disabled' : ''}>
+    //                        ${objOptionsHtml}
+    //                    </select>
+    //                </td>
+
+    //                <!-- Description (readonly) -->
+    //                <td>
+    //                    <input type="text" class="form-control" value="${item2.description || ''}" readonly>
+    //                </td>
+
+    //                <!-- MA Remark (ng-disabled when claimed==sanctioned) -->
+    //                <td>
+    //                    <input type="text" class="form-control ma-remark-input"
+    //                        value="${item2.ma_remark || ''}"
+    //                        data-parent-index="${k}"
+    //                        data-child-index="${k2}"
+    //                        ${isSame ? 'disabled' : ''}>
+    //                </td>`;
+
+    //            tableRowsHtml += `<tr>${rowCells}</tr>`;
+    //        }
+
+    //        // ---- Assemble the full expense block ----
+    //        var blockHtml = `
+    //        <div class="expense-type-block" data-index="${k}">
+
+    //            <div class="form-row">
+    //                <div class="form-group col-md-3">
+    //                    <label>Expense Type:</label>
+    //                    <input type="text" class="form-control" value="${item.expense_type_name || ''}" readonly>
+    //                </div>
+    //            </div>
+
+    //            ${hospitalSectionHtml}
+
+    //            <div class="row">
+    //                <table class="table table-hover table-bordered" cellspacing="0" width="100%">
+    //                    <tr>${headerHtml}</tr>
+    //                    ${tableRowsHtml}
+    //                </table>
+    //            </div>
+
+    //            <div class="row">
+    //                <div class="form-group col-md-4"></div>
+    //                <div class="form-group col-md-4">
+    //                    <label>Total Claimed Rs.: ${item.total_claimed_rs || 0}</label>
+    //                </div>
+    //                <div class="form-group col-md-4">
+    //                    <label>Sanc. Rs.: <span id="expense-sanc-${k}">${item.total_sanctioned_rs || 0}</span></label>
+    //                </div>
+    //            </div>
+
+    //        </div>`;
+
+    //        container.append(blockHtml);
+    //    }
+
+    //    bindEvents();
+    //}
+
+    function bindEvents() {
+
+        // ---- Sanction Amount input change (ng-change="calculateSactionAmt(...)") ----
+        $(document).off('input.sanc').on('input.sanc', '.sanc-amt-input', function () {
+            var parentIndex = parseInt($(this).data('parent-index'));
+            var childIndex = parseInt($(this).data('child-index'));
+            var val = $(this).val();
+
+            // Sync back to model object
+            model.expense_type_detalis[parentIndex]
+                .request_claim_expense_items[childIndex].amt_sanctioned_rs = val;
+
+            // Update disabled state of objection code & MA remark
+            // (mirrors ng-disabled="item2.amt_claimed_rs==item2.amt_sanctioned_rs")
+            var claimedAmt = parseFloat($(this).data('claimed'));
+            var sanctAmt = parseFloat(val);
+            var isSame = (claimedAmt === sanctAmt);
+
+            var $row = $(this).closest('tr');
+            $row.find('.objection-code-select').prop('disabled', isSame);
+            $row.find('.ma-remark-input').prop('disabled', isSame);
+
+            // Run same calculation as Angular
+            calculateSactionAmt();
+        });
+
+        // ---- Objection Code select change (ng-model sync) ----
+        $(document).off('change.obj').on('change.obj', '.objection-code-select', function () {
+            var parentIndex = parseInt($(this).data('parent-index'));
+            var childIndex = parseInt($(this).data('child-index'));
+            model.expense_type_detalis[parentIndex]
+                .request_claim_expense_items[childIndex].objection_code_id = parseInt($(this).val());
+        });
+
+        // ---- MA Remark input change (ng-model sync) ----
+        $(document).off('input.maremark').on('input.maremark', '.ma-remark-input', function () {
+            var parentIndex = parseInt($(this).data('parent-index'));
+            var childIndex = parseInt($(this).data('child-index'));
+            model.expense_type_detalis[parentIndex]
+                .request_claim_expense_items[childIndex].ma_remark = $(this).val();
+        });
+
+        // ---- Hospital section: expense from/to date (ng-model sync) ----
+        $(document).off('change.expdate').on('change.expdate', '.expense-from-date, .expense-to-date', function () {
+            var parentIndex = parseInt($(this).data('parent-index'));
+            var field = $(this).hasClass('expense-from-date') ? 'from_date' : 'to_date';
+            model.expense_type_detalis[parentIndex][field] = $(this).val();
+        });
+
+        // ---- Hospital name input (ng-model sync) ----
+        $(document).off('input.hospital').on('input.hospital', '.expense-hospital-name', function () {
+            var parentIndex = parseInt($(this).data('parent-index'));
+            model.expense_type_detalis[parentIndex].hospital_name = $(this).val();
+        });
+    }
+
+    function save() {
+        // ---- Validate: objection code must be selected if claimed != sanctioned ----
+        // (same loop as Angular $scope.save)
+        for (var k = 0; k < model.expense_type_detalis.length; k++) {
+            for (var k2 = 0; k2 < model.expense_type_detalis[k].request_claim_expense_items.length; k2++) {
+
+                var item = model.expense_type_detalis[k].request_claim_expense_items[k2];
+
+                // Same console.log as original
+                console.log('Item [' + k + '][' + k2 + '] - Claimed: ' + item.amt_claimed_rs +
+                    ', Sanctioned: ' + item.amt_sanctioned_rs +
+                    ', Objection Code: ' + item.objection_code_id);
+
+                if (item.amt_claimed_rs !== parseFloat(item.amt_sanctioned_rs)) {
+                    if (!item.objection_code_id || item.objection_code_id === 0) {
+                        toastr['error']('Please select objection code !');
+                        return;
+                    }
+                }
+            }
+        }
+
+        // ---- Post to server (replaces EditCheckingDetailsFactory.save) ----
+        $.post('/EditCheckingMedicalBills/Save', { model: model })
+            .done(function (success) {
+                if (success.Status) {
+                    toastr['success'](success.Message);
+                    window.location.href = window.location.origin + '/EditCheckingMedicalBills';
+                } else {
+                    toastr['error'](success.Message);
+                }
+            })
+            .fail(function () {
+                toastr['error']('Request failed. Please try again.');
+            });
+    }
+
+    function init() {
+        var id = getIdFromUrl();
+
+        $.when(
+            $.post('/EditCheckingMedicalBills/GetItem', { id: id }),
+            $.get('/Common/GetObjectionCodes/')
+        ).done(function (res1, res2) {
+
+            var itemResponse = res1[0];
+            var objCodesResponse = res2[0];
+
+            model = itemResponse.data !== undefined ? itemResponse.data : itemResponse;
+            objection_codes = objCodesResponse.data !== undefined ? objCodesResponse.data : objCodesResponse;
+
+            //  Safety check — agar array nahi mila to empty array use karo
+            if (!Array.isArray(objection_codes)) {
+                objection_codes = [];
+            }
+
+            if (!model) {
+                toastr['error']('Model data load ');
+                return;
+            }
+
+            // Same loop as before
+            if (model.id > 0) {
+                for (var k = 0; k < model.expense_type_detalis.length; k++) {
+                    showhidefields(model.expense_type_detalis[k].expense_type_code, k);
+                }
+            }
+
+            populateTopForm();
+            buildExpenseTypesUI();
+
+        }).fail(function (err) {
+            console.error('API call failed:', err);
+            toastr['error']('Failed to load data. Please refresh the page.');
+        });
+    }
+
+    $(document).ready(function () {
+
+        // Init data load
+        init();
+
+        // Save button click (replaces ng-click="save()")
+        $('#btnSave').on('click', function () {
+            save();
+        });
+    });
+
+</script>

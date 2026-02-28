@@ -1,0 +1,540 @@
+﻿@model MedicalR.Models.MedicalR.MedicalRequest
+
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<div class="col-md-12 p-0">
+    <ul class="nav">
+        <li class="nav-item"> <a class="nav-link" href="/MedicalRequest">Statistics</a> </li>
+        <li class="nav-item"> <a class="nav-link text-dark" href="javascript:void(0);"><strong>Request Form</strong></a> </li>
+
+    </ul>
+    <hr class="m-0">
+</div>
+<article class="col-md-12">
+    <div class="row pt-2 bg-light"> </div>
+    <div class="row">
+        <div class="col-md-3 shadow p-0">
+            <hr class="mb-0 mt-0 border-top-0">
+            <div class="list-group list-group-flush" id="client-sidebar-info">
+
+
+            </div>
+        </div>
+        <div class="col-md-9 mt-3">
+            <ul class="nav nav-pills mb-3" id="clients-tab" role="tablist">
+                <li class="nav-item" role="presentation" data-tab="info"> <a href="javascript:void(0);" class="nav-link active" data-target="/MedicalRequest/_NewRequest">New Request</a> </li>
+                @*<li class="nav-item" role="presentation" data-tab="info"> <a href="javascript:void(0);" class="nav-link active" data-target="/MedicalRequest/_NewRequest">New Request</a> </li>*@
+                <li class="nav-item @(@ViewBag.Client_ID > 0 ? "" :"disabled")" role="presentation" data-tab="Details"> <a href="javascript:void(0);" class="nav-link" data-target="/Notes/_SearchNotes?PageID=1">Past Details</a> </li>
+                <li class="nav-item @(@ViewBag.Client_ID > 0 ? "" :"disabled")" role="presentation" data-tab="notes"> <a href="javascript:void(0);" class="nav-link" data-target="/Notes/_SearchNotes?PageID=1">Notes</a> </li>
+                <li class="nav-item @(@ViewBag.Client_ID > 0 ? "" :"disabled")" role="presentation" data-tab="attachments"> <a href="javascript:void(0);" class="nav-link" data-target="/Attachments/_SearchAttachments?PageID=1">Past Details</a> </li>
+
+            </ul>
+            <hr>
+
+            <div class="tab-content" id="client-tabContent">
+
+            </div>
+        </div>
+    </div>
+
+</article>
+<input type="hidden" value="0" id="employee_id" class="hdnRelevantID" />
+
+<script>
+    var clientID = @ViewBag.Client_ID;
+    var activeTab = window.location.hash.substring(1);
+    if(activeTab=="" || clientID==0)
+    {
+        activeTab="info";
+        window.location.hash = '#'+activeTab;
+
+    }
+    var activeView = $("#clients-tab li[data-tab='"+activeTab+"']").find("a.nav-link").data("target");
+    LoadClientViews(activeView);
+    //LoadClientSideBarViews();
+
+    function LoadClientViews(targetView)
+    {
+        $("#clients-tab a").removeClass("active");
+        $("#clients-tab a[data-target='" + targetView + "']").addClass("active");
+        $("#loader").show();
+        $.ajax({
+            url: targetView,
+            type: "post",
+            data :{"clientID":clientID},
+            dataType: "html",
+            success: function (result) {
+                $("#client-tabContent").html(result);
+                $('#client-tabContent table').DataTable();
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                $("#loader").hide();
+            }
+
+        });
+    }
+
+    //function LoadClientSideBarViews()
+    //{
+    //    $.ajax({
+    //        url: "/clients/_SearchSideBarInfo",
+    //        type: "post",
+    //        data :{"clientID":clientID},
+    //        dataType: "html",
+    //        success: function (result) {
+    //            $("#client-sidebar-info").html(result);
+    //        },
+    //        error: function (xhr) {
+    //            if (xhr.status === 401) {
+    //                window.location.reload();
+    //                return;
+    //            }
+    //        }
+
+    //    });
+    //}
+
+</script>
+<script type="text/javascript">
+
+
+    function addRowsfordomi() {
+
+        var table = document.getElementById('domitbl');
+        var table = document.getElementById('domitbl');
+        var rowCount = table.rows.length;
+        var cellCount = table.rows[0].cells.length;
+        var row = table.insertRow(rowCount);
+        for (var i = 0; i <= cellCount; i++) {
+            var cell = 'cell' + i;
+            cell = row.insertCell(i);
+            var copycel = document.getElementById('call' + i).innerHTML;
+            cell.innerHTML = copycel;
+
+        }
+    }
+    function deleteRowsfordomi() {
+        var table = document.getElementById('domitbl');
+        var rowCount = table.rows.length;
+        if (rowCount > '2') {
+            var row = table.deleteRow(rowCount - 1);
+            rowCount--;
+        }
+        else {
+            alert('There should be atleast one row');
+        }
+    }
+
+    function addRowsforhospital() {
+
+        var table = document.getElementById('hospitaltbl');
+        var rowCount = table.rows.length;
+        var cellCount = table.rows[0].cells.length;
+        var row = table.insertRow(rowCount)
+        for (var i = 0; i <= cellCount; i++) {
+            var cell = 'cell' + i;
+            cell = row.insertCell(i);
+            var copycel = document.getElementById('cl' + i).innerHTML;
+
+            cell.innerHTML = copycel;
+
+        }
+
+    }
+
+    function deleteRowsforhospital() {
+        var table = document.getElementById('hospitaltbl');
+        var rowCount = table.rows.length;
+        if (rowCount > '2') {
+            var row = table.deleteRow(rowCount - 1);
+            rowCount--;
+        }
+        else {
+            alert('There should be atleast one row');
+        }
+    }
+
+    function addRowsforhead() {
+
+        var table = document.getElementById('domiforheadtbl');
+        var table = document.getElementById('domiforheadtbl');
+        var rowCount = table.rows.length;
+        var cellCount = table.rows[0].cells.length;
+        var row = table.insertRow(rowCount);
+        for (var i = 0; i <= cellCount; i++) {
+            var cell = 'cell' + i;
+            cell = row.insertCell(i);
+            var copycel = document.getElementById('co' + i).innerHTML;
+            cell.innerHTML = copycel;
+
+
+        }
+    }
+    function deleteRowsforhead() {
+        var table = document.getElementById('domiforheadtbl');
+        var rowCount = table.rows.length;
+        if (rowCount > '2') {
+            var row = table.deleteRow(rowCount - 1);
+            rowCount--;
+        }
+        else {
+            alert('There should be atleast one row');
+        }
+    }
+    function clear() {
+        $("#bill_no").val("");
+        $("#amt_claimed_rs").val("");
+        $("#remark").val("");
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+
+
+
+        $("#clients-tab a.nav-link").click(function () {
+            var tab = $(this).parent().data("tab");
+            window.location.hash = '#' + tab;
+
+            var targetView = $(this).data("target");
+            LoadClientViews(targetView);
+
+
+        })
+
+
+
+        $("body").on("change", "#treatment_type_id", function (e) {
+
+            // var name = $(this).val();
+            //  $("#treatment_type_id option:selected").text();
+            var name = $("#treatment_type_id option:selected").text();
+            $(".total").val(0);
+            $('#hospitaltbl tr').slice(2).remove();
+            clear();
+            //$("#bill_no")="";
+            //$("#amt_claimed_rs")="";
+            //$("#remark")="";
+            if (name == 'HOSPITALISATION') {
+
+
+                $("#Hospital").show();
+
+                $("#btndelete").hide();
+                $("#Domiciliary").hide();
+                $("#DomiforHeadsOn").hide();
+                // $("#Maternity").hide();
+
+                $("#Maternity").hide();
+
+            }
+            else if (name == 'MATERNITY') {
+
+                $("#Hospital").show();
+
+
+                // $("#Maternity").show();
+                $("#btndelete").hide();
+                $("#Domiciliary").hide();
+                $("#DomiforHeadsOn").hide();
+                //$("#Hospital").hide();
+
+            }
+            else if (name == 'DOMICILIARY') {
+
+                $("#DomiforHeadsOn").show();
+                $("#btndelete").show();
+                $("#Domiciliary").hide();
+
+                $("#Hospital").hide();
+                $("#Maternity").hide();
+            }
+            else {
+                $("#Hospital").hide();
+                $("#Domiciliary").hide();
+                $("#Maternity").hide();
+                $("#DomiforHeadsOn").hide();
+
+            }
+            var data = {
+                "name": name
+
+
+            };
+            $.ajax({
+                url: "/MedicalRequest/GetExpenseType",
+                type: "post",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $("#expense_type").empty();
+                    if (result.length > 0) {
+                        $("#expense_type").append("<option value=''>Expense Type</option>")
+                        for (var i = 0; i < result.length > 0; i++) {
+                            $("#expense_type").append("<option value='" + result[i]["expence_type"] + "'>" + result[i]["expence_type"] + "</option>");
+                        }
+
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+                }
+            });
+
+        })
+        $("body").on("change", "#expense_type", function (e) {
+
+            var name = $(this).val();
+
+            var data = {
+                "name": name
+
+            };
+            $.ajax({
+                url: "/MedicalRequest/GetHeadsonExpense",
+                type: "Post",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $("#heads_of_expense").empty();
+                    if (result.length > 0) {
+                        $("#heads_of_expense").append("<option value=''>Heads of Expense</option>")
+                        for (var i = 0; i < result.length > 0; i++) {
+                            $("#heads_of_expense").append("<option value='" + result[i]["head_expence"] + "'>" + result[i]["head_expence"] + "</option>");
+                        }
+                    }
+
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+
+
+
+
+                }
+            });
+
+        })
+
+
+        $("body").on("click", "#saverequest,#updateClient", function () {
+            $(this).css("pointer-events", "none");
+            var btn = $(this);
+            var retStatus = true;
+            $(".has-error").html("");
+            var buttonValue = $(this).data("val");
+            var employee_id = $("#employee_id").val();
+            var patient_id = $("#patient_id").val().trim();
+            var appln_no = $("#appln_no").val().trim();
+            var Nature_of_illness = $("#Nature_of_illness").val().trim();
+            var treatment_type_id = $("#treatment_type_id").val().trim();
+            var expense_type = $("#expense_type").val().trim();
+            var from_date = $("#from_date").val().trim();
+            var to_date = $("#to_date").val().trim();
+            var hospital_id = $("#hospital_id").val().trim();
+            var hosp_awarded_i_t_rebate = $("#hosp_awarded_i_t_rebate").val().trim();
+            var table = document.getElementById('hospitaltbl');
+
+            var mmodel = {    
+                             employee_id: $("#employee_id").val(),
+                             patient_id: $("#patient_id").val().trim(),
+                             appln_no: $("#appln_no").val().trim(),
+                             Nature_of_illness: $("#Nature_of_illness").val().trim(),
+                             treatment_type_id: $("#treatment_type_id").val().trim(),
+                             expense_type: $("#expense_type").val().trim(),
+                             from_date: $("#from_date").val().trim(),
+                             to_date: $("#to_date").val().trim(),
+                             hospital_id: $("#hospital_id").val().trim(),
+                             hosp_awarded_i_t_rebate: $("#hosp_awarded_i_t_rebate").val().trim()
+                         } 
+
+            var rowCount = table.rows.length;
+
+            if (rowCount > 0) {
+                var emodel = getFirstCellTextList($('#hospitaltbl'));
+            }
+
+            function getFirstCellTextList(tableElement) {
+                
+                if (tableElement instanceof jQuery) {
+                    // Create an array
+                    var textList = [];
+
+                    // Iterate over each table row
+                    tableElement.find('tbody tr').each(function () {
+
+                        var row = $(this);
+                        if (row.children('td').length > 0)
+                        {
+                         
+                                emodel= {
+                                    heads_of_expense: $(this).find("td:eq(1) select").val(),
+                                    bill_no: $(this).find("td:eq(2) input[type='text']").val(),
+                                    amt_claimed_rs: $(this).find("td:eq(3) input[type='text']").val(),
+                                    remark: $(this).find("td:eq(3) input[type='text']").val()
+                                }
+                           
+                            //obj.heads_of_expense = $(this).find("td:eq(1) select").val();
+                            //obj.bill_no = $(this).find("td:eq(2) input[type='text']").val();
+                            //obj.amt_claimed_rs = $(this).find("td:eq(3) input[type='text']").val();
+                            //obj.remark = $(this).find("td:eq(4) input[type='text']").val();
+
+                            // Get the first cells's text and push it inside the array
+
+                            //var tdObject = $(this).find('td:eq(1)'); //locate the <td> holding select;
+                            // textList.push(tdObject.find("select").val());
+                            //textList.push();
+                            //textList.push($(this).find("td:eq(2) input[type='text']").val());
+                            //textList.push($(this).find("td:eq(3) input[type='text']").val());
+                            //textList.push($(this).find("td:eq(4) input[type='text']").val());
+                            // textList.push(row.children('td').eq(0).text());
+                            // textList.push($(this).parents('td').siblings().find('input'));
+                            textList.push(emodel);
+                        }
+                    });
+                    return textList;
+                }
+            }
+           // var expenses = myList;
+            
+
+           
+
+            var total_claimed_rs = $("#total_claimed_rs").val().trim();
+
+            if (patient_id == "") {
+                $("#patient_id").parent().find(".has-error").html("Required*");
+                retStatus = false;
+            }
+            if (treatment_type_id == "") {
+                $("#treatment_type_id").parent().find(".has-error").html("Required*");
+                retStatus = false;
+            }
+
+
+            if (expense_type == "") {
+                $("#expense_type").parent().find(".has-error").html("Required*");
+                retStatus = false;
+            }
+            if (bill_no == "") {
+                $("#bill_no").parent().find(".has-error").html("Required*");
+                retStatus = false;
+            }
+            if (amt_claimed_rs == "") {
+                $("#amt_claimed_rs").parent().find(".has-error").html("Required*");
+                retStatus = false;
+            }
+            if (total_claimed_rs == "") {
+                $("#total_claimed_rs").parent().find(".has-error").html("Required*");
+                retStatus = false;
+            }
+            
+            var model = {
+                "mmodel": mmodel,
+                "emodel": emodel
+            } 
+
+            if (retStatus == true) {
+                setTimeout(function () { $(btn).css("pointer-events", "unset"); }, 3000);
+               // var formData = new FormData();
+               // formData.append("model", model);
+                //formData.append("expenses", expenses);
+                //formData.append("employee_id", employee_id);
+                //formData.append("patient_id", patient_id);
+                //formData.append("appln_no", appln_no);
+                //formData.append("Nature_of_illness", Nature_of_illness);
+                //formData.append("treatment_type_id", treatment_type_id);
+                //formData.append("expense_type", expense_type);
+                //formData.append("from_date", from_date);
+                //formData.append("to_date", to_date);
+                //formData.append("hospital_id", hospital_id);
+                //formData.append("hosp_awarded_i_t_rebate", hosp_awarded_i_t_rebate);               
+                //formData.append("total_claimed_rs", total_claimed_rs);
+                //formData.append("ExpenseModels", ExpenseModels);
+               
+                $(btn).attr("data-loading", "");
+
+                // var url = "/Clients/UpdateClient";
+
+                if (employee_id == 0) {
+                    url = "/MedicalRequest/AddRequest";
+                }
+
+                $.ajax({                  
+                    url: url,
+                    type: "Post",
+                    data: model,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        if (result["Status"] == true) {
+                            toastr["success"](result["Message"]);
+                            if (buttonValue == 1) {
+                                window.location.href = "/MedicalRequest";
+                            }
+                            else if (buttonValue == 2) {
+                                $("#client-tabContent input").val('');
+                                $("#client-tabContent textarea").val('');
+                                $("#client-tabContent select").val('');
+                            }
+                            else {
+                                LoadClientSideBarViews();
+                            }
+                        }
+                        else {
+                            toastr["error"](result["Message"]);
+                        }
+                        $(btn).removeAttr("data-loading");
+
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.reload();
+                            return;
+                        }
+                        $(btn).removeAttr("data-loading");
+                        toastr["error"]("Something went wrong. Please try after some time.");
+                    }
+                });
+            }
+            else {
+                $(this).css("pointer-events", "unset");
+            }
+        })
+    });
+
+
+
+    $(document).on("change", ".qty1", function () {
+        var sum = 0;
+
+        $(".qty1").each(function () {
+            sum += +$(this).val();
+        });
+        $(".total").val(sum);
+    });
+
+</script>
+
+<script src="~/Includes/AttachmentNotes.js"></script>
+<script src="~/Includes/SendEmailTab.js"></script>

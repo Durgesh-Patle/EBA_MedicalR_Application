@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Hospitalization Credit Facilities";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Hospitalization Cr./Recover for Empl</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <div class="pt-3">
+                <a href="/HospitalizationCF/Item/0"
+                   class="btn btn-secondary plusbut float-right ml-1">+</a>
+            </div>
+
+            <br />
+
+            <table id="table_id" class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Appln.No</th>
+                        <th>Employee Code</th>
+                        <th>From Date</th>
+                        <th>To Date</th>
+                        <th>Office Note</th>
+                        <th>Bank Advise</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    var table;
+    var hospi_grid_details = [];
+
+    $(document).ready(function () {
+
+        loadHospitalizationData();
+
+    });
+
+    // LOAD GRID DATA (Init Logic)
+    function loadHospitalizationData() {
+
+        $.ajax({
+            url: '/HospitalizationCF/GetHospitalCFGridData/',
+            type: 'POST',
+            success: function (response) {
+
+                if (typeof response === "string") {
+                    response = JSON.parse(response);
+                }
+
+                hospi_grid_details = response;
+
+                bindTable(response);
+            },
+            error: function () {
+                alert("Error loading data.");
+            }
+        });
+    }
+
+    // BIND DATATABLE
+    function bindTable(data) {
+
+        if ($.fn.DataTable.isDataTable('#table_id')) {
+            $('#table_id').DataTable().destroy();
+        }
+
+        table = $('#table_id').DataTable({
+            data: data,
+            lengthMenu: [[10, 25, 50, 100, 200, -1],
+            [10, 25, 50, 100, 200, "All"]],
+            columns: [
+                {
+                    data: "appln_no",
+                    render: function (data, type, row) {
+                        return "<a href='/HospitalizationCF/Item/" + row.id + "'>" + data + "</a>";
+                    }
+                },
+                { data: "employee_code" },
+                {
+                    data: "from_date",
+                    render: function (data) {
+
+                        console.log(data, "Data");
+
+                        return formatDate(data);
+                    }
+                },
+                {
+                    data: "to_date",
+                    render: function (data) {
+                        return formatDate(data);
+                    }
+                },
+                {
+                    data: "id",
+                    render: function (data) {
+                        return "<a href='/HospitalizationCF/DownloadOfficeNotes/" + data + "' class='btn btn-primary'>Download</a>";
+                    }
+                },
+                {
+                    data: "id",
+                    render: function (data) {
+                        return "<a href='/HospitalizationCF/DownloadBankAdvise/" + data + "' class='btn btn-primary'>Download</a>";
+                    }
+                }
+            ]
+        });
+    }
+
+    // DATE FORMAT FUNCTION
+    function formatDate(dateString) {
+
+        if (!dateString) return "";
+
+        // Handle /Date(1648751400000)/ format
+        var match = /Date\((\d+)\)/.exec(dateString);
+
+        if (match) {
+            var timestamp = parseInt(match[1]);
+            var date = new Date(timestamp);
+        } else {
+            var date = new Date(dateString);
+        }
+
+        if (isNaN(date)) return "";
+
+        var day = ("0" + date.getDate()).slice(-2);
+        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+
+        return day + "/" + month + "/" + year;
+    }
+
+
+</script>

@@ -1,0 +1,538 @@
+﻿@{
+    ViewBag.Title = "Hospitalization Credit Facilities";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+
+    <input type="hidden" id="record_id">
+    <input type="hidden" id="employee_id">
+
+    <div class="form-row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Hospitalization Cr./Recover for Empl</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+    </div>
+
+    <!-- ================= TOP SECTION ================= -->
+
+    <div class="form-row mt-3">
+
+        <div class="form-group col-md-3">
+            <label>EmplID</label>
+            <input type="text" id="empl_code" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Name</label>
+            <input type="text" id="employeename" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Band Group</label>
+            <input type="text" id="band_level" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Name of Patient</label>
+            <select id="patient_id" class="form-control"></select>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Nature of Illness</label>
+            <input type="text" id="nature_of_illness" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Name of Hospital</label>
+            <select id="hospital_id" class="form-control"></select>
+        </div>
+
+        <div class="form-group col-md-3" id="otherHospitalDiv" style="display:none;">
+            <label>Name of Hospital</label>
+            <input type="text" id="hospital_name" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>From Date</label>
+            <input type="date" id="from_date" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>To Date</label>
+            <input type="date" id="to_date" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Treatment Type</label>
+            <input type="text" id="treatment_type" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Bill No</label>
+            <input type="text" id="bill_no" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Bill Date</label>
+            <input type="date" id="bill_date" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Whether Hospital Awarded I.T.Rebate Certificate</label>
+            <select id="is_rebate_certificate" class="form-control">
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+        </div>
+
+    </div>
+
+    <!-- ================= SEND LETTER SECTION ================= -->
+
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>Send Letter</label>
+            <select id="send_letter_status" class="form-control">
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label>.</label>
+            <button id="btnSendLetter" class="btn btn-primary form-control">Save</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ================= BILL SECTION ================= -->
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+            <label>Gross Bill Amount in Rs.</label>
+            <input type="text" id="gross_bill_amt_rs" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Amount Paid to Hospital in Rs.</label>
+            <input type="text" id="amt_paid_to_hospital_rs" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Amount Approved / Sanctioned TMS Rs.</label>
+            <input type="text" id="amt_approved_sanc_tms_rs" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Amount Approved / Sanctioned MAF Rs.</label>
+            <input type="text" id="amt_approved_sanc_maf_rs" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Additional Sanction in Rs.</label>
+            <input type="text" id="addl_sanction_rs" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Amount to be Recover from Empl. in Rs.</label>
+            <input type="text" id="amt_tobe_recover_frm_empl" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Recovery installment/Period</label>
+            <input type="text" id="recovery_installments_period" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>EMI</label>
+            <input type="text" id="emi" class="form-control" readonly>
+        </div>
+
+    </div>
+
+    <h6 class="pt-3"><strong>Application Status - Information</strong></h6>
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+            <label>Send Date To TMO</label>
+            <input type="date" id="send_date_to_tmo" class="form-control">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Received Date from TMO</label>
+            <input type="date" id="received_date_from_tmo" class="form-control">
+        </div>
+
+    </div>
+
+    <div class="form-row">
+        <div class="col-md-4"></div>
+
+        <div class="col-md-2" id="btnSaveLaterDiv" style="display:none;">
+            <button id="btnSaveLater" class="btn btn-primary btn-block">Save for Later</button>
+        </div>
+
+        <div class="col-md-2" id="btnApprovedDiv" style="display:none;">
+            <button id="btnApproved" class="btn btn-primary btn-block">Approved</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        var model = {};
+        var id = getIdFromUrl();
+        $("#record_id").val(id);
+
+        loadInitialData(id);
+
+        // EMI 
+        $("#amt_tobe_recover_frm_empl, #recovery_installments_period").on("keyup change", function () {
+
+            var amount = parseFloat($("#amt_tobe_recover_frm_empl").val()) || 0;
+            var months = parseFloat($("#recovery_installments_period").val()) || 0;
+
+            if (amount > 0 && months > 0) {
+                var emi = (amount / months).toFixed(2);
+                $("#emi").val(emi);
+            } else {
+                $("#emi").val("");
+            }
+        });
+
+
+        // Employee Auto Fetch
+        $("#empl_code").on("keyup", function () {
+            var code = $(this).val();
+            if (code.length === 4) {
+                getEmployeeDetails(code);
+            }
+        });
+
+        // Hospital Change Show/Hide
+        $("#hospital_id").change(function () {
+            if ($(this).val() == "41") {
+                $("#otherHospitalDiv").show();
+            } else {
+                $("#otherHospitalDiv").hide();
+            }
+        });
+
+        // SEND LETTER
+        $("#btnSendLetter").click(function () {
+
+            var data = collectFormData();
+
+            if (!data.patient_id) {
+                toastr.error("Please select patient name !");
+                return;
+            }
+
+            if (!data.nature_of_illness) {
+                toastr.error("Field nature of illness can not be blank !");
+                return;
+            }
+
+            if (!data.hospital_id) {
+                toastr.error("Please select hospital name !");
+                return;
+            }
+
+            if (!data.from_date) {
+                toastr.error("Field from date can not be blank !");
+                return;
+            }
+
+            if (data.from_date && data.to_date) {
+                if (new Date(data.from_date) > new Date(data.to_date)) {
+                    toastr.error("To date can be less than from date !");
+                    return;
+                }
+            }
+
+            if (!data.send_letter_status) {
+                toastr.error("Please select letter status !");
+                return;
+            }
+
+            $.post('/HospitalizationCF/SendLetterToEmpl_N_Hospital', { model: data })
+                .done(function (res) {
+                    if (res.Status) {
+                        toastr.success("Data save successfully !");
+                        window.location.href = '/HospitalizationCF';
+                    } else {
+                        toastr.error("Something went wrong !");
+                    }
+                });
+
+        });
+
+        // SAVE
+        $("#btnSaveLater").click(function () {
+            saveRecord("true");
+        });
+
+        $("#btnApproved").click(function () {
+            saveRecord("false");
+        });
+
+    });
+
+    // FUNCTIONS
+
+    function saveRecord(isSaveLater) {
+
+        var data = collectFormData();
+
+        if (!data.gross_bill_amt_rs) {
+            toastr.error("Please enter Gross Bill Amount !");
+            return;
+        }
+
+        if (!data.amt_paid_to_hospital_rs) {
+            toastr.error("Please enter Amount Paid !");
+            return;
+        }
+
+        data.is_save_for_later = isSaveLater;
+
+        $.post('/HospitalizationCF/Save', { model: data })
+            .done(function (res) {
+                if (res.Status) {
+                    toastr.success("Data updated successfully !");
+                    window.location.href = '/HospitalizationCF';
+                } else {
+                    toastr.error("Something went wrong !");
+                }
+            });
+    }
+
+    function getEmployeeDetails(code) {
+
+        $.post('/HospitalizationCF/GetDetailsByEmpl_Code', { empl_code: code })
+            .done(function (res) {
+
+                $("#employeename").val(res.employeename);
+                $("#band_level").val(res.band_level);
+                $("#treatment_type").val(res.treatment_type);
+                $("#employee_id").val(res.employee_id);
+
+                loadPatients(res.employee_id);
+            });
+    }
+
+    function loadPatients(employee_id, selectedId) {
+
+        $.ajax({
+            url: '/Common/GetHospExPatients',
+            type: 'POST',
+            data: { employee_id: employee_id },
+            dataType: 'json',
+            success: function (res) {
+
+                if (typeof res === "string") {
+                    res = JSON.parse(res);
+                }
+
+                $("#patient_id").empty();
+                $("#patient_id").append('<option value="">-- Select Patient --</option>');
+
+                if (Array.isArray(res)) {
+                    $.each(res, function (i, item) {
+                        $("#patient_id").append(
+                            $('<option>', {
+                                value: item.id,
+                                text: item.name
+                            })
+                        );
+                    });
+                }
+
+                if (selectedId) {
+                    $("#patient_id").val(selectedId);
+                }
+            }
+        });
+    }
+
+
+
+
+    function loadInitialData(id) {
+
+        $.when(
+            $.ajax({
+                url: '/HospitalizationCF/GetItem',
+                type: 'POST',
+                data: { id: id },
+                dataType: 'json'
+            }),
+            $.ajax({
+                url: '/Common/GetCFHospitals',
+                type: 'GET',
+                dataType: 'json'
+            })
+        ).done(function (itemRes, hospRes) {
+
+            var data = itemRes[0];
+            var hospitals = hospRes[0];
+
+            console.log(data, "dataaaaa");
+
+            if (typeof hospitals === "string") {
+                hospitals = JSON.parse(hospitals);
+            }
+
+            $("#hospital_id").empty();
+            $("#hospital_id").append('<option value="">-- Select Hospital --</option>');
+
+            if (Array.isArray(hospitals)) {
+                $.each(hospitals, function (i, item) {
+                    $("#hospital_id").append(
+                        $('<option>', {
+                            value: item.id,
+                            text: item.name
+                        })
+                    );
+                });
+            }
+
+            // ================= EDIT MODE =================
+            if (data && data.id > 0) {
+                $("#btnSendLetter").prop("disabled", true);
+                // Disable EmplID
+                $("#empl_code").prop("disabled", true);
+
+                // Show Save/Approved buttons
+                $("#btnSaveLaterDiv").show();
+                $("#btnApprovedDiv").show();
+
+                // Basic Fields
+                $("#empl_code").val(data.employee_code);
+                $("#employeename").val(data.employeename);
+                $("#band_level").val(data.band_level);
+                $("#treatment_type").val(data.treatment_type);
+                $("#bill_no").val(data.bill_no);
+                $("#nature_of_illness").val(data.nature_of_illness);
+                $("#hospital_id").val(data.hospital_id);
+
+                $("#from_date").val(formatDateInput(data.from_date));
+                $("#to_date").val(formatDateInput(data.to_date));
+                $("#bill_date").val(formatDateInput(data.bill_date));
+                $("#send_letter_status").val(data.send_letter_status);
+
+                // Bill Section
+                $("#gross_bill_amt_rs").val(data.gross_bill_amt_rs);
+                $("#amt_paid_to_hospital_rs").val(data.amt_paid_to_hospital_rs);
+                $("#amt_approved_sanc_tms_rs").val(data.amt_approved_sanc_tms_rs);
+                $("#amt_approved_sanc_maf_rs").val(data.amt_approved_sanc_maf_rs);
+                $("#addl_sanction_rs").val(data.addl_sanction_rs);
+                $("#amt_tobe_recover_frm_empl").val(data.amt_tobe_recover_frm_empl);
+                $("#recovery_installments_period").val(data.recovery_installments_period);
+
+                $("#send_date_to_tmo").val(formatDateInput(data.send_date_to_tmo));
+                $("#received_date_from_tmo").val(formatDateInput(data.received_date_from_tmo));
+
+                // Show Other Hospital if 41
+                if (data.hospital_id == 41) {
+                    $("#otherHospitalDiv").show();
+                }
+
+                // Load Patients + Select Patient AFTER dropdown load
+                loadPatients(data.employee_id, data.patient_id);
+
+                // EMI Calculate in Edit Mode
+                if (data.amt_tobe_recover_frm_empl && data.recovery_installments_period) {
+                    var emi = (data.amt_tobe_recover_frm_empl / data.recovery_installments_period).toFixed(2);
+                    $("#emi").val(emi);
+                }
+            }
+
+        }).fail(function (err) {
+            console.error("Error loading data:", err);
+            alert("Something went wrong while loading data.");
+        });
+    }
+
+    function collectFormData() {
+        return {
+            id: $("#record_id").val(),
+            employee_code: $("#empl_code").val(),
+            employee_id: $("#employee_id").val(),
+            patient_id: $("#patient_id").val(),
+            nature_of_illness: $("#nature_of_illness").val(),
+            hospital_id: $("#hospital_id").val(),
+            hospital_name: $("#hospital_name").val(),
+            from_date: $("#from_date").val(),
+            to_date: $("#to_date").val(),
+            bill_no: $("#bill_no").val(),
+            bill_date: $("#bill_date").val(),
+            is_rebate_certificate: $("#is_rebate_certificate").val(),
+            send_letter_status: $("#send_letter_status").val(),
+
+            gross_bill_amt_rs: $("#gross_bill_amt_rs").val(),
+            amt_paid_to_hospital_rs: $("#amt_paid_to_hospital_rs").val(),
+            amt_approved_sanc_tms_rs: $("#amt_approved_sanc_tms_rs").val(),
+            amt_approved_sanc_maf_rs: $("#amt_approved_sanc_maf_rs").val(),
+            addl_sanction_rs: $("#addl_sanction_rs").val(),
+            amt_tobe_recover_frm_empl: $("#amt_tobe_recover_frm_empl").val(),
+            recovery_installments_period: $("#recovery_installments_period").val(),
+
+            send_date_to_tmo: $("#send_date_to_tmo").val(),
+            received_date_from_tmo: $("#received_date_from_tmo").val()
+        };
+    }
+
+
+    function getIdFromUrl() {
+        var match = window.location.pathname.match(/\d+/);
+        return match ? parseInt(match[0]) : 0;
+    }
+
+    //function formatDateInput(dateString) {
+    //    if (!dateString) return "";
+    //    var match = /Date\((\d+)\)/.exec(dateString);
+    //    if (match) {
+    //        var d = new Date(parseInt(match[1]));
+    //        return d.toISOString().split('T')[0];
+    //    }
+    //    return "";
+    //}
+
+    function formatDateInput(dateString) {
+        if (!dateString) return "";
+
+        var match = /Date\((-?\d+)\)/.exec(dateString);
+        if (!match) return "";
+
+        var d = new Date(parseInt(match[1]));
+
+        var year = d.getFullYear();
+        var month = ("0" + (d.getMonth() + 1)).slice(-2);
+        var day = ("0" + d.getDate()).slice(-2);
+
+        return year + "-" + month + "-" + day;
+    }
+
+
+</script>

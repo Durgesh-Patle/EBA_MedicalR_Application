@@ -1,0 +1,225 @@
+﻿@{
+    ViewBag.Title = "Item";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container-fluid headtop">
+
+    <input type="hidden" id="record_id" />
+
+    <div class="form-row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/MedicalBillsException/Index">Additional Sanction</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+    </div>
+
+    <!-- =================== BASIC DETAILS =================== -->
+
+    <div class="form-row mt-3">
+        <div class="form-group col-md-3">
+            <label>Appln.No:</label>
+            <input type="text" id="appln_no" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Date of Request:</label>
+            <input type="date" id="created_date" class="form-control" disabled />
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Department:</label>
+            <input type="text" id="department_name" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Band Group:</label>
+            <input type="text" id="band_level" class="form-control" disabled>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>Name of Patient:</label>
+            <input type="text" id="patient_name" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Relationship:</label>
+            <input type="text" id="family_relation_code" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Nature of Illness:</label>
+            <input type="text" id="nature_of_illness" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Treatment Type:</label>
+            <input type="text" id="treatment_type" class="form-control" disabled>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label>Total Claimed Rs.:</label>
+            <input type="text" id="total_claimed_rs" class="form-control" disabled>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label>Sanction & Paid Rs.:</label>
+            <input type="text" id="total_sanctioned_rs" class="form-control" disabled>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- =================== ADDITIONAL PAYMENT =================== -->
+
+    <div class="form-row">
+        <div class="form-group col-md-2">
+            <label>Addl.Sanction Rs.:</label>
+            <input type="number" id="add_pay_amt" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-6">
+            <label>Payment Remarks:</label>
+            <input type="text" id="add_pay_remark" class="form-control" />
+        </div>
+
+        <div class="form-group col-md-4">
+            <label>No.Of Enclosure.:</label>
+            <input type="text" id="add_pay_enclosure" class="form-control" />
+        </div>
+    </div>
+
+    <div class="text-center mt-3">
+        <button id="btnSave" class="btn btn-primary">
+            Approved-Additional Sanctioned
+        </button>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+
+        // GET ID FROM URL
+        var path = window.location.pathname;
+        var idMatch = path.match(/\d+/);
+        var id = idMatch ? parseInt(idMatch[0]) : 0;
+
+        $("#record_id").val(id);
+
+        // LOAD RECORD DATA
+        if (id > 0) {
+            $.ajax({
+                url: '/MedicalBillsException/GetItem',
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+
+                    console.log(response,"response");
+
+                    if (typeof response === "string") {
+                        response = JSON.parse(response);
+                    }
+
+                    $("#appln_no").val(response.appln_no);
+                    $("#created_date").val(formatDate(response.created_date));
+                    $("#department_name").val(response.department_name);
+                    $("#band_level").val(response.band_level);
+                    $("#patient_name").val(response.patient_name);
+                    $("#family_relation_code").val(response.family_relation_code);
+                    $("#nature_of_illness").val(response.nature_of_illness);
+                    $("#treatment_type").val(response.treatment_type);
+                    $("#total_claimed_rs").val(response.total_claimed_rs);
+                    $("#total_sanctioned_rs").val(response.total_sanctioned_rs);
+
+                    // 🔥 ADD THESE LINES
+                    $("#add_pay_amt").val(response.add_pay_amt);
+                    $("#add_pay_remark").val(response.add_pay_remark);
+                    $("#add_pay_enclosure").val(response.add_pay_enclosure);
+
+
+                    console.log(response.add_pay_enclosure, "response.add_pay_enclosure");
+                },
+                error: function () {
+                    toastr.error("Failed to load data.");
+                }
+            });
+        }
+
+        // SAVE FUNCTION
+        $("#btnSave").click(function () {
+
+            var model = {
+                id: $("#record_id").val(),
+                add_pay_amt: $("#add_pay_amt").val().trim(),
+                add_pay_remark: $("#add_pay_remark").val().trim(),
+                add_pay_enclosure: $("#add_pay_enclosure").val().trim()
+            };
+
+            // -------- VALIDATION --------
+            if (!model.add_pay_amt || model.add_pay_amt == 0) {
+                toastr.error("Field additional payment can not be blank !");
+                return;
+            }
+
+            if (!model.add_pay_remark) {
+                toastr.error("Field remark can not be blank !");
+                return;
+            }
+
+            if (!model.add_pay_enclosure || model.add_pay_enclosure == 0) {
+                toastr.error("Field enclosure can not be blank !");
+                return;
+            }
+
+            // -------- SAVE API --------
+            $.ajax({
+                url: '/MedicalBillsException/Save',
+                type: 'POST',
+                data: { model: model },
+                success: function () {
+                    toastr.success("Data save successfully!");
+                    setTimeout(function () {
+                        window.location.href = '/MedicalBillsException';
+                    }, 1000);
+                },
+                error: function () {
+                    toastr.error("Something went wrong while saving.");
+                }
+            });
+
+        });
+
+    });
+
+    // DATE FORMATTER FUNCTION
+    function formatDate(dateString) {
+
+        if (!dateString) return "";
+
+        var date = new Date(dateString);
+
+        if (isNaN(date)) return "";
+
+        var month = ('0' + (date.getMonth() + 1)).slice(-2);
+        var day = ('0' + date.getDate()).slice(-2);
+
+        return date.getFullYear() + "-" + month + "-" + day;
+    }
+
+</script>

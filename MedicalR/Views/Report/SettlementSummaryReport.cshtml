@@ -1,0 +1,177 @@
+﻿@{
+    ViewBag.Title = "Settlement Summary Report";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics ></strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Settlement Summary Report</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <br />
+            <div class="form-row">
+
+                <div class="form-group col-md-3">
+                    <label>Report Status</label>
+                    <select id="report_status" class="form-control">
+                        <option value="">Select</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Settled">Settled</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-sm-1">
+                    <label>.</label>
+                    <button type="button" id="btnSearch" class="btn btn-primary form-control">
+                        Search
+                    </button>
+                </div>
+
+                <div class="form-group col-sm-2" id="downloadDiv" style="display:none;">
+                    <label>.</label>
+                    <a id="btnDownload" class="btn btn-primary form-control">
+                        Download
+                    </a>
+                </div>
+
+            </div>
+        </article>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="overflow-auto">
+                <table class="table table-hover table-bordered" id="table_id">
+                    <thead>
+                        <tr class="bg-primary text-white text-center">
+                            <th>SrNo.</th>
+                            <th>Employee Name</th>
+                            <th>Patient Name</th>
+                            <th>Treatment Type</th>
+                            <th>Band</th>
+                            <th>Date Of Request</th>
+                            <th>Bill Date</th>
+                            <th>Claim Amount</th>
+                            <th>Sanction Amount</th>
+                            <th>Balance Amount</th>
+                            <th>Sent To Tmo</th>
+                            <th>Received From Tmo</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#btnSearch").click(function () {
+            getSettlementSummaryReport();
+        });
+
+        $("#btnDownload").click(function () {
+
+            var report_status = $("#report_status").val() || "Select";
+
+            var url = "/Report/SettelmentSummaryReport/" +
+                report_status + "/";
+
+            window.location.href = url;
+        });
+
+    });
+
+
+    function getSettlementSummaryReport() {
+
+        var report_status = $("#report_status").val() || "Select";
+
+        $("#btnSearch").text("Searching...");
+
+        $.ajax({
+            url: "/Report/GetSettlementSummaryReport",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                report_status: report_status
+            }),
+            success: function (response) {
+
+                $("#btnSearch").text("Search");
+
+                if ($.fn.DataTable.isDataTable('#table_id')) {
+                    $('#table_id').DataTable().clear().destroy();
+                }
+
+                var tbody = $("#table_id tbody");
+                tbody.empty();
+
+                if (response.length > 0) {
+                    $("#downloadDiv").show();
+                } else {
+                    $("#downloadDiv").hide();
+                }
+
+                $.each(response, function (index, item) {
+
+                    tbody.append(`
+                        <tr class="text-center">
+                            <td>${index + 1}</td>
+                            <td>${item.employeename || ''}</td>
+                            <td>${item.patient_name || ''}</td>
+                            <td>${item.treatment_type || ''}</td>
+                            <td>${item.band || ''}</td>
+                            <td>${formatDate(item.date_of_request)}</td>
+                            <td>${formatDate(item.bill_date)}</td>
+                            <td>${item.claim_amount || 0}</td>
+                            <td>${item.sanction_amount || 0}</td>
+                            <td>${item.balance_amount || 0}</td>
+                            <td>${formatDate(item.sent_to_tmo)}</td>
+                            <td>${formatDate(item.received_from_tmo)}</td>
+                        </tr>
+                    `);
+                });
+
+                $('#table_id').DataTable({
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    destroy: true
+                });
+            },
+            error: function () {
+                $("#btnSearch").text("Search");
+                alert("Something went wrong.");
+            }
+        });
+    }
+
+
+    function formatDate(dateString) {
+
+        if (!dateString) return "";
+
+        var date = new Date(dateString);
+        if (isNaN(date)) return "";
+
+        var day = ("0" + date.getDate()).slice(-2);
+        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+
+        return day + "-" + month + "-" + year;
+    }
+
+</script>

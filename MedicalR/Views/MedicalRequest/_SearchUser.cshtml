@@ -1,0 +1,158 @@
+﻿<table id="dtUserList" class="table table-sm" cellspacing="0" width="100%">
+    @*<thead>
+        <tr>
+            <th class="th-sm chk"><input type="checkbox" class="clientChkAll"></th>
+            <th class="th-sm">Client Name </th>
+            @if (ViewBag.selectedColumns != null)
+            {
+                foreach (var column in ViewBag.selectedColumns)
+                {
+                    if (column == "Email")
+                    {
+                        <th class="th-sm">Email</th>
+                    }
+                    else if (column == "Contact Number")
+                    {
+                        <th class="th-sm">Contact Number</th>
+                    }
+                    else if (column == "FAX Number")
+                    {
+                        <th class="th-sm">FAX Number</th>
+                    }
+                    else if (column == "Account Manager")
+                    {
+                        <th class="th-sm">Account Manager</th>
+                    }
+                    else if (column == "Industry Type")
+                    {
+                        <th class="th-sm">Industry Type</th>
+                    }
+                    else if (column == "Tax Type")
+                    {
+                        <th class="th-sm">Tax Type</th>
+                    }
+                    else if (column == "Tax Number")
+                    {
+                        <th class="th-sm">Tax Number</th>
+                    }
+                    else if (column == "Company Size")
+                    {
+                        <th class="th-sm">Company Size</th>
+                    }
+                    else if (column == "Website")
+                    {
+                        <th class="th-sm">Website</th>
+                    }
+                    else if (column == "Country")
+                    {
+                        <th class="th-sm">Country</th>
+                    }
+                    else if (column == "State")
+                    {
+                        <th class="th-sm">State</th>
+                    }
+                    else if (column == "City")
+                    {
+                        <th class="th-sm">City</th>
+                    }
+                    else if (column == "Zip")
+                    {
+                        <th class="th-sm">Zip</th>
+                    }
+                    else if (column == "Created Time")
+                    {
+                        <th class="th-sm">Created Time</th>
+                    }
+                }
+            }
+            <th class="th-sm text-right action">Action </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            <tr>
+                <td scope="row" class="chk"><input type="checkbox" class="clientChk"></td>
+                <td><a href="/clients/@item.clientID/detail#info">@item.clientName</a></td>
+                @if (ViewBag.selectedColumns != null)
+                {
+                    foreach (var column in ViewBag.selectedColumns)
+                    {
+                        if (column == "Email")
+                        {
+                            <td>@item.clientEmail</td>
+                        }
+                        else if (column == "Contact Number")
+                        {
+                            <td>@item.clientNumber</td>
+                        }
+                        else if (column == "FAX Number")
+                        {
+                            <td>@item.clientFax</td>
+                        }
+                        else if (column == "Account Manager")
+                        {
+                            <td>@item.clientManager</td>
+                        }
+                        else if (column == "Industry Type")
+                        {
+                            <td>@item.industryName</td>
+                        }
+                        else if (column == "Tax Type")
+                        {
+                            <td>@item.clientTaxType</td>
+                        }
+                        else if (column == "Tax Number")
+                        {
+                            <td>@item.clientTaxNumber</td>
+                        }
+                        else if (column == "Company Size")
+                        {
+                            <td>@item.clientCompanySize</td>
+                        }
+                        else if (column == "Website")
+                        {
+                            <td><a href="@item.clientWebsite" target="_blank">@item.clientWebsite</a></td>
+                        }
+                        else if (column == "Country")
+                        {
+                            <td>@item.countryName</td>
+                        }
+                        else if (column == "State")
+                        {
+                            <td>@item.stateName</td>
+                        }
+                        else if (column == "City")
+                        {
+                            <td>@item.cityName</td>
+                        }
+                        else if (column == "Zip")
+                        {
+                            <td>@item.clientZip</td>
+                        }
+                        else if (column == "Created Time")
+                        {
+                            <td>@item.clientCreatedDate</td>
+                        }
+                    }
+                }
+                <td class="action">
+                    <select class="custom-select dropright sel" id="inlineFormCustomSelect" onchange="location = this.options[this.selectedIndex].value;">
+                        <option selected>Select</option>
+                        @*<option value="/clients/@item.clientID/detail#activities">Activities</option>
+                        <option value="/clients/@item.clientID/detail#info">Info</option>
+                        <option value="/clients/@item.clientID/detail#interview">Interview</option>
+                        <option value="/clients/@item.clientID/detail#jobopening">Job Opening</option>
+                        <option value="/clients/@item.clientID/detail#candidates">Candidates</option>
+                        <option value="/clients/@item.clientID/detail#clientspoc">Clients POC</option>
+                        <option value="/clients/@item.clientID/detail#notes">Notes</option>
+                        <option value="/clients/@item.clientID/detail#attachments">Attachments</option>
+                        <option value="/clients/@item.clientID/detail#sendemail">Send Email</option>*@
+                    </select>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>

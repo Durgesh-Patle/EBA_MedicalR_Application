@@ -1,0 +1,132 @@
+﻿@{
+    ViewBag.Title = "Batch View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/UpdateBatch">
+                        Batch View (Batch_No - <span id="disp_batch_no"></span>)
+                    </a>
+                </li>
+            </ul>
+            <hr class="m-0">
+            <br />
+        </div>
+
+        <article class="col-md-12">
+
+            <table id="table_id" class="table table-hover table-bordered" width="100%">
+                <thead>
+                    <tr>
+                        <th>Appln.No</th>
+                        <th>Employee Code</th>
+                        <th>Name of Employee</th>
+                        <th>Name Of Patient</th>
+                        <th>Relationship</th>
+                        <th>Total Claimed Rs.</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    var batchNo = "";
+
+    $(document).ready(function () {
+
+        batchNo = getBatchNoFromUrl();
+
+        if (!batchNo) {
+            alert("Invalid batch number.");
+            return;
+        }
+
+        $("#disp_batch_no").text(batchNo);
+
+        loadBatchItems(batchNo);
+    });
+
+    // Get Batch No from URL
+    function getBatchNoFromUrl() {
+
+        var urlParts = window.location.href.split('?')[0].split('/');
+        var lastSegment = urlParts[urlParts.length - 1];
+
+        if (lastSegment && isNaN(lastSegment) === false) {
+            return lastSegment;
+        }
+
+        return lastSegment; // if batch no is string
+    }
+
+
+    // Load Grid Data
+    function loadBatchItems(batchNo) {
+
+        $.ajax({
+            url: '/BatchCreation/GetBatchItemsGridData/',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ batch_no: batchNo }),
+            success: function (response) {
+
+                if (!response || response.length === 0) {
+                    alert("No batch items found.");
+                    return;
+                }
+
+                initializeDataTable(response);
+            },
+            error: function () {
+                alert("Error loading batch items.");
+            }
+        });
+    }
+
+    // Initialize DataTable
+    function initializeDataTable(data) {
+
+        if ($.fn.DataTable.isDataTable('#table_id')) {
+            $('#table_id').DataTable().clear().destroy();
+        }
+
+        $('#table_id').DataTable({
+            lengthChange: true,
+            lengthMenu: [[10, 15, 20, -1], [10, 15, 20, "All"]],
+            searching: true,
+            ordering: true,
+            paging: true,
+            data: data,
+            columns: [
+                { data: 'appln_no' },
+                { data: 'employeecode' },
+                { data: 'employeename' },
+                { data: 'patient_name' },
+                { data: 'family_relation_code' },
+                {
+                    data: 'total_claimed_rs',
+                    render: function (data) {
+                        return data ? parseFloat(data).toFixed(2) : '0.00';
+                    }
+                }
+            ]
+        });
+    }
+
+</script>
+

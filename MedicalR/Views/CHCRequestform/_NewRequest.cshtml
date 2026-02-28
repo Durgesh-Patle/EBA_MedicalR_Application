@@ -1,0 +1,256 @@
+﻿@model MedicalR.Models.CHC.CHCRequest
+
+<form>
+    <div class="form-row">
+        <div class="form-group col-md-3"></div>
+        <h6 class="pt-2"><strong>Comprehensive Health Checkup</strong></h6>
+
+    </div>
+    <hr>
+    <div class="form-row">
+
+        <div class="form-group col-md-4">
+            <label for="">Select claim for:</label>
+            <select class="form-control" id="relationship" onchange="show()">
+
+                @if (Model.name_of_spouse == null)
+                {
+                    <option hidden value="Self and Spouse">Self and Spouse</option>
+                    <option value="self" selected>Self</option>
+                    <option hidden value="spouse">Spouse</option>
+                }
+                else
+                {
+                    <option value="Self and Spouse" selected>Self and Spouse</option>
+                    <option value="self">Self</option>
+                    <option value="spouse">Spouse</option>
+                }
+
+
+            </select>
+        </div>
+
+
+    </div>
+    <div id="both">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Mob/Telephone No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="mob_no" placeholder="Mob/Tele No"  value="@Model.mob_no">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Office Telephone No: </label>
+                <input type="text" class="form-control" id="office_tel_no" placeholder="Telephone No">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Birth: <span class="text-danger">*</span></label>
+                @*<input type="date" class="form-control" id="date_of_birth" placeholder="dd-mm-yyyy" value="@Model.date_of_birth">*@
+                @Html.TextBoxFor(m => @Model.date_of_birth, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly", @onchange = "calculateAge();" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Age: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="age" placeholder="Enter Age" value="@Model.empl_age">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Checkup: <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="date_of_checkup" placeholder="dd-mm-yyyy"  onchange="autospousedatefill()">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Name of CHC Center:</label>
+                @if (Model.tot_row == 0)
+                {
+                    <input type="text" class="form-control" id="txtboth_chc_centerid" placeholder="Enter CHC Centre Name" required>
+                    <input type="text" hidden class="form-control" id="chc_centerid" value="4">
+                }
+                else
+                {
+                    <select class="form-control" id="chc_centerid" onchange="BindCHC()">
+                        <option value="0">Select</option>
+                        @foreach (var item in ViewBag.HospitalName)
+                        {
+                            <option value="@item.hospital_id">@item.name</option>
+                        }
+                    </select>
+                }
+
+            </div>
+        </div>
+        <div class="form-row">
+             <p><b>Please Furnish below the information for your Spouse:</b></p>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Name of the Spouse: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="name_of_spouse" placeholder="Name" value="@Model.name_of_spouse">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Birth of Spouse: <span class="text-danger">*</span></label>
+                @*<input type="date" class="form-control" id="dob_spouse" placeholder="dd-mm-yyyy" onchange="calculateAge()" required>*@
+                @Html.TextBoxFor(m => @Model.dob_spouse, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly",id= "dob_spouse", @onchange = "calculateAge();" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Age of Spouse(In Completed year): <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="spouse_age" placeholder="" value="@Model.spouse_cur_age" readonly>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Checkup(Spouse): <span class="text-danger" >*</span></label>
+                <input type="date" class="form-control" id="spouse_dt_of_checkup" placeholder="dd-mm-yyyy" required readonly>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Name of CHC Center (Spouse):</label>
+                @if (Model.tot_row == 0)
+                {
+                    <input type="text" class="form-control" id="txtsps_chc_centid" placeholder="Enter CHC Centre Name" required>
+                    <input type="text" hidden class="form-control" id="chc_centid" value="4">
+                }
+                else
+                {
+                    <select class="form-control" id="chc_centid" disabled></select>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <div id="self">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Mob/Telephone No: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="mob_no" placeholder="Mob/Tele No" value="@Model.mob_no">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Office Telephone No: </label>
+                <input type="text" class="form-control" id="office_tel_no" placeholder="Telephone No">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Birth: <span class="text-danger">*</span></label>
+                @*<input type="date" class="form-control" id="date_of_birth" placeholder="dd-mm-yyyy" value="@Model.date_of_birth">*@
+                @Html.TextBoxFor(m => @Model.date_of_birth, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Age: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="age" placeholder="Enter Age" value="@Model.empl_age">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Checkup: <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="dateofself" placeholder="dd-mm-yyyy">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Name of CHC Center:</label>
+                @if (Model.tot_row == 0)
+                {
+                    <input type="text" class="form-control" id="txt_chc_centerid_self" placeholder="Enter CHC Centre Name">
+                    <input type="text" hidden class="form-control" id="chc_centerid_self" value="4">
+                }
+                else
+                {
+                    <select class="form-control" id="chc_centerid_self">
+                        <option value="0">Select</option>
+                        @foreach (var item in ViewBag.HospitalName)
+                        {
+                            <option value="@item.hospital_id">@item.name</option>
+                        }
+
+                    </select>
+                }
+
+            </div>
+        </div>
+    </div>
+    <div id="spouse">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="">Name of the Spouse: <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" readonly id="namespouse" placeholder="Name" value="@Model.name_of_spouse">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Birth of Spouse: <span class="text-danger">*</span></label>
+                @*<input type="date" class="form-control" id="dobspouse" placeholder="dd-mm-yyyy" onchange="calculateAge()">*@
+                @Html.TextBoxFor(m => @Model.dob_spouse, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @readonly = "readonly", id = "dobspouse", @onchange = "calculateAge();" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Age of Spouse(In Completed year): <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="spouseage" placeholder="" value="@Model.spouse_cur_age" readonly>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="">Date of Checkup(Spouse): <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="spouse_dt_ofcheckup" placeholder="dd-mm-yyyy">
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="">Name of CHC Center (Spouse):</label>
+                @if (Model.tot_row == 0)
+                {
+                    <input type="text" class="form-control" id="txt_chccentid" placeholder="Enter CHC Centre Name">
+                    <input type="text" hidden class="form-control" id="chccentid" value="4">
+                }
+                else
+                {
+                    <select class="form-control" id="chccentid">
+                        <option value="0">Select</option>
+                        @foreach (var item in ViewBag.HospitalName)
+                        {
+                            <option value="@item.hospital_id">@item.name</option>
+                        }
+
+                    </select>
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="form-group col-md-4"></div>
+        <div class="form-group col-md-2"> <a href="javascript:void(0)" class="btn btn-primary" id="SaveLater" data-val="1">Save For Later<span class="spinner"></span></a>  </div>
+        <div class="form-group col-md-2"> <a href="javascript:void(0)" class="btn btn-primary" id="Save" data-val="0">Submit<span class="spinner"></span></a> </div>
+
+    </div>
+</form>
+<script>
+
+
+    $(document).ready(function () {
+        //$("#both").show();
+        //$("#self").hide();
+        //$("#spouse").hide();
+        var relationship = $("#relationship").val().trim();
+        if (relationship == "Self and Spouse") {
+            $("#both").show();
+            $("#self").hide();
+            $("#spouse").hide();
+        }
+        if (relationship == "self") {
+            $("#self").show();
+            $("#both").hide();
+            $("#spouse").hide();
+        }
+        if (relationship == "spouse") {
+            $("#spouse").show();
+            $("#both").hide();
+            $("#self").hide();
+        }
+
+    });
+    function show() {
+        var relationship = $("#relationship").val().trim();
+        if (relationship == "Self and Spouse") {
+            $("#both").show();
+            $("#self").hide();
+            $("#spouse").hide();
+        }
+        if (relationship == "self") {
+            $("#self").show();
+            $("#both").hide();
+            $("#spouse").hide();
+        }
+        if (relationship == "spouse") {
+            $("#spouse").show();
+            $("#both").hide();
+            $("#self").hide();
+        }
+    }
+
+</script>

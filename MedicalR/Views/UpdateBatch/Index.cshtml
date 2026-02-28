@@ -1,0 +1,266 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="javascript:void(0);"><strong>Statistics ></strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Update Batch Sent / Receive Date</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+            <br />
+        </div>
+
+        <article class="col-md-12">
+            <table class="table table-hover table-bordered" id="table_id" border="1" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th class="th-sm">Batch.No</th>
+                        <th class="th-sm">Batch Date</th>
+                        <th class="th-sm">Batch Status</th>
+                        <th class="th-sm">Doctor</th>
+                        <th class="th-sm">Send Date</th>
+                        <th class="th-sm">Received Date</th>
+                        <th class="th-sm">Application Count</th>
+                        <th class="th-sm">Action</th>
+                        <th class="th-sm">Print</th>
+                    </tr>
+                </thead>
+                <tbody id="batch-tbody">
+                </tbody>
+            </table>
+        </article>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    var updatebatch_grid_details = [];
+    var doctors = [];
+    var ishide = [];
+    ishide[0] = true;
+
+    function parseDotNetDate(val) {
+        if (!val) return null;
+        if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+
+        if (typeof val === 'string') {
+            var match = /\/Date\((-?\d+)([+-]\d{4})?\)\//.exec(val);
+            if (match) {
+                return new Date(parseInt(match[1], 10));
+            }
+            var d = new Date(val);
+            return isNaN(d.getTime()) ? null : d;
+        }
+        return null;
+    }
+
+    /**
+     * Formats a Date object to  dd-MMM-yyyy  (e.g. 20-Feb-2026)
+     * exactly as shown in the screenshot.
+     */
+    function formatDisplayDate(dateObj) {
+        if (!dateObj || isNaN(dateObj.getTime())) return '';
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var dd = ('0' + dateObj.getDate()).slice(-2);
+        var mmm = months[dateObj.getMonth()];
+        var yyyy = dateObj.getFullYear();
+        return dd + '-' + mmm + '-' + yyyy;
+    }
+
+
+    function formatInputDate(dateObj) {
+        if (!dateObj || isNaN(dateObj.getTime())) return '';
+        var mm = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+        var dd = ('0' + dateObj.getDate()).slice(-2);
+        return dateObj.getFullYear() + '-' + mm + '-' + dd;
+    }
+
+
+    function buildDoctorSelect(selectedId) {
+
+        var html = '<select class="form-control doctor-select">';
+
+        var defaultSelected = (!selectedId || selectedId == 0) ? ' selected' : '';
+        html += '<option value="0"' + defaultSelected + '>-- Select Doctor --</option>';
+
+        $.each(doctors, function (i, doc) {
+
+            var sel = (doc.id == selectedId) ? ' selected' : '';
+            html += '<option value="' + doc.id + '"' + sel + '>'
+                + doc.name + '</option>';
+        });
+
+        html += '</select>';
+
+        return html;
+    }
+
+    function renderTable() {
+        var $tbody = $('#batch-tbody');
+        $tbody.empty();
+
+        $.each(updatebatch_grid_details, function (index, item) {
+
+            var sentVal = formatInputDate(item.doctor_sent_date);
+            var receivedVal = formatInputDate(item.doctor_received_date);
+
+            var rcvDisabled = ishide[index] ? 'disabled' : '';
+
+            var sentDisabled = '';
+
+            var batchNo = item.batch_no || '';
+            var batchStatus = item.batch_status || '';
+            var batchDate = formatDisplayDate(parseDotNetDate(item.batch_created_date));
+            var appCount = item.application_count || 0;
+
+            var row =
+                '<tr data-index="' + index + '">' +
+                '<td>' + batchNo + '</td>' +
+                '<td>' + batchDate + '</td>' +
+                '<td>' + batchStatus + '</td>' +
+                '<td>' + buildDoctorSelect(item.doctor_id) + '</td>' +
+                '<td>' +
+                '<input type="date" class="form-control sent-date"' +
+                ' value="' + sentVal + '" ' + sentDisabled + ' />' +
+                '</td>' +
+                '<td>' +
+                '<input type="date" class="form-control received-date"' +
+                ' value="' + receivedVal + '" ' + rcvDisabled + ' />' +
+                '</td>' +
+                '<td>' +
+                '<a href="/BatchCreation/BatchItems/' + batchNo + '">' +
+                'View Claimed Details (' + appCount + ')</a>' +
+                '</td>' +
+                '<td>' +
+                '<button type="button"' +
+                ' class="form-control btn btn-primary btn-sm btn-update">' +
+                'update</button>' +
+                '</td>' +
+                '<td>' +
+                '<a href="/UpdateBatch/download/' + batchNo + '">Download</a>' +
+                '</td>' +
+                '</tr>';
+
+            $tbody.append(row);
+        });
+
+        if ($.fn.DataTable.isDataTable('#table_id')) {
+            $('#table_id').DataTable().destroy();
+        }
+        $('#table_id').DataTable();
+    }
+
+    $(document).on('click', '.btn-update', function () {
+
+        var $row = $(this).closest('tr');
+        var index = parseInt($row.data('index'), 10);
+
+        var item = $.extend(true, {}, updatebatch_grid_details[index]);
+
+        item.doctor_id = parseInt($row.find('.doctor-select').val(), 10);
+
+        var sentRaw = $row.find('.sent-date').val();
+        var receivedRaw = $row.find('.received-date').val();
+
+        item.doctor_sent_date = sentRaw || null;
+        item.doctor_received_date = receivedRaw || null;
+
+        if (sentRaw && receivedRaw && sentRaw > receivedRaw) {
+            toastr["error"]("Sent date cannot be greater than received date!");
+            return;
+        }
+
+        $.ajax({
+            url: '/UpdateBatch/Update_BatchDetails/',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(item),
+            success: function (res) {
+                toastr["success"](res);
+                location.reload();
+            },
+            error: function () {
+                toastr["error"]("Update failed!");
+            }
+        });
+    });
+
+    $(document).on('click', '#table_id tbody tr', function () {
+        if ($(this).is(":checked")) {
+            alert("Checkbox Is Checked");
+        }
+        if ($.fn.DataTable.isDataTable('#table_id')) {
+            var data = $('#table_id').DataTable().row(this).data();
+            // data available if needed
+        }
+    });
+
+    function initPage() {
+
+        $.when(
+            $.ajax({
+                url: '/UpdateBatch/Get_UpdateBatchNo_Grid_data/',
+                type: 'POST',
+                dataType: 'json'
+            }),
+            $.ajax({
+                url: '/Common/GetDoctors/',
+                type: 'GET',
+                dataType: 'json'
+            })
+        ).done(function (gridRes, doctorRes) {
+
+            // Always take index 0
+            updatebatch_grid_details = gridRes[0] || [];
+            doctors = doctorRes[0] || [];
+
+            console.log(updatebatch_grid_details);
+            console.log(doctors);
+
+            if (!updatebatch_grid_details.length) {
+                toastr["warning"]("No batch data found.");
+            }
+
+            for (var k = 0; k < updatebatch_grid_details.length; k++) {
+
+                var row = updatebatch_grid_details[k];
+
+                // Proper null check
+                var sentParsed = parseDotNetDate(row.doctor_sent_date);
+                var receivedParsed = parseDotNetDate(row.doctor_received_date);
+
+                row.doctor_sent_date = sentParsed;
+                row.doctor_received_date = receivedParsed;
+
+                // Fix ishide logic
+                if (row.batch_status === 'Assigned' && sentParsed) {
+                    ishide[k] = false;
+                } else {
+                    ishide[k] = true;
+                }
+            }
+
+            renderTable();
+
+        }).fail(function (xhr) {
+
+            console.error(xhr.responseText);
+            toastr["error"]("Data load failed. Check console.");
+        });
+    }
+    $(document).ready(function () {
+        initPage();
+    });
+
+</script>

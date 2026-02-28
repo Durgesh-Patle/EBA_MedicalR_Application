@@ -1,0 +1,83 @@
+﻿@model IEnumerable<MedicalR.Models.UserManagement.UserDetailModel>
+@{
+    ViewBag.Title = "Users";
+}
+
+<article class="col-md-12">
+    <div class="p-2">
+        <div class=""> <a href="/settings/users/add" class="btn btn-secondary float-right ml-1">+</a> &nbsp;<a href="UserManagement.html" class="btn btn-secondary float-right">Import</a> </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Action</th>
+                <th scope="col">Name</th>
+                <th scope="col">Mobile No</th>
+                <th scope="col">Role Type</th>
+                <th scope="col">Email ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <th scope="row">
+                        <a href="/settings/users/@item.UserID/edit"><i class="fa fa-edit"></i></a>
+                        <label class="switch">
+                            <input type="checkbox" @(item.IsActive == true ? "checked" : "") class="userStatus" data-userID="@item.UserID">
+                            <span class="slider round"></span>
+                        </label>
+                    </th>
+                    <td><a href="/settings/users/@item.UserID/edit">@item.UserName </a></td>
+                    <td>@item.MobileNo</td>
+                    <td>@item.RoleName</td>
+                    <td>@item.EmailID</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.Count() == 0)
+    {
+        <div class="no-data-found">No Data Found</div>
+    }
+</article>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("body").on("change", ".userStatus", function (e) {
+            var UserID = $(this).data("userid");
+            var UserStatus = $(this).is(":checked");
+            var data = {
+                "UserID": UserID,
+                "IsActive": UserStatus
+            };
+            $.ajax({
+                url: "/Settings/UpdateUserStatus",
+                type: "post",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result["Status"] == true) {
+                        toastr["success"](result["Message"]);
+                    }
+                    else {
+                        toastr["error"](result["Message"]);
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.reload();
+                        return;
+                    }
+                    toastr["error"]("Something went wrong. Please try after some time.");
+                }
+            });
+        })
+
+
+    })
+</script>

@@ -1,0 +1,189 @@
+﻿@{
+    ViewBag.Title = "EmployeeWise Payment Report";
+}
+
+<div class="container-fluid headtop">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-dark"><strong>Statistics ></strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Employee Wise Payment Report</a>
+                </li>
+            </ul>
+            <hr class="m-0">
+        </div>
+
+        <article class="col-md-12">
+            <br />
+            <div class="form-row">
+
+                <div class="form-group col-md-3">
+                    <label>From Date</label>
+                    <input type="date" id="from_date" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>To Date</label>
+                    <input type="date" id="to_date" class="form-control" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label>Employee Code</label>
+                    <input type="text" id="employeecode" class="form-control" />
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="form-group col-sm-1">
+                    <label>.</label>
+                    <button type="button" id="btnSearch" class="btn btn-primary form-control">
+                        Search
+                    </button>
+                </div>
+
+                <div class="form-group col-sm-2" id="downloadDiv" style="display:none;">
+                    <label>.</label>
+                    <a id="btnDownload" class="btn btn-primary form-control">
+                        Download
+                    </a>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="overflow-auto">
+                <table class="table table-hover table-bordered" id="table_id">
+                    <thead>
+                        <tr class="bg-primary text-white text-center">
+                            <th>SrNo.</th>
+                            <th>Employee Name</th>
+                            <th>Sanction Amount</th>
+                            <th>Payment Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+
+    var temp_from_date = "";
+    var temp_to_date = "";
+
+    $(document).ready(function () {
+
+        // Set default dates (same as Angular new Date())
+        var today = new Date().toISOString().split('T')[0];
+        $("#from_date").val(today);
+        $("#to_date").val(today);
+
+        convertDate();
+
+        $("#from_date, #to_date").change(function () {
+            convertDate();
+        });
+
+        $("#btnSearch").click(function () {
+            getEmployeeWisePaymentReport();
+        });
+
+        $("#btnDownload").click(function () {
+
+            var employeecode = $("#employeecode").val() || "Select";
+
+            var url = "/Report/EmployeeWisePaymentReport/" +
+                temp_from_date + "/" +
+                temp_to_date + "/1_" +
+                employeecode + "/";
+
+            window.location.href = url;
+        });
+
+    });
+
+
+    // Equivalent of Angular convertdate()
+    function convertDate() {
+
+        var from_date = $("#from_date").val();
+        var to_date = $("#to_date").val();
+
+        if (from_date)
+            temp_from_date = from_date;
+
+        if (to_date)
+            temp_to_date = to_date;
+    }
+
+
+    function getEmployeeWisePaymentReport() {
+
+        var employeecode = $("#employeecode").val() || "Select";
+        var from_date = $("#from_date").val();
+        var to_date = $("#to_date").val();
+
+        $("#btnSearch").text("Searching...");
+
+        $.ajax({
+            url: "/Report/GetEmployeeWisePaymentReport",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                employeecode: employeecode,
+                from_date: from_date,
+                to_date: to_date
+            }),
+            success: function (response) {
+
+                $("#btnSearch").text("Search");
+
+                if ($.fn.DataTable.isDataTable('#table_id')) {
+                    $('#table_id').DataTable().clear().destroy();
+                }
+
+                var tbody = $("#table_id tbody");
+                tbody.empty();
+
+                if (response.length > 0) {
+                    $("#downloadDiv").show();
+                } else {
+                    $("#downloadDiv").hide();
+                }
+
+                $.each(response, function (index, item) {
+                    //class="text-center"
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.employeename || ''}</td>
+                            <td>${item.sanction_amount || 0}</td>
+                            <td>${item.payment_amount || 0}</td>
+                        </tr>
+                    `);
+                });
+
+                $('#table_id').DataTable({
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    destroy: true
+                });
+
+            },
+            error: function () {
+                $("#btnSearch").text("Search");
+                alert("Something went wrong.");
+            }
+        });
+    }
+
+</script>
